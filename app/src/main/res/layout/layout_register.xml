@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/loginCard"
+    app:cardCornerRadius="@dimen/loginCardRadius"
+    android:elevation="5dp"
+    android:layout_gravity="center"
+    android:layout_marginTop="@dimen/loginViewsMargin"
+    android:layout_marginBottom="@dimen/loginViewsMargin"
+    android:background="@color/black">
+
+    <LinearLayout
+        style="@style/linearParent"
+        android:layout_gravity="center"
+        android:padding="@dimen/loginViewsMargin"
+        android:background="@color/black"
+        >
+
+        <TextView
+            style="@style/headerTextPrimary"
+            android:text="@string/register"
+            android:layout_marginTop="@dimen/loginViewsMargin"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/parent"
+            android:layout_marginTop="@dimen/signup_text_margin_top">
+            <EditText
+                android:id="@+id/editTextRegPhone"
+                style="@style/modifiedEditText"
+                android:inputType="phone"
+                android:maxLines="1"
+                android:hint="@string/phone_number"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/parent"
+            android:layout_marginTop="@dimen/signup_text_margin_top">
+            <EditText
+                android:id="@+id/editTextRegEmail"
+                style="@style/modifiedEditText"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:hint="@string/login_email_hint"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/parent"
+            android:layout_marginTop="@dimen/signup_text_margin_top">
+            <EditText
+                android:id="@+id/editTextRegName"
+                style="@style/modifiedEditText"
+                android:inputType="text"
+                android:maxLines="1"
+                android:hint="Display Name"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/parent"
+            android:layout_marginTop="@dimen/signup_text_margin_top">
+            <EditText
+                android:id="@+id/editTextRegPassword"
+                style="@style/modifiedEditText"
+                android:hint="@string/login_password_hint"
+                android:maxLines="1"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/parent"
+            android:layout_marginTop="@dimen/signup_text_margin_top">
+            <EditText
+                android:id="@+id/editTextRegConfPassword"
+                style="@style/modifiedEditText"
+                android:hint="@string/confirm_password"
+                android:maxLines="1"
+                android:inputType="textPassword"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <TextView
+            android:id="@+id/registerGoToLoginText"
+            style="@style/parent"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:textColor="@color/logo_orange2"
+            android:text="@string/signup_login_hint"
+            android:layout_marginTop="@dimen/loginViewsMargin"/>
+
+        <Button
+            android:id="@+id/cirRegisterButton"
+            style="@style/loginButton"
+            android:layout_gravity="center"
+            android:text="@string/register2"
+            android:layout_marginTop="@dimen/loginViewsMargin"
+            android:layout_width="match_parent"
+            android:background="@drawable/button_with_ripple"
+            />
+        <Button
+            android:id="@+id/cirGoogleButton"
+            style="@style/loginButton"
+            android:layout_gravity="center"
+            android:text="@string/use_google"
+            android:layout_marginTop="@dimen/loginViewsMargin"
+            android:layout_width="match_parent"
+            android:drawableLeft="@drawable/google_logo_24"
+            android:drawablePadding="8dp"
+            android:background="@drawable/button_with_ripple"
+            />
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Timescape</string>
+    <string name="navigation_drawer_open">Buka laci navigasi</string>
+    <string name="navigation_drawer_close">Tutup laci navigasi</string>
+    <string name="nav_header_desc">Header navigasi</string>
+    <string name="action_settings">Pengaturan</string>
+
+    <string name="menu_dashboard">Dasbor</string>
+    <string name="menu_inbox">Notifikasi</string>
+    <string name="menu_account">Profil dan Pengaturan</string>
+    <string name="menu_chats">Obrolan Proyek</string>
+    <string name="menu_signout">Keluar</string>
+
+
+    <string name="register">Daftar</string>
+    <string name="login_email_hint">Email</string>
+    <string name="login_password_hint">Kata Sandi</string>
+    <string name="signup_login_hint">Sudah punya akun? Masuk</string>
+    <string name="login_signup_hint">Belum punya akun? Daftar</string>
+    <string name="forgot_password">Lupa Kata Sandi?</string>
+    <string name="login">Masuk</string>
+    <string name="register2">Daftar</string>
+    <string name="phone_number">Nomor Telepon</string>
+    <string name="gender">Jenis Kelamin</string>
+    <string name="male">Pria</string>
+    <string name="female">Wanita</string>
+    <string name="unspecified">Tidak Dijelaskan</string>
+    <string name="date_of_birth">Tanggal Lahir</string>
+    <string name="confirm_password">Konfirmasi Kata Sandi</string>
+    <string name="change">Ubah</string>
+    <string name="use_google">Gunakan Akun Google</string>
+    <string name="recent_projects">Diakses Baru-baru Ini</string>
+    <string name="all_projects">Semua Proyek</string>
+
+    <string name="time_less_than_minute">kurang dari semenit yang lalu</string>
+    <string name="time_minutes_ago">%d menit yang lalu</string>
+    <string name="time_hours_ago">%d jam yang lalu</string>
+    <string name="time_days_ago">%d hari yang lalu</string>
+    <string name="time_weeks_ago">%d minggu yang lalu</string>
+    <string name="time_months_ago">%d bulan yang lalu</string>
+    <string name="time_years_ago">%d tahun yang lalu</string>
+    <string name="last_edit">terakhir diubah</string>
+    <string name="private_str">Private Project?</string>
+    <string name="private_on">Private</string>
+    <string name="private_off">Public</string>
+    <string name="deadline">Deadline</string>
+    <string name="description">Description</string>
+    <string name="title">Title</string>
+    <string name="add_project">New Project</string>
+    <string name="create">Create</string>
+    <string name="all_the_users_in_the_list_will_be_added_to_the_project_upon_creation">All the users in the list will be added to the project upon creation</string>
+    <string name="add">Add</string>
+    <string name="invite_members">Invite Members</string>
+    <string name="project_tasks">Project Tasks</string>
+    <string name="project_completion_progress">Project Completion Progress</string>
+    <string name="back_button">Back</string>
+    <string name="add_task">New Task</string>
+    <string name="title_required">Title is required</string>
+    <string name="description_required">Description is required</string>
+    <string name="task_added_successfully">New task created</string>
+    <string name="error_adding_task">Error while adding task</string>
+    <string name="attach_file">Attach File</string>
+    <string name="send_project_invite">Send Project Invite</string>
+    <string name="type_message">Write a message</string>
+    <string name="send_message">Send Message</string>
+    <string name="options">Options</string>
+    <string name="hide">Hide</string>
+    <string name="unknown_user">Unknown User</string>
+    <string name="attach_image">Attach Image</string>
+    <string name="reply">Reply</string>
+    <string name="sent_a_file">sent a file attachment.</string>
+    <string name="sent_an_image">sent an image attachment.</string>
+    <string name="select_text">Select Text</string>
+    <string name="copy_message">Copy Message</string>
+    <string name="share">Share</string>
+    <string name="unsend_message">Unsend Message</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="edit_project">Edit Project</string>
+    <string name="edit_task">Edit Task</string>
+    <string name="delete">Delete</string>
+    <string name="project_chat">Project Chat</string>
+    <string name="show_members">Show Members</string>
+    <string name="edit_project_details">Edit Project Details</string>
+    <string name="private_str2">Private</string>
+    <string name="public_str">Public</string>
+
+</resources>

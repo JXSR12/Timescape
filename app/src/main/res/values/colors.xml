@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="orange_def0">#FF9647</color>
+    <color name="orange_def1">#FB8F1B</color>
+    <color name="orange_def2">#FD8B34</color>
+    <color name="orange_acc0">#FF851A</color>
+    <color name="teal_700">#FF9800</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="logo_orange1">#F39506</color>
+    <color name="logo_orange2">#FF914D</color>
+
+    <color name="green_online">#2FD800</color>
+    <color name="gray_offline">#8C8C8C</color>
+    <color name="mention_highlight">#36FFE081</color>
+
+    <color name="colorRed">#FF3939</color>
+
+    <color name="colorPrimary">#FF9D0B</color>
+    <color name="colorPrimaryDark">#FF8400</color>
+    <color name="colorAccent">#FF914D</color>
+    <color name="whiteTextColor">@color/white</color>
+    <color name="primaryTextColor">@color/black</color>
+    <color name="loginBkColor">#f0f0f0</color>
+    <color name="whiteCardColor">#fff</color>
+
+    <color name="chat_background_color">#FFF6EB</color>
+    <color name="chat_bottombar_color">#FFFFFF</color>
+</resources>

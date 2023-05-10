@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Timescape"
+        tools:targetApi="31">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Timescape.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="timescapxtnsn.page.link"
+                    android:pathPrefix="/project_invite"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/Theme.Timescape.NoActionBar"/>
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/Theme.Timescape.NoActionBar"/>
+        <activity
+            android:name=".ProjectDetailActivity"
+            android:theme="@style/FullScreenTheme" />
+        <activity
+            android:name=".FullScreenImageActivity"
+            android:theme="@style/FullScreenTheme" />
+        <activity
+            android:name=".ProjectChatActivity"
+            android:theme="@style/FullScreenTheme"
+            android:windowSoftInputMode="adjustResize"/>
+        <activity
+            android:name=".ProjectMembersActivity"
+            android:theme="@style/FullScreenTheme2" />
+        <receiver
+            android:name=".NotificationReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="your.package.name.ACTION_REPLY" />
+                <action android:name="your.package.name.ACTION_MUTE" />
+            </intent-filter>
+        </receiver>
+        <service
+            android:name=".services.NotificationListenerService"
+            android:enabled="true"
+            android:exported="false" />
+    </application>
+
+</manifest>

@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:paddingTop="2dp"
+    android:paddingLeft="8dp"
+    android:paddingBottom="2dp"
+    android:paddingRight="8dp"
+    android:id="@+id/chat_item_root">
+
+    <TextView
+        android:id="@+id/date_separator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Mon, May 1"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:textColor="#FF6F00"
+        android:background="@drawable/date_separator_bubble"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/avatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_margin="8dp"
+            android:src="@drawable/avatar_placeholder_chat"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/display_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="User 1"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/other_user_text_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/chat_bubble_other"
+                android:padding="8dp"
+                android:text="Other user's message"
+                android:textColor="@android:color/white"
+                android:textColorLink="#FFC67F"
+                android:textIsSelectable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:autoLink="all"
+                android:linksClickable="true"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/self_text_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:background="@drawable/chat_bubble_self"
+                android:padding="8dp"
+                android:text="Self message"
+                android:textColorLink="#CF3B00"
+                android:textColor="@android:color/white"
+                android:textIsSelectable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:autoLink="all"
+                android:linksClickable="true"
+                android:visibility="gone" />
+
+            <FrameLayout
+                android:id="@+id/other_user_image_message_frame"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="left"
+                android:clipChildren="true"
+                android:visibility="gone" >
+
+                <edu.bluejack22_2.timescape.ui.RoundedImageView
+                    android:id="@+id/other_user_image_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/timescape_logo_1" />
+
+            </FrameLayout>
+
+
+            <FrameLayout
+                android:id="@+id/self_image_message_frame"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="right"
+                android:clipChildren="true"
+                android:visibility="gone" >
+
+                <edu.bluejack22_2.timescape.ui.RoundedImageView
+                    android:id="@+id/self_image_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/timescape_logo_1" />
+
+            </FrameLayout>
+
+
+            <TextView
+                android:id="@+id/unsent_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:background="@drawable/chat_bubble_self"
+                android:backgroundTint="#3EFF6D00"
+                android:padding="8dp"
+                android:text="message deleted"
+                android:textStyle="italic"
+                android:textColorLink="#CF3B00"
+                android:textColor="#787878"
+                android:textIsSelectable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:autoLink="all"
+                android:linksClickable="true"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/other_user_unsent_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:background="@drawable/chat_bubble_other"
+                android:backgroundTint="#3EFF6D00"
+                android:padding="8dp"
+                android:text="message deleted"
+                android:textStyle="italic"
+                android:textColorLink="#CF3B00"
+                android:textColor="#787878"
+                android:textIsSelectable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:autoLink="all"
+                android:linksClickable="true"
+                android:visibility="gone" />
+
+
+            <LinearLayout
+                android:id="@+id/self_file_attachment_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/chat_bubble_self"
+                android:orientation="vertical"
+                android:layout_gravity="right"
+                android:padding="8dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/self_file_attachment_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="File Name"
+                    android:textColor="@android:color/white" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="56dp"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/round_insert_drive_file_24"/>
+
+                    <TextView
+                        android:id="@+id/self_file_attachment_extension"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="PDF"
+                        android:textColor="@android:color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+
+                <Button
+                    android:id="@+id/self_file_attachment_download_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#FF6F00"
+                    android:text="Download" />
+
+                <ProgressBar
+                    android:id="@+id/self_file_attachment_progress_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="false"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/other_user_file_attachment_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/chat_bubble_other"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/other_user_file_attachment_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="File Name"
+                    android:textColor="@android:color/white" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/round_insert_drive_file_24"/>
+
+                    <TextView
+                        android:id="@+id/other_user_file_attachment_extension"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="PDF"
+                        android:textColor="@android:color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+
+                <Button
+                    android:id="@+id/other_user_file_attachment_download_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#F88D0B"
+                    android:text="Download" />
+                <ProgressBar
+                    android:id="@+id/other_user_file_attachment_progress_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="false"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/self_project_invite_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:background="@drawable/chat_bubble_self"
+                android:padding="8dp"
+                android:text="Project Invite"
+                android:textColor="@android:color/white"
+                android:textIsSelectable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:autoLink="all"
+                android:linksClickable="true"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/other_user_project_invite_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:background="@drawable/chat_bubble_other"
+                android:padding="8dp"
+                android:text="Project Invite"
+                android:textColor="@android:color/white"
+                android:textIsSelectable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:autoLink="all"
+                android:linksClickable="true"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/other_user_reply_message_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/chat_bubble_other"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:visibility="gone"
+                android:layout_gravity="left">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/other_user_replied_avatar"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/avatar_placeholder_chat" />
+
+                    <TextView
+                        android:id="@+id/other_user_replied_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="User 1"
+                        android:textSize="12sp"
+                        android:textColor="@android:color/white"
+                        android:paddingStart="4dp" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/other_user_replied_message_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:text="Replied message content"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="#32FFFFFF" /> />
+
+                <TextView
+                    android:id="@+id/other_user_reply_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Other user's reply"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/self_reply_message_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/chat_bubble_self"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:layout_gravity="right"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/self_replied_avatar"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/avatar_placeholder_chat" />
+
+                    <TextView
+                        android:id="@+id/self_replied_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="User 1"
+                        android:textSize="12sp"
+                        android:textColor="@android:color/white"
+                        android:paddingStart="4dp" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/self_replied_message_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:text="This is a replied message content, this message might be long but it will be clipped accordingly. This is a replied message content, this message might be long but it will be clipped accordingly."
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="#32FFFFFF" />
+
+                <TextView
+                    android:id="@+id/self_reply_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="This is the replier's reply to the message, this message might be long and will not be clipped."
+                    android:textColor="@android:color/white" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/read_and_timestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="right">
+                <TextView
+                    android:id="@+id/read_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:text="Read 1 • "
+                    android:textSize="11sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/timestamp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:text="12:00 PM"
+                    android:textSize="10sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

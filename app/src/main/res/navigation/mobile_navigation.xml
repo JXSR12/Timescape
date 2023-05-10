@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_dashboard">
+
+    <fragment
+        android:id="@+id/nav_dashboard"
+        android:name="edu.bluejack22_2.timescape.ui.dashboard.DashboardFragment"
+        android:label="@string/menu_dashboard"
+        tools:layout="@layout/fragment_dashboard" />
+
+    <fragment
+        android:id="@+id/nav_notifs"
+        android:name="edu.bluejack22_2.timescape.ui.notifications.NotificationsFragment"
+        android:label="@string/menu_inbox"
+        tools:layout="@layout/fragment_notifs" />
+
+    <fragment
+        android:id="@+id/nav_chats"
+        android:name="edu.bluejack22_2.timescape.ui.chats.ChatsFragment"
+        android:label="@string/menu_chats"
+        tools:layout="@layout/fragment_chats" />
+</navigation>
