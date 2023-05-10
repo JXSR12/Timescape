@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -27,6 +28,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.RemoteInput;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -41,10 +44,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
+import edu.bluejack22_2.timescape.FirestoreHelper;
 import edu.bluejack22_2.timescape.NotificationReceiver;
 import edu.bluejack22_2.timescape.ProjectChatActivity;
 import edu.bluejack22_2.timescape.ProjectDetailActivity;
 import edu.bluejack22_2.timescape.R;
+import edu.bluejack22_2.timescape.model.InboxMessage;
 
 public class NotificationListenerService extends Service {
     public static final String CHANNEL_ID = "NotificationListenerServiceChannel";
@@ -92,9 +97,9 @@ public class NotificationListenerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         createNotificationChannels();
-        String input = "Listening for notifications";
+        String input = "Service active";
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Notification Listener")
+                .setContentTitle("Timescape Foreground Service")
                 .setContentText(input)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -123,8 +128,6 @@ public class NotificationListenerService extends Service {
                         }
                     }
                 });
-
-        Toast.makeText(this, "Notifications service started", Toast.LENGTH_SHORT).show();
 
         return START_NOT_STICKY;
     }
@@ -243,9 +246,10 @@ public class NotificationListenerService extends Service {
             String projectId = (String) notificationData.get("projectId");
             String projectName = (String) notificationData.get("projectName");
             String action = (String) notificationData.get("action"); //CAN BE "ADD" or "REMOVE". (Will add more later)
-            String objectUserId = (String) notificationData.get("objectUserName");
-            String objectUserName = (String) notificationData.get("objectUserId");
+            String objectUserId = (String) notificationData.get("objectUserId");
+            String objectUserName = (String) notificationData.get("objectUserName");
 
+            //
             String header = "Project Operations Notice: " + projectName;
             String actionVerb = "ACTION_VERB";
             if(action.equals("ADD")){
@@ -253,17 +257,18 @@ public class NotificationListenerService extends Service {
             }else if(action.equals("REMOVE")){
                 actionVerb = "removed";
             }
-            String content = actorName + " has " + actionVerb + " " + objectUserName + (action.equals("ADD") ? " to " : " from ") + "the project.";
 
-            Intent detailActivityIntent = new Intent(this, ProjectDetailActivity.class);
+            String content = actorName + " has " + actionVerb + " " + "you" + (action.equals("ADD") ? " to " : " from ") + "the project.";
+
+            Intent detailActivityIntent = new Intent(NotificationListenerService.this, ProjectDetailActivity.class);
             detailActivityIntent.putExtra("PROJECT_ID", projectId);
 
             int notificationId = new Random().nextInt(1000000);
             // Wrap the Intent in a PendingIntent
-            PendingIntent detailActivityPendingIntent = PendingIntent.getActivity(this, 0, detailActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            PendingIntent detailActivityPendingIntent = PendingIntent.getActivity(NotificationListenerService.this, 0, detailActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
             // Create a notification with the specified data
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channel.getId())
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(NotificationListenerService.this, channel.getId())
                     .setSmallIcon(R.drawable.round_people_24) // Replace with your app's notification icon
                     .setContentTitle(header)
                     .setContentText(content)
@@ -273,6 +278,10 @@ public class NotificationListenerService extends Service {
                     .setContentIntent(detailActivityPendingIntent);
 
             notificationManager.notify(notificationId, builder.build());
+
+            InboxMessage message = new InboxMessage(objectUserId, "You have been " + actionVerb + (action.equals("ADD") ? " to " : " from ") + projectName, content + (action.equals("ADD") ? " The project should now be visible to you in your dashboard. You can now collaborate and contribute to this project, be sure to also check the project chat in case of any new messages! " : " The project should no longer be visible in your dashboard, and your access to contribute to the project has been revoked. If you think that this is a mistake, please contact the owner of the project."), Timestamp.now(), false);
+            FirestoreHelper.sendInboxMessage(message);
+            Log.d("SendInbox", "Sending to " + objectUserId);
         }
     }
 

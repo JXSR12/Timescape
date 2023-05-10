@@ -13,9 +13,9 @@
 
     <fragment
         android:id="@+id/nav_notifs"
-        android:name="edu.bluejack22_2.timescape.ui.notifications.NotificationsFragment"
+        android:name="edu.bluejack22_2.timescape.ui.inbox.InboxFragment"
         android:label="@string/menu_inbox"
-        tools:layout="@layout/fragment_notifs" />
+        tools:layout="@layout/fragment_inbox" />
 
     <fragment
         android:id="@+id/nav_chats"

@@ -464,6 +464,7 @@ public class MainActivity extends BaseActivity {
         notificationData.put("action", action);
         notificationData.put("objectUserId", objectUserId);
         notificationData.put("objectUserName", objectUserName);
+        notificationData.put("notificationType", "PROJECT_OPERATION_NOTICE");
 
         notificationRef.update("notifs", FieldValue.arrayUnion(notificationData))
                 .addOnSuccessListener(aVoid -> Log.d("Notification", "Notification sent successfully"))
