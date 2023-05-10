@@ -7,7 +7,7 @@ Project Management and Messenger Application
 > Create and manage projects easily
 * Easily store, manage, and track your project progress
 > Collaborate in real time
-* See what your project members are doing and view their status in real time
+* See what your project members are doing, view their online status, and interact with them in real time
 > Built in robust communication system
 * Comes with a robust messenger providing a hassle-free yet feature-rich chatting with your project mates
 > Invite new members quick and easy
