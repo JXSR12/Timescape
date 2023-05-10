@@ -19,8 +19,6 @@ public class DashboardTabsAdapter extends FragmentStateAdapter {
                 return new ProjectsFragment();
             case 1:
                 return new AllTasksFragment();
-            case 2:
-                return new TasksForTodayFragment();
             default:
                 return new ProjectsFragment();
         }
@@ -28,6 +26,6 @@ public class DashboardTabsAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 3; // Number of tabs
+        return 2; // Number of tabs
     }
 }

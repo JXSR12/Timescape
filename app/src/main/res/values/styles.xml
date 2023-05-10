@@ -32,7 +32,8 @@
     <style name="modifiedEditText" parent="parent">
         <item name="android:background">"@drawable/login_shape_bk"</item>
         <item name="android:textSize">@dimen/newsMoreTextSize</item>
-        <item name="android:backgroundTint">#3A3A3A</item>
+        <item name="android:backgroundTint">#373737</item>
+        <item name="android:textColor">#CFCFCF</item>
     </style>
 
     <style name="viewParent">
