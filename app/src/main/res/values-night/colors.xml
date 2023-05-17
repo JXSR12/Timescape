@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="login_background">#292929</color>
     <color name="chat_background_color">#2B2B2B</color>
     <color name="chat_bottombar_color">#B6B6B6</color>
 </resources>
