@@ -35,7 +35,7 @@
                 android:id="@+id/radioBtnPhone"
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
-                android:text="Phone"
+                android:text="@string/phone"
                 android:textColor="@color/logo_orange2"
                 android:layout_marginLeft="15dp"
                 />
@@ -43,7 +43,7 @@
                 android:id="@+id/radioBtnEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
-                android:text="Email Address"
+                android:text="@string/email_address"
                 android:textColor="@color/logo_orange2"
                 android:layout_marginLeft="20dp"
                 />

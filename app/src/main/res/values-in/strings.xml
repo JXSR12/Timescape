@@ -202,5 +202,8 @@
     <string name="the_project_deadline_is_in">Batas waktu proyek akan berakhir dalam </string>
     <string name="have_you_finished_what_you_should_do">. Apakah Anda sudah menyelesaikan yang harus Anda lakukan?</string>
     <string name="project_operations_notice">Pemberitahuan Operasi Proyek: </string>
+    <string name="display_name">Nama Pengguna</string>
+    <string name="phone">Nomor Telepon</string>
+    <string name="email_address">Alamat Email</string>
 
 </resources>

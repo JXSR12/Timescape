@@ -202,4 +202,7 @@
     <string name="the_project_deadline_is_in">"The project deadline is in "</string>
     <string name="have_you_finished_what_you_should_do">. Have you finished what you should do?</string>
     <string name="project_operations_notice">"Project Operations Notice: "</string>
+    <string name="display_name">Display Name</string>
+    <string name="phone">Phone Number</string>
+    <string name="email_address">Email Address</string>
 </resources>
