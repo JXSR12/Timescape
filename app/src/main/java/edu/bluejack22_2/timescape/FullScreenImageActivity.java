@@ -215,10 +215,10 @@ public class FullScreenImageActivity extends AppCompatActivity {
                 fos.close();
             }
 
-            Toast.makeText(this, "Image saved to gallery", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.image_saved_to_gallery, Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Error saving image to gallery", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_saving_image_to_gallery, Toast.LENGTH_SHORT).show();
         }
     }
 

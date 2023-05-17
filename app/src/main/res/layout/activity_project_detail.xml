@@ -251,7 +251,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="More"
+        android:text="@string/more"
         android:drawableEnd="@drawable/round_dashboard_20"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"

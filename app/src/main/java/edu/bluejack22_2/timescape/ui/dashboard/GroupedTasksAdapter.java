@@ -191,22 +191,22 @@ public class GroupedTasksAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Snackbar.make(itemView, "Task updated", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(itemView, R.string.task_updated, Snackbar.LENGTH_SHORT).show();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Snackbar.make(itemView, "Error while updating task", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(itemView, R.string.error_while_updating_task, Snackbar.LENGTH_SHORT).show();
                         }
                     });
         }
 
         private void deleteTask(Task task, View itemView, ViewGroup parentView) {
             AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
-            builder.setTitle("Delete this task?")
-                    .setMessage("This action cannot be undone.")
-                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            builder.setTitle(R.string.delete_this_task)
+                    .setMessage(R.string.this_action_cannot_be_undone)
+                    .setPositiveButton(R.string.delete_b, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             FirebaseFirestore db = FirebaseFirestore.getInstance();
                             db.collection("tasks").document(task.getUid())
@@ -214,13 +214,13 @@ public class GroupedTasksAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Snackbar.make(itemView, "Task deleted", Snackbar.LENGTH_SHORT).show();
+                                            Snackbar.make(itemView, R.string.task_deleted, Snackbar.LENGTH_SHORT).show();
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                            Snackbar.make(itemView, "Error while deleting task", Snackbar.LENGTH_SHORT).show();
+                                            Snackbar.make(itemView, R.string.error_while_deleting_task, Snackbar.LENGTH_SHORT).show();
                                         }
                                     });
                         }

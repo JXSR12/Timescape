@@ -14,6 +14,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import edu.bluejack22_2.timescape.R;
 import edu.bluejack22_2.timescape.databinding.FragmentDashboardBinding;
 
 public class DashboardFragment extends Fragment {
@@ -44,13 +45,13 @@ public class DashboardFragment extends Fragment {
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
                 case 0:
-                    tab.setText("Projects");
+                    tab.setText(R.string.projects);
                     break;
                 case 1:
-                    tab.setText("All Tasks");
+                    tab.setText(R.string.all_tasks);
                     break;
                 case 2:
-                    tab.setText("Tasks for Today");
+                    tab.setText(R.string.tasks_for_today);
                     break;
             }
         }).attach();

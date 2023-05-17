@@ -204,7 +204,7 @@ public class MainActivity extends BaseActivity {
                 new TimePickerDialog(MainActivity.this, (timeView, hourOfDay, minute) -> {
                     calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     calendar.set(Calendar.MINUTE, minute);
-                    SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy 'at' HH:mm", Locale.getDefault());
+                    SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.mmm_dd_yyyy_at_hh_mm), Locale.getDefault());
                     deadlineDateEditText.setText(sdf.format(calendar.getTime()));
                 }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
             }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
@@ -227,7 +227,7 @@ public class MainActivity extends BaseActivity {
             boolean isPrivate = visibilitySwitch.isChecked();
 
             if (title.isEmpty() || description.isEmpty() || deadlineDateStr.isEmpty()) {
-                Snackbar.make(dialogView, "All fields must be filled", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(dialogView, R.string.all_fields_must_be_filled, Snackbar.LENGTH_SHORT).show();
                 return;
             }
 
@@ -275,7 +275,7 @@ public class MainActivity extends BaseActivity {
                                                 .addOnSuccessListener(docSnap -> {
                                                     String objectUserName = docSnap.getString("displayName");
                                                     // Send the notification
-                                                    sendProjectOperationNotification(actorUserId, actorName, documentReference.getId(), "new project " + projectName, "ADD", member.getUid(), objectUserName);
+                                                    sendProjectOperationNotification(actorUserId, actorName, documentReference.getId(), getString(R.string.new_project) + projectName, "ADD", member.getUid(), objectUserName);
                                                 })
                                                 .addOnFailureListener(e -> Log.w("ProjectCreation", "Error getting added user's display name", e));
                                     }
@@ -283,11 +283,11 @@ public class MainActivity extends BaseActivity {
                             });
 
                             dialog.dismiss();
-                            Snackbar.make(dialogView, "Project created successfully!", Snackbar.LENGTH_LONG).show();
+                            Snackbar.make(dialogView, R.string.project_created_successfully, Snackbar.LENGTH_LONG).show();
                         })
                         .addOnFailureListener(e -> {
                             // Show error message
-                            Snackbar.make(dialogView, "Error creating project: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
+                            Snackbar.make(dialogView, getString(R.string.error_creating_project) + e.getMessage(), Snackbar.LENGTH_LONG).show();
                         });
             });
 
@@ -302,7 +302,7 @@ public class MainActivity extends BaseActivity {
         // Create the dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setView(dialogView)
-                .setTitle("Search User");
+                .setTitle(R.string.search_user);
 
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -424,7 +424,7 @@ public class MainActivity extends BaseActivity {
                         DocumentReference ownerRef = project.getOwner();
 
                         if (ownerRef.getId().equals(userId) || (members != null && members.containsKey(userId))) {
-                            Toast.makeText(this, "You are already in the project", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, R.string.you_are_already_in_the_project, Toast.LENGTH_SHORT).show();
                             Intent detailIntent = new Intent(MainActivity.this, ProjectDetailActivity.class);
                             detailIntent.putExtra("PROJECT_ID", projectId);
                             startActivity(detailIntent);
@@ -435,18 +435,18 @@ public class MainActivity extends BaseActivity {
 
                             projectRef.update("members." + userRef.getId(), newMember)
                                     .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(this, "You have been added to the project", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(this, R.string.you_have_been_added_to_the_project, Toast.LENGTH_SHORT).show();
                                         Intent detailIntent = new Intent(MainActivity.this, ProjectDetailActivity.class);
                                         detailIntent.putExtra("PROJECT_ID", projectId);
                                         startActivity(detailIntent);
                                     })
                                     .addOnFailureListener(e -> {
-                                        Toast.makeText(this, "Failed to join project", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(this, R.string.failed_to_join_project, Toast.LENGTH_SHORT).show();
                                     });
                         }
                     }
                 }).addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to fetch project information", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.failed_to_fetch_project_information, Toast.LENGTH_SHORT).show();
                 });
             }
         }

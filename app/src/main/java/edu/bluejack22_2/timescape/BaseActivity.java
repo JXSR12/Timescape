@@ -77,7 +77,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 startNotificationListenerService();
             } else {
                 // Show a message to the user explaining why the permission is needed
-                Toast.makeText(this, "Permission not granted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.permission_not_granted, Toast.LENGTH_SHORT).show();
             }
         }
     }

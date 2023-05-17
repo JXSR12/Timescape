@@ -106,7 +106,7 @@ public class ProjectMembersActivity extends AppCompatActivity {
         mViewModel.getmOwnerId().observe(this, ownerId -> {
             mAdapter = new ProjectMembersAdapter(new ArrayList<>(), this, ownerId, userId -> mViewModel.removeMember(mProjectId, userId));
             mIsCurrentUserOwner = ownerId.equals(FirebaseAuth.getInstance().getCurrentUser().getUid());
-            mLeaveOrDeleteProjectButton.setText(mIsCurrentUserOwner ? "DELETE PROJECT" : "LEAVE PROJECT");
+            mLeaveOrDeleteProjectButton.setText(mIsCurrentUserOwner ? getString(R.string.delete_project) : getString(R.string.leave_project));
             mRecyclerView.setAdapter(mAdapter);
         });
 
@@ -149,7 +149,7 @@ public class ProjectMembersActivity extends AppCompatActivity {
             if(!project.isPrivate() || project.getOwner().getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
                 showSearchUserDialog();
             }else{
-                Snackbar.make(mInviteMemberButton, "Only project owner can invite members in private projects", BaseTransientBottomBar.LENGTH_SHORT).show();
+                Snackbar.make(mInviteMemberButton, R.string.only_project_owner_can_invite_members_in_private_projects, BaseTransientBottomBar.LENGTH_SHORT).show();
             }
         });
 
@@ -157,7 +157,7 @@ public class ProjectMembersActivity extends AppCompatActivity {
             if(!project.isPrivate() || project.getOwner().getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
                 showInviteLinkDialog();
             }else{
-                Snackbar.make(mInviteMemberButton, "Only project owner can generate invite links in private projects", BaseTransientBottomBar.LENGTH_SHORT).show();
+                Snackbar.make(mInviteMemberButton, R.string.only_project_owner_can_generate_invite_links_in_private_projects, BaseTransientBottomBar.LENGTH_SHORT).show();
             }
         });
 
@@ -174,9 +174,9 @@ public class ProjectMembersActivity extends AppCompatActivity {
             };
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Are you sure you want to " + (mIsCurrentUserOwner ? "delete" : "leave") + " this project?")
-                    .setPositiveButton("Yes", dialogClickListener)
-                    .setNegativeButton("No", dialogClickListener)
+            builder.setMessage(getString(R.string.are_you_sure_you_want_to) + (mIsCurrentUserOwner ? getString(R.string.delete_2) : getString(R.string.leave)) + getString(R.string.this_project))
+                    .setPositiveButton(R.string.yes, dialogClickListener)
+                    .setNegativeButton(R.string.no, dialogClickListener)
                     .show();
         });
     }
@@ -208,7 +208,7 @@ public class ProjectMembersActivity extends AppCompatActivity {
                         Uri dynamicLinkUri = task.getResult().getShortLink();
 
                         progressBar.setVisibility(View.GONE);
-                        inviteLinkTitle.setText("Project Invite Link");
+                        inviteLinkTitle.setText(R.string.project_invite_link);
                         inviteLinkEditText.setVisibility(View.VISIBLE);
                         inviteLinkEditText.setText(dynamicLinkUri.toString());
                         shareInviteLinkButton.setVisibility(View.VISIBLE);
@@ -219,18 +219,18 @@ public class ProjectMembersActivity extends AppCompatActivity {
                             shareIntent.setAction(Intent.ACTION_SEND);
                             shareIntent.putExtra(Intent.EXTRA_TEXT, dynamicLinkUri.toString());
                             shareIntent.setType("text/plain");
-                            startActivity(Intent.createChooser(shareIntent, "Share Project Invite Link"));
+                            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_project_invite_link)));
                         });
 
                         copyInviteLinkButton.setOnClickListener(v -> {
                             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                            ClipData clip = ClipData.newPlainText("Project Invite Link", dynamicLinkUri.toString());
+                            ClipData clip = ClipData.newPlainText(getString(R.string.project_invite_link_2), dynamicLinkUri.toString());
                             clipboard.setPrimaryClip(clip);
-                            Toast.makeText(this, "Link copied to clipboard", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, R.string.link_copied_to_clipboard, Toast.LENGTH_SHORT).show();
                         });
                     } else {
                         // Error generating Dynamic Link
-                        Toast.makeText(this, "Error generating invite link, please try again", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.error_generating_invite_link_please_try_again, Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
                 });
@@ -310,7 +310,7 @@ public class ProjectMembersActivity extends AppCompatActivity {
         // Create the dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(ProjectMembersActivity.this);
         builder.setView(dialogView)
-                .setTitle("Search User");
+                .setTitle(R.string.search_user);
 
         AlertDialog dialog = builder.create();
         dialog.show();

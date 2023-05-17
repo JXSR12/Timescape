@@ -69,7 +69,7 @@ public class NotificationListenerService extends Service {
 
         NotificationChannel serviceChannel = new NotificationChannel(
                 CHANNEL_ID,
-                "Foreground Service",
+                getString(R.string.foreground_service),
                 NotificationManager.IMPORTANCE_HIGH
         );
 
@@ -77,7 +77,7 @@ public class NotificationListenerService extends Service {
 
         NotificationChannel chatChannel = new NotificationChannel(
                 CHAT_CHANNEL_ID,
-                "Project Chats",
+                getString(R.string.project_chats),
                 NotificationManager.IMPORTANCE_HIGH
         );
         manager.createNotificationChannel(chatChannel);
@@ -97,9 +97,9 @@ public class NotificationListenerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         createNotificationChannels();
-        String input = "Service active";
+        String input = getString(R.string.service_active);
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Timescape Foreground Service")
+                .setContentTitle(getString(R.string.timescape_foreground_service))
                 .setContentText(input)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -158,7 +158,7 @@ public class NotificationListenerService extends Service {
             // Create a notification with the specified data
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channel.getId())
                     .setSmallIcon(R.drawable.round_question_answer_24) // Replace with your app's notification icon
-                    .setContentTitle(senderName + " in " + projectName)
+                    .setContentTitle(senderName + getString(R.string.in) + projectName)
                     .setContentText(content)
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setDefaults(Notification.DEFAULT_ALL)
@@ -166,7 +166,7 @@ public class NotificationListenerService extends Service {
                     .setContentIntent(chatActivityPendingIntent); // Set the PendingIntent as the content intent for the notification
 
             // Add Reply action with RemoteInput
-            String replyLabel = "Reply";
+            String replyLabel = getString(R.string.reply_3);
             RemoteInput remoteInput = new RemoteInput.Builder(EXTRA_REPLY)
                     .setLabel(replyLabel)
                     .build();
@@ -194,7 +194,7 @@ public class NotificationListenerService extends Service {
             muteIntent.putExtra(EXTRA_NOTIFICATION_ID, notificationId);
             PendingIntent mutePendingIntent = PendingIntent.getBroadcast(this, 0, muteIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             NotificationCompat.Action muteAction = new NotificationCompat.Action.Builder(
-                    R.drawable.round_notifications_off_24, "Mute", mutePendingIntent).build();
+                    R.drawable.round_notifications_off_24, getString(R.string.mute), mutePendingIntent).build();
             builder.addAction(muteAction);
 
             notificationManager.notify(notificationId, builder.build());
@@ -208,17 +208,17 @@ public class NotificationListenerService extends Service {
 
             String unitStr = "TIME_UNIT";
             if(unit.equals("MINUTE")){
-                unitStr = "minute(s)";
+                unitStr = getString(R.string.minute_s);
             }else if(unit.equals("HOUR")){
-                unitStr = "hour(s)";
+                unitStr = getString(R.string.hour_s);
             }else if(unit.equals("DAY")){
-                unitStr = "day(s)";
+                unitStr = getString(R.string.day_s);
             }else if(unit.equals("WEEK")){
-                unitStr = "week(s)";
+                unitStr = getString(R.string.week_s);
             }
 
-            String header = "Project Deadline Warning: " + projectName;
-            String content = "The project deadline is in " + String.format(Locale.ENGLISH,"%.0f",Math.floor(time)) + " " + unitStr + ". Have you finished what you should do?";
+            String header = getString(R.string.project_deadline_warning) + projectName;
+            String content = getString(R.string.the_project_deadline_is_in) + String.format(Locale.ENGLISH,"%.0f",Math.floor(time)) + " " + unitStr + getString(R.string.have_you_finished_what_you_should_do);
 
             Intent detailActivityIntent = new Intent(this, ProjectDetailActivity.class);
             detailActivityIntent.putExtra("PROJECT_ID", projectId);
@@ -250,7 +250,7 @@ public class NotificationListenerService extends Service {
             String objectUserName = (String) notificationData.get("objectUserName");
 
             //
-            String header = "Project Operations Notice: " + projectName;
+            String header = getString(R.string.project_operations_notice) + projectName;
             String actionVerb = "ACTION_VERB";
             if(action.equals("ADD")){
                 actionVerb = "added";

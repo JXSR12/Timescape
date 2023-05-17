@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="Invite Member"
+        android:text="@string/invite_member"
         app:layout_constraintBottom_toTopOf="@+id/project_invite_link_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="Project Invite Link"
+        android:text="@string/project_invite_link_3"
         app:layout_constraintBottom_toTopOf="@+id/leave_or_delete_project_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

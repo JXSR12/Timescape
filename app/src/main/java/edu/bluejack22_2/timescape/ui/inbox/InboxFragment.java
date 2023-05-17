@@ -46,13 +46,13 @@ public class InboxFragment extends Fragment {
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
                 case 0:
-                    tab.setText("All");
+                    tab.setText(R.string.all);
                     break;
                 case 1:
-                    tab.setText("Unread");
+                    tab.setText(R.string.unread);
                     break;
                 case 2:
-                    tab.setText("Read");
+                    tab.setText(R.string.read_2);
                     break;
             }
         }).attach();

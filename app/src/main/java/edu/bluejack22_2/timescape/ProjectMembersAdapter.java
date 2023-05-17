@@ -81,9 +81,9 @@ public class ProjectMembersAdapter extends RecyclerView.Adapter<ProjectMembersAd
                 };
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setMessage("Are you sure you want to remove this member?")
-                        .setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener)
+                builder.setMessage(R.string.are_you_sure_you_want_to_remove_this_member)
+                        .setPositiveButton(R.string.yes, dialogClickListener)
+                        .setNegativeButton(R.string.no, dialogClickListener)
                         .show();
             }
         });

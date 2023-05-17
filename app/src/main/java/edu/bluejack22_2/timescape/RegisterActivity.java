@@ -170,23 +170,23 @@ public class RegisterActivity extends AppCompatActivity {
                         updateUserProfile(user, displayName, phoneNumber, true);
                     } else {
                         // If sign in fails, display a message to the user.
-                        Toast.makeText(RegisterActivity.this, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegisterActivity.this, R.string.authentication_failed + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
     public boolean validateInputs(){
         if(regName.getText().toString().length() < 4){
-            Toast.makeText(this, "Name must be > 3 chars", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.name_must_be_3_chars, Toast.LENGTH_SHORT).show();
         }
         if(regPassword.getText().toString().length() < 6){
-            Toast.makeText(this, "Password must be > 5 chars", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.password_must_be_5_chars, Toast.LENGTH_SHORT).show();
         }
         if(regPhone.getText().toString().length() < 7){
-            Toast.makeText(this, "Phone must be > 6 chars", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.phone_must_be_6_chars, Toast.LENGTH_SHORT).show();
         }
         if(!isValidEmail(regEmail.getText().toString())){
-            Toast.makeText(this, "Email must be valid!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.email_must_be_valid, Toast.LENGTH_SHORT).show();
         }
 
         return !(regPhone.getText().toString().length() < 7)

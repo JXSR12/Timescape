@@ -62,7 +62,7 @@ public class EPSearchResultAdapter extends RecyclerView.Adapter<EPSearchResultAd
         holder.bind(user);
         holder.addButton.setOnClickListener(v -> {
             if (projectMemberIds.contains(user.getUid())) {
-                Toast.makeText(context, "User is already a member of the project", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.user_is_already_a_member_of_the_project, Toast.LENGTH_SHORT).show();
             } else {
                 addMemberToProject(user.getUid());
             }
@@ -74,7 +74,7 @@ public class EPSearchResultAdapter extends RecyclerView.Adapter<EPSearchResultAd
         DocumentReference projectRef = db.collection("projects").document(projectId);
         DocumentReference userRef = db.collection("users").document(userId);
 
-        ProjectMember newMember = new ProjectMember(userId, "", Timestamp.now(), "member");
+        ProjectMember newMember = new ProjectMember(userId, "", Timestamp.now(), "collaborator");
 
         projectRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
@@ -87,7 +87,7 @@ public class EPSearchResultAdapter extends RecyclerView.Adapter<EPSearchResultAd
                     // Add the new member to the project's 'members' field
                     projectRef.update("members." + userId, newMember)
                             .addOnSuccessListener(aVoid -> {
-                                Toast.makeText(context, "User added to the project", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, R.string.user_added_to_the_project, Toast.LENGTH_SHORT).show();
 
                                 // Get the current user's ID and display name
                                 FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -105,7 +105,7 @@ public class EPSearchResultAdapter extends RecyclerView.Adapter<EPSearchResultAd
                                         .addOnFailureListener(e -> Log.w("ProjectMembersViewModel", "Error getting added user's display name", e));
                             })
                             .addOnFailureListener(e -> {
-                                Toast.makeText(context, "Failed to add user to the project", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, R.string.failed_to_add_user_to_the_project, Toast.LENGTH_SHORT).show();
                             });
                 }
             }});

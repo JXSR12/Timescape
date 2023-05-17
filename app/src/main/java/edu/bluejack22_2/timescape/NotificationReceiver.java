@@ -81,13 +81,13 @@ public class NotificationReceiver extends BroadcastReceiver {
 
                         db.collection("settings").document(userId).set(data, SetOptions.merge())
                                 .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(context, "Chat has been muted", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, R.string.chat_has_been_muted, Toast.LENGTH_SHORT).show();
                                     int notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0);
                                     NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                                     notificationManager.cancel(notificationId);
                                 })
                                 .addOnFailureListener(e -> {
-                                    Toast.makeText(context, "Failed to mute chat", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, R.string.failed_to_mute_chat, Toast.LENGTH_SHORT).show();
                                     int notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0);
                                     NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                                     notificationManager.cancel(notificationId);
@@ -97,7 +97,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                     })
                     .addOnFailureListener(e -> {
                         Log.e(TAG, "Failed to get user settings", e);
-                        Toast.makeText(context, "Failed to mute chat", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, R.string.failed_to_mute_chat, Toast.LENGTH_SHORT).show();
                         int notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0);
                         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                         notificationManager.cancel(notificationId);

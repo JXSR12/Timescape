@@ -278,7 +278,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 User clickedUser = memberAdapter.getItem(position);
-                String mentionName = "<<" + clickedUser.getDisplayName() + ">>";
+                String mentionName = "<@" + clickedUser.getDisplayName() +">";
                 int selectionStart = messageInput.getSelectionStart();
                 int mentionStart = messageInput.getText().toString().lastIndexOf('@', selectionStart);
                 messageInput.getText().replace(mentionStart, selectionStart, ""); // Remove the '@' character that was typed before
@@ -716,9 +716,9 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
 
     private void updateOnlineStatusDisplay(int onlineCount, int typingCount) {
         if (typingCount > 0) {
-            actionBarOnlineText.setText(typingCount > 1 ? typingCount + " members are typing..." : "1 member is typing...");
+            actionBarOnlineText.setText(typingCount > 1 ? typingCount + getString(R.string.members_are_typing) : getString(R.string._1_member_is_typing));
         } else if (onlineCount > 0) {
-            actionBarOnlineText.setText(onlineCount > 1 ? onlineCount + " other members online" : "1 other member online");
+            actionBarOnlineText.setText(onlineCount > 1 ? onlineCount + getString(R.string.other_members_online) : getString(R.string._1_other_member_online));
             actionBarOnlineBullet.setColorFilter(ContextCompat.getColor(this, R.color.green_online));
         } else {
             actionBarOnlineText.setText("No other member online");
@@ -798,11 +798,11 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.w(TAG, "Error sending message", e);
-                            Toast.makeText(ProjectChatActivity.this, "Failed to send message", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ProjectChatActivity.this, R.string.failed_to_send_message, Toast.LENGTH_SHORT).show();
                         }
                     });
         } else {
-            Toast.makeText(this, "Please enter a message", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.please_enter_a_message, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -837,11 +837,11 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.w(TAG, "Error sending message", e);
-                            Toast.makeText(ProjectChatActivity.this, "Failed to send message", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ProjectChatActivity.this, R.string.failed_to_send_message, Toast.LENGTH_SHORT).show();
                         }
                     });
         } else {
-            Toast.makeText(this, "Please enter a message", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.please_enter_a_message, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -924,10 +924,10 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                                 if (displayNameString != null && !displayNameString.isEmpty()) {
                                     enterReplyMode(message.getId(), displayNameString);
                                 } else {
-                                    Toast.makeText(ProjectChatActivity.this, "Replied message unavailable", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(ProjectChatActivity.this, R.string.replied_message_unavailable, Toast.LENGTH_SHORT).show();
                                 }
                             } else {
-                                Toast.makeText(ProjectChatActivity.this, "Replied message unavailable", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ProjectChatActivity.this, R.string.replied_message_unavailable, Toast.LENGTH_SHORT).show();
                             }
                         });
                         return true;
@@ -937,7 +937,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                         ClipData clip = ClipData.newPlainText("Message", message.getContent());
                         clipboard.setPrimaryClip(clip);
 
-                        Snackbar.make(menuItemView, "Message copied to clipboard", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(menuItemView, R.string.message_copied_to_clipboard, Snackbar.LENGTH_SHORT).show();
                         return true;
                     } else if (item.getItemId() == R.id.share) {
                         // Share the message content to other apps
@@ -953,7 +953,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                         long millisecondsIn24Hours = 24 * 60 * 60 * 1000;
 
                         if (timeDifference > millisecondsIn24Hours) {
-                            Snackbar.make(menuItemView, "Cannot unsend messages sent more than 24 hours ago", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(menuItemView, R.string.cannot_unsend_messages_sent_more_than_24_hours_ago, Snackbar.LENGTH_SHORT).show();
                             return true;
                         }
 
@@ -1020,7 +1020,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         // Show the reply mode layout
         replyModeLayout.setVisibility(View.VISIBLE);
         // Set the reply mode text ("Replying to 'Replied Sender Name' 's message")
-        replyModeText.setText("Replying to " + senderName + "'s message");
+        replyModeText.setText(getString(R.string.replying_to) + senderName + getString(R.string.s_message));
     }
 
     public void exitReplyMode(View view) {
@@ -1072,11 +1072,11 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.w(TAG, "Error sending reply message", e);
-                            Toast.makeText(ProjectChatActivity.this, "Failed to send reply message", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ProjectChatActivity.this, R.string.failed_to_send_reply_message, Toast.LENGTH_SHORT).show();
                         }
                     });
         } else {
-            Toast.makeText(this, "Please enter a message", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.please_enter_a_message, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -1118,11 +1118,11 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 Log.w(TAG, "Error sending message", e);
-                                Toast.makeText(ProjectChatActivity.this, "Failed to send message", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ProjectChatActivity.this, R.string.failed_to_send_message, Toast.LENGTH_SHORT).show();
                             }
                         });
             } else {
-                Toast.makeText(this, "Please enter a message", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.please_enter_a_message, Toast.LENGTH_SHORT).show();
             }
         }
         mentionedUserIds.clear();
@@ -1147,7 +1147,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(ProjectChatActivity.this, "Failed to upload: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProjectChatActivity.this, getString(R.string.failed_to_upload) + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

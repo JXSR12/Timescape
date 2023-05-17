@@ -113,17 +113,17 @@ public class InboxAdapter extends RecyclerView.Adapter<InboxAdapter.ViewHolder> 
         String friendlyTimeAgo;
 
         if (diffInSeconds < 60) {
-            friendlyTimeAgo = diffInSeconds + "s ago";
+            friendlyTimeAgo = diffInSeconds + context.getString(R.string.s_ago);
         } else if (diffInSeconds < 3600) {
-            friendlyTimeAgo = (diffInSeconds / 60) + "m ago";
+            friendlyTimeAgo = (diffInSeconds / 60) + context.getString(R.string.m_ago);
         } else if (diffInSeconds < 86400) {
-            friendlyTimeAgo = (diffInSeconds / 3600) + "h ago";
+            friendlyTimeAgo = (diffInSeconds / 3600) + context.getString(R.string.h_ago);
         } else if (diffInSeconds < 2592000) {
-            friendlyTimeAgo = (diffInSeconds / 86400) + "d ago";
+            friendlyTimeAgo = (diffInSeconds / 86400) + context.getString(R.string.d_ago);
         } else if (diffInSeconds < 31536000) {
-            friendlyTimeAgo = (diffInSeconds / 2592000) + "mo ago";
+            friendlyTimeAgo = (diffInSeconds / 2592000) + context.getString(R.string.mo_ago);
         } else {
-            friendlyTimeAgo = (diffInSeconds / 31536000) + "y ago";
+            friendlyTimeAgo = (diffInSeconds / 31536000) + context.getString(R.string.y_ago);
         }
 
         return friendlyTimeAgo;

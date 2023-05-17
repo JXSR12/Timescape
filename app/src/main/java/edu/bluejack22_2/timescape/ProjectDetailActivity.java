@@ -255,7 +255,7 @@ public class ProjectDetailActivity extends BaseActivity {
 
                 titleEditText.setText(project.getTitle());
                 descriptionEditText.setText(project.getDescription());
-                SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy 'at' HH:mm", Locale.getDefault());
+                SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.mmm_dd_yyyy_at_hh_mm), Locale.getDefault());
                 deadlineDateEditText.setText(sdf.format(project.getDeadline_date().toDate()));
                 visibilitySwitch.setChecked(project.isPrivate());
 
@@ -282,7 +282,7 @@ public class ProjectDetailActivity extends BaseActivity {
                     boolean newVisibility = visibilitySwitch.isChecked();
 
                     if (newTitle.isEmpty() || newDescription.isEmpty() || newDeadlineText.isEmpty()) {
-                        Snackbar.make(dialogView, "All fields must be filled", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(dialogView, R.string.all_fields_must_be_filled, Snackbar.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -297,11 +297,11 @@ public class ProjectDetailActivity extends BaseActivity {
                             .addOnSuccessListener(aVoid -> {
                                 // Close the dialog and show success message
                                 dialog.dismiss();
-                                Snackbar.make(dialogView, "Project edited successfully!", Snackbar.LENGTH_LONG).show();
+                                Snackbar.make(dialogView, R.string.project_edited_successfully, Snackbar.LENGTH_LONG).show();
                             })
                             .addOnFailureListener(e -> {
                                 // Show error message
-                                Snackbar.make(dialogView, "Error editing project: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
+                                Snackbar.make(dialogView, getString(R.string.error_editing_project) + e.getMessage(), Snackbar.LENGTH_LONG).show();
                             });
                 });
 
@@ -444,9 +444,9 @@ public class ProjectDetailActivity extends BaseActivity {
         // Update members count
         if (project.getMembers() != null) {
             int membersCount = project.getMembers().size();
-            projectMembersCount.setText(String.format(Locale.getDefault(), "%d members", membersCount + 1));
+            projectMembersCount.setText(String.format(Locale.getDefault(), getString(R.string.d_members), membersCount + 1));
         } else {
-            projectMembersCount.setText("0 members");
+            projectMembersCount.setText(R.string._0_members);
         }
     }
 
@@ -454,7 +454,7 @@ public class ProjectDetailActivity extends BaseActivity {
         long remainingMillis = project.getDeadline_date().toDate().getTime() - new Date().getTime();
 
         if (remainingMillis <= 0) {
-            projectTimeRemaining.setText("Deadline passed");
+            projectTimeRemaining.setText(R.string.deadline_passed);
             return;
         }
 
@@ -462,13 +462,13 @@ public class ProjectDetailActivity extends BaseActivity {
         long hours = TimeUnit.MILLISECONDS.toHours(remainingMillis) % 24;
         long minutes = TimeUnit.MILLISECONDS.toMinutes(remainingMillis) % 60;
 
-        if (days > 0) {projectTimeRemaining.setText(String.format(Locale.getDefault(), "%d days left", days));
+        if (days > 0) {projectTimeRemaining.setText(String.format(Locale.getDefault(), getString(R.string.d_days_left), days));
         } else if (hours > 0) {
-            projectTimeRemaining.setText(String.format(Locale.getDefault(), "%d hours left", hours));
+            projectTimeRemaining.setText(String.format(Locale.getDefault(), getString(R.string.d_hours_left), hours));
         } else if (minutes > 0) {
-            projectTimeRemaining.setText(String.format(Locale.getDefault(), "%d minutes left", minutes));
+            projectTimeRemaining.setText(String.format(Locale.getDefault(), getString(R.string.d_minutes_left), minutes));
         } else {
-            projectTimeRemaining.setText("Under a minute left");
+            projectTimeRemaining.setText(R.string.under_a_minute_left);
         }
     }
 
@@ -485,14 +485,14 @@ public class ProjectDetailActivity extends BaseActivity {
 
         if(totalTasks == 0){
             completionPercentage = 100;
-            projectCompletionPercentage.setText("No tasks yet");
+            projectCompletionPercentage.setText(R.string.no_tasks_yet);
         }else{
             completionPercentage = (int) (((float) completedTasks / totalTasks) * 100);
             projectCompletionPercentage.setText(String.format(Locale.getDefault(), "%d%%", completionPercentage));
         }
         projectCompletionProgressBar.setProgress(completionPercentage);
 
-        projectTaskCompletedCaption.setText(String.format(Locale.getDefault(), "%d out of %d completed", completedTasks, totalTasks));
+        projectTaskCompletedCaption.setText(String.format(Locale.getDefault(), getString(R.string.d_out_of_d_completed), completedTasks, totalTasks));
     }
 
     @Override

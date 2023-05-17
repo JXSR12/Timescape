@@ -18,6 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.bluejack22_2.timescape.R;
 import edu.bluejack22_2.timescape.databinding.FragmentAllTasksBinding;
 import edu.bluejack22_2.timescape.model.Project;
 import edu.bluejack22_2.timescape.model.ProjectWithTasks;
@@ -44,7 +45,7 @@ public class AllTasksFragment extends Fragment {
             List<Object> items = new ArrayList<>();
             for (ProjectWithTasks project : projects) {
                 if (!project.getTasks().isEmpty()) {
-                    items.add("Project: " + project.getProject().getTitle());
+                    items.add(getString(R.string.project) + project.getProject().getTitle());
                     items.addAll(project.getTasks());
                 }
             }

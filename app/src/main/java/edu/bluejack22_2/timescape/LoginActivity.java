@@ -122,13 +122,13 @@ public class LoginActivity extends AppCompatActivity {
             usingPhone[0] = selectPhone.isChecked();
             if(usingPhone[0]){
                 if(inputPhoneStr[0].isEmpty() || inputPassStr[0].isEmpty()){
-                    Toast.makeText(getApplicationContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.please_fill_all_fields, Toast.LENGTH_SHORT).show();
                 }else{
                     loginWithPhone(inputPhoneStr[0], inputPassStr[0]);
                 }
             }else{
                 if(inputEmailStr[0].isEmpty() || inputPassStr[0].isEmpty()){
-                    Toast.makeText(getApplicationContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.please_fill_all_fields, Toast.LENGTH_SHORT).show();
                 }else {
                     loginWithEmail(inputEmailStr[0], inputPassStr[0]);
                 }
@@ -155,7 +155,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         loadMain();
                     } else {
-                        Toast.makeText(LoginActivity.this, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, getString(R.string.authentication_failed) + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -171,10 +171,10 @@ public class LoginActivity extends AppCompatActivity {
                             String email = document.getString("email");
                             loginWithEmail(email, password);
                         } else {
-                            Toast.makeText(LoginActivity.this, "Phone number not found", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, R.string.phone_number_not_found, Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(LoginActivity.this, "Error retrieving user: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, getString(R.string.error_retrieving_user) + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -202,7 +202,7 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
-                Toast.makeText(LoginActivity.this, "Google sign-in failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, getString(R.string.google_sign_in_failed) + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -232,12 +232,12 @@ public class LoginActivity extends AppCompatActivity {
                                             updateUserProfile(user, displayName, phoneNumber, true);
                                         }
                                     } else {
-                                        Toast.makeText(LoginActivity.this, "Error checking user data: " + fetchTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(LoginActivity.this, getString(R.string.error_checking_user_data) + fetchTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     } else {
                         // If sign in fails, display a message to the user.
-                        Toast.makeText(LoginActivity.this, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, getString(R.string.authentication_failed) + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -256,10 +256,10 @@ public class LoginActivity extends AppCompatActivity {
                     .set(userData)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            Toast.makeText(LoginActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, R.string.registration_successful, Toast.LENGTH_SHORT).show();
                             loadMain();
                         } else {
-                            Toast.makeText(LoginActivity.this, "Error saving user data: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, getString(R.string.error_saving_user_data) + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
         }

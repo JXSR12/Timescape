@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -546,7 +547,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                             localFile = new File(downloadsFolder, fileName);
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Toast.makeText(context, "Error creating local file: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, context.getString(R.string.error_creating_local_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
                             selfFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
                             return;
@@ -569,7 +570,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
                                     ContentResolver resolver = context.getContentResolver();
                                     Uri uri = null;
-                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                                         uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
                                     }
 
@@ -588,11 +589,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
                                     progressBar.setVisibility(View.GONE);
                                     selfFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
-                                    Toast.makeText(context, "File downloaded", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, R.string.file_downloaded, Toast.LENGTH_SHORT).show();
                                     Log.d("Download", "File downloaded at: " + uri.toString());
                                 } catch (IOException e) {
                                     e.printStackTrace();
-                                    Toast.makeText(context, "Error saving the file: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, context.getString(R.string.error_saving_the_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     progressBar.setVisibility(View.GONE);
                                     selfFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
                                 }
@@ -602,7 +603,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                             public void onFailure(@NonNull Exception e) {
                                 progressBar.setVisibility(View.GONE);
                                 selfFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
-                                Toast.makeText(context, "Failed to download file: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, context.getString(R.string.failed_to_download_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
                             @Override
@@ -639,7 +640,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                             localFile = new File(downloadsFolder, fileName);
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Toast.makeText(context, "Error creating local file: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, context.getString(R.string.error_creating_local_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
                             otherUserFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
                             return;
@@ -663,7 +664,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
                                     ContentResolver resolver = context.getContentResolver();
                                     Uri uri = null;
-                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                                         uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
                                     }
 
@@ -682,11 +683,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
                                     progressBar.setVisibility(View.GONE);
                                     otherUserFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
-                                    Toast.makeText(context, "File downloaded", Toast.LENGTH_SHORT).show();
-                                    Log.d("Download", "File downloaded at: " + uri.toString());
+                                    Toast.makeText(context, context.getString(R.string.file_downloaded), Toast.LENGTH_SHORT).show();
+                                    Log.d(context.getString(R.string.download), context.getString(R.string.file_downloaded_at) + uri.toString());
                                 } catch (IOException e) {
                                     e.printStackTrace();
-                                    Toast.makeText(context, "Error saving the file: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, context.getString(R.string.error_saving_the_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     progressBar.setVisibility(View.GONE);
                                     otherUserFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
                                 }
@@ -696,7 +697,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                             public void onFailure(@NonNull Exception e) {
                                 progressBar.setVisibility(View.GONE);
                                 otherUserFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
-                                Toast.makeText(context, "Failed to download file: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, context.getString(R.string.failed_to_download_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
                             @Override
@@ -716,7 +717,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                 List<String> reads = message.getReads();
                 if (reads != null && !reads.isEmpty()) {
                     int readCountValue = reads.size();
-                    readCount.setText("Read " + readCountValue + " • ");
+                    readCount.setText(String.format("%s%d • ", context.getString(R.string.read), readCountValue));
                     readCount.setVisibility(View.VISIBLE);
                 } else {
                     readCount.setVisibility(View.GONE);
@@ -735,7 +736,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         }
 
         private void handleUnsentMessage(Message message, boolean isCurrentUser) {
-            String unsentText = "message deleted";
+            String unsentText = context.getString(R.string.message_deleted);
             if (isCurrentUser) {
                 selfUnsentMessage.setVisibility(View.VISIBLE);
                 selfUnsentMessage.setText(unsentText);
@@ -762,7 +763,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                     List<String> reads = message.getReads();
                     if (reads != null && !reads.isEmpty()) {
                         int readCountValue = reads.size();
-                        readCount.setText("Read " + readCountValue + " • ");
+                        readCount.setText(String.format("%s%d • ", context.getString(R.string.read), readCountValue));
                         readCount.setVisibility(View.VISIBLE);
                     } else {
                         readCount.setVisibility(View.GONE);
