@@ -26,5 +26,6 @@
     <color name="whiteCardColor">#fff</color>
 
     <color name="chat_background_color">#FFF6EB</color>
+    <color name="reverse_color">#2B2B2B</color>
     <color name="chat_bottombar_color">#FFFFFF</color>
 </resources>

@@ -20,6 +20,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +70,7 @@ public class RegisterActivity extends AppCompatActivity {
             if (validateInputs()) {
                 registerWithEmailPassword();
             } else {
-                Toast.makeText(getApplicationContext(), "Please fill all fields correctly, tap (?) icon for more info", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.please_fill_all_fields_correctly_tap_icon_for_more_info, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -90,17 +92,33 @@ public class RegisterActivity extends AppCompatActivity {
     private void registerWithEmailPassword() {
         String email = regEmail.getText().toString().trim();
         String password = regPassword.getText().toString().trim();
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        String displayName = regName.getText().toString().trim();
-                        String phoneNumber = regPhone.getText().toString().trim();
-                        updateUserProfile(user, displayName, phoneNumber, false);
-                    } else {
-                        Toast.makeText(RegisterActivity.this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+        String phoneNumber = regPhone.getText().toString().trim();
+
+        // Check if the phone number already exists in the database
+        Query query = db.collection("users").whereEqualTo("phoneNumber", phoneNumber);
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
+                if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                    // Phone number already exists, show error message
+                    Toast.makeText(RegisterActivity.this, R.string.phone_number_already_registered, Toast.LENGTH_SHORT).show();
+                } else {
+                    // Phone number is unique, proceed with registration
+                    mAuth.createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(this, authTask -> {
+                                if (authTask.isSuccessful()) {
+                                    FirebaseUser user = mAuth.getCurrentUser();
+                                    String displayName = regName.getText().toString().trim();
+                                    updateUserProfile(user, displayName, phoneNumber, false);
+                                } else {
+                                    Toast.makeText(RegisterActivity.this, getString(R.string.registration_failed) + authTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
+            } else {
+                Toast.makeText(RegisterActivity.this, getString(R.string.error_checking_phone_number) + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void updateUserProfile(FirebaseUser user, String displayName, String phoneNumber, boolean isGoogleSignIn) {
@@ -117,14 +135,14 @@ public class RegisterActivity extends AppCompatActivity {
                     .set(userData)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            Toast.makeText(RegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this, R.string.registration_successful, Toast.LENGTH_SHORT).show();
                             if (isGoogleSignIn) {
                                 loadMainActivity();
                             } else {
                                 loadLogin();
                             }
                         } else {
-                            Toast.makeText(RegisterActivity.this, "Error saving user data: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this, R.string.error_saving_user_data + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
         }
@@ -153,7 +171,7 @@ public class RegisterActivity extends AppCompatActivity {
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
-                Toast.makeText(RegisterActivity.this, "Google sign in failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegisterActivity.this, R.string.google_sign_in_failed + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }

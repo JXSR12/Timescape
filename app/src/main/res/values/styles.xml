@@ -33,7 +33,7 @@
         <item name="android:background">"@drawable/login_shape_bk"</item>
         <item name="android:textSize">@dimen/newsMoreTextSize</item>
         <item name="android:backgroundTint">@color/login_background</item>
-        <item name="android:textColor">#CFCFCF</item>
+        <item name="android:textColor">@color/reverse_color</item>
     </style>
 
     <style name="viewParent">

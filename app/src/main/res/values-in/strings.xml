@@ -205,5 +205,9 @@
     <string name="display_name">Nama Pengguna</string>
     <string name="phone">Nomor Telepon</string>
     <string name="email_address">Alamat Email</string>
+    <string name="registration_failed">"Registrasi gagal: "</string>
+    <string name="error_checking_phone_number">"Error saat memeriksa nomor telepon: "</string>
+    <string name="phone_number_already_registered">Nomor telepon sudah terdaftar</string>
+    <string name="please_fill_all_fields_correctly_tap_icon_for_more_info">Harap isi semua kolom dengan benar, ketuk ikon (?) untuk informasi lebih lanjut</string>
 
 </resources>

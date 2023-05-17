@@ -205,5 +205,9 @@
     <string name="display_name">显示名称</string>
     <string name="phone">电话号码</string>
     <string name="email_address">电子邮件地址</string>
+    <string name="registration_failed">"注册失败: "</string>
+    <string name="error_checking_phone_number">"检查电话号码时出错: "</string>
+    <string name="phone_number_already_registered">电话号码已经注册</string>
+    <string name="please_fill_all_fields_correctly_tap_icon_for_more_info">请正确填写所有字段，点击 (?) 图标获取更多信息</string>
 
 </resources>

@@ -205,4 +205,8 @@
     <string name="display_name">Display Name</string>
     <string name="phone">Phone Number</string>
     <string name="email_address">Email Address</string>
+    <string name="registration_failed">"Registration failed: "</string>
+    <string name="error_checking_phone_number">"Error checking phone number: "</string>
+    <string name="phone_number_already_registered">Phone number already registered</string>
+    <string name="please_fill_all_fields_correctly_tap_icon_for_more_info">Please fill all fields correctly, tap (?) icon for more info</string>
 </resources>

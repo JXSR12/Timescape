@@ -103,11 +103,14 @@ public class ProjectMembersActivity extends AppCompatActivity {
 
         mViewModel = new ViewModelProvider(this).get(ProjectMembersViewModel.class);
 
+        mAdapter = new ProjectMembersAdapter(new ArrayList<>(), this, "", userId -> mViewModel.removeMember(mProjectId, userId));
+        mRecyclerView.setAdapter(mAdapter);
+
         mViewModel.getmOwnerId().observe(this, ownerId -> {
-            mAdapter = new ProjectMembersAdapter(new ArrayList<>(), this, ownerId, userId -> mViewModel.removeMember(mProjectId, userId));
+            mAdapter.setOwnerId(ownerId);
             mIsCurrentUserOwner = ownerId.equals(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            mAdapter.setIsCurrentUserOwner(mIsCurrentUserOwner);
             mLeaveOrDeleteProjectButton.setText(mIsCurrentUserOwner ? getString(R.string.delete_project) : getString(R.string.leave_project));
-            mRecyclerView.setAdapter(mAdapter);
         });
 
         mViewModel = new ViewModelProvider(this).get(ProjectMembersViewModel.class);

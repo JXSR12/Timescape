@@ -3,4 +3,5 @@
     <color name="login_background">#292929</color>
     <color name="chat_background_color">#2B2B2B</color>
     <color name="chat_bottombar_color">#B6B6B6</color>
+    <color name="reverse_color">#E3E3E3</color>
 </resources>

@@ -49,6 +49,11 @@ public class ProjectMembersAdapter extends RecyclerView.Adapter<ProjectMembersAd
         notifyDataSetChanged();
     }
 
+    public void setOwnerId(String ownerId) {
+        this.mOwnerId = ownerId;
+        notifyDataSetChanged();
+    }
+
     public void setIsCurrentUserOwner(boolean isOwner) {
         this.mIsCurrentUserOwner = isOwner;
         notifyDataSetChanged();
