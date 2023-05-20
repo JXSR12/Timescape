@@ -215,4 +215,6 @@
     <string name="resolving_invite">Resolving invite</string>
     <string name="scan_a_project_invite_qr">Join project using QR code</string>
     <string name="no_other_member_online">No other member online</string>
+    <string name="sent_a_file_attachment">" sent a file attachment"</string>
+    <string name="sent_an_image_attachment">" sent an image attachment"</string>
 </resources>

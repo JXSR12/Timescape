@@ -441,7 +441,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
                     android:text="12:00 PM"
-                    android:textSize="10sp"
+                    android:textSize="11sp"
                     android:textColor="@android:color/darker_gray"
                     android:visibility="gone" />
             </LinearLayout>

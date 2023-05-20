@@ -215,5 +215,7 @@
     <string name="resolving_invite">正在解析邀请</string>
     <string name="scan_a_project_invite_qr">使用QR码加入项目</string>
     <string name="no_other_member_online">没有其他成员在线</string>
+    <string name="sent_a_file_attachment">"发送了文件附件"</string>
+    <string name="sent_an_image_attachment">"发送了图片附件"</string>
 
 </resources>

@@ -80,8 +80,6 @@ public class ChatsViewModel extends ViewModel {
         return chatItems;
     }
 
-
-
     private void processChatDocument(QueryDocumentSnapshot document, String userId, MutableLiveData<List<Chat>> chatItems, List<Chat> chatItemList, ChatListAdapter chatListAdapter) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String projectId = document.getId();
@@ -89,44 +87,27 @@ public class ChatsViewModel extends ViewModel {
 
         db.collection("chats")
                 .document(projectId)
+                .collection("messages")
+                .orderBy("timestamp")
                 .addSnapshotListener((chatSnapshot, chatError) -> {
                     if (chatError != null) {
                         Log.w(TAG, "Chat listen failed.", chatError);
                         return;
                     }
 
-                    List<Map<String, Object>> messages = (List<Map<String, Object>>) chatSnapshot.get("messages");
+                    List<DocumentSnapshot> messages = chatSnapshot.getDocuments();
                     if (messages != null && !messages.isEmpty()) {
-                        Map<String, Object> latestMessage = messages.get(messages.size() - 1);
-                        Message latestMessageObject = new Message();
-                        if (latestMessage.get("id") == null) {
-                            String newId = generateMessageId();
-                            latestMessageObject.setId(newId);
-                            latestMessage.put("id", newId);
-                        } else {
-                            latestMessageObject.setId((String) latestMessage.get("id"));
-                        }
-                        latestMessageObject.setSender((DocumentReference) latestMessage.get("sender"));
-                        latestMessageObject.setMessage_type(Message.MessageType.valueOf((String) latestMessage.get("message_type")));
-                        latestMessageObject.setContent((String) latestMessage.get("content"));
-                        latestMessageObject.setTimestamp((Timestamp) latestMessage.get("timestamp"));
-                        latestMessageObject.setFileName((String) latestMessage.get("fileName"));
-                        latestMessageObject.setReplyingTo((String) latestMessage.get("replyingTo"));
-                        latestMessageObject.setMentions(latestMessage.get("mentions") != null ? (HashMap<String, String>) latestMessage.get("mentions") : null);
-                        latestMessageObject.setReads(latestMessage.get("reads") != null ? (List<String>) latestMessage.get("reads") : null);
-
+                        DocumentSnapshot latestMessage = messages.get(messages.size() - 1);
+                        Message latestMessageObject = latestMessage.toObject(Message.class);
 
                         int unreadCount = 0;
 
-                        for (Map<String, Object> message : messages) {
-                            List<String> reads = (List<String>) message.get("reads");
-                            DocumentReference sender = (DocumentReference) message.get("sender");
-                            if (!sender.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) && (reads == null || !reads.contains(userId))) {
+                        for (DocumentSnapshot messageSnapshot : messages) {
+                            Message message = messageSnapshot.toObject(Message.class);
+                            if (!message.getSender().getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) && (message.getReads() == null || !message.getReads().contains(userId))) {
                                 unreadCount++;
                             }
                         }
-
-                        //String projectId, String projectTitle, Message latestMessage, String senderName, String timestamp, int unreadCount, Message.MessageType messageType
 
                         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
                         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd", Locale.getDefault());
@@ -150,7 +131,7 @@ public class ChatsViewModel extends ViewModel {
                                 projectId,
                                 projectTitle,
                                 latestMessageObject,
-                                "User 1",
+                                "loading..",
                                 timestampString,
                                 unreadCount,
                                 latestMessageObject.getMessage_type()

@@ -30,10 +30,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -50,12 +53,15 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.bluejack22_2.timescape.FullScreenImageActivity;
 import edu.bluejack22_2.timescape.R;
 import edu.bluejack22_2.timescape.model.Chat;
 import edu.bluejack22_2.timescape.model.Message;
+import edu.bluejack22_2.timescape.model.User;
 import edu.bluejack22_2.timescape.ui.RoundedImageView;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
@@ -65,6 +71,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     private FirebaseAuth firebaseAuth;
 
     private RecyclerView recyclerView;
+    private Map<String, String> memberDisplayNameMap = new HashMap<>();
+    private String projectId = "NONE";
+
 
     public interface MessageLongClickListener {
         void onMessageLongClicked(View view, Message message);
@@ -75,13 +84,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     }
     private MessageLongClickListener messageLongClickListener;
 
-    public ChatAdapter(Context context, FirebaseAuth firebaseAuth, MessageLongClickListener messageLongClickListener, RecyclerView recyclerView) { // Modify this line
+    public ChatAdapter(Context context, FirebaseAuth firebaseAuth, MessageLongClickListener messageLongClickListener, RecyclerView recyclerView, String projectId) { // Modify this line
         this.context = context;
         this.firebaseAuth = firebaseAuth; // Add this line
         this.messageLongClickListener = messageLongClickListener;
         this.recyclerView = recyclerView;
+        this.projectId = projectId;
     }
 
+    public void setCachedMembers(ArrayList<User> projectMembers){
+        for(User u : projectMembers){
+            memberDisplayNameMap.put(u.getUid(), u.getDisplayName());
+        }
+    }
 
     public void setMessages(List<Message> messages, RecyclerView recyclerView) {
         if (this.messages == null) {
@@ -202,6 +217,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             }
         }
         return -1;
+    }
+
+    private void getCachedDisplayName(String userId, final TextView displayName) {
+        if (memberDisplayNameMap.containsKey(userId)) {
+            displayName.setText(memberDisplayNameMap.get(userId));
+        } else {
+            displayName.setText(context.getString(R.string.unknown_user));
+        }
     }
 
     public class ChatViewHolder extends RecyclerView.ViewHolder {
@@ -423,20 +446,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
         private void showOtherUserDisplayName(Message message) {
             displayName.setVisibility(View.VISIBLE);
-            message.fetchSenderData().addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    String displayNameString = documentSnapshot.getString("displayName");
-                    if (displayNameString != null && !displayNameString.isEmpty()) {
-                        displayName.setText(displayNameString);
-                    } else {
-                        displayName.setText(R.string.unknown_user);
-                    }
-                } else {
-                    displayName.setText(R.string.unknown_user);
-                }
-            });
+            getCachedDisplayName(message.getSender().getId(), displayName);
         }
-
 
         private void handleTextMessage(Message message, boolean isCurrentUser) {
             String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -457,7 +468,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                 selfTextMessage.setText(message.getContent());
                 if (reads != null && !reads.isEmpty()) {
                     int readCountValue = reads.size();
-                    readCount.setText("Read " + readCountValue + " • ");
+                    readCount.setText(context.getString(R.string.read) + readCountValue + " • ");
                     readCount.setVisibility(View.VISIBLE);
                 } else {
                     readCount.setVisibility(View.GONE);
@@ -479,7 +490,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                 List<String> reads = message.getReads();
                 if (reads != null && !reads.isEmpty()) {
                     int readCountValue = reads.size();
-                    readCount.setText("Read " + readCountValue + " • ");
+                    readCount.setText(context.getString(R.string.read) + readCountValue + " • ");
                     readCount.setVisibility(View.VISIBLE);
                 } else {
                     readCount.setVisibility(View.GONE);
@@ -518,7 +529,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                 List<String> reads = message.getReads();
                 if (reads != null && !reads.isEmpty()) {
                     int readCountValue = reads.size();
-                    readCount.setText("Read " + readCountValue + " • ");
+                    readCount.setText(context.getString(R.string.read) + readCountValue + " • ");
                     readCount.setVisibility(View.VISIBLE);
                 } else {
                     readCount.setVisibility(View.GONE);
@@ -802,18 +813,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         }
 
         private void showRepliedDisplayName(TextView repliedName, Message message) {
-            message.fetchSenderData().addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    String displayNameString = documentSnapshot.getString("displayName");
-                    if (displayNameString != null && !displayNameString.isEmpty()) {
-                        repliedName.setText(displayNameString);
-                    } else {
-                        repliedName.setText(R.string.unknown_user);
-                    }
-                } else {
-                    repliedName.setText(R.string.unknown_user);
-                }
-            });
+            getCachedDisplayName(message.getSender().getId(), repliedName);
         }
 
 

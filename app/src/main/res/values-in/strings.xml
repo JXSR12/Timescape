@@ -92,7 +92,7 @@
     <string name="failed_to_download_file">"Gagal mengunduh file: "</string>
     <string name="file_downloaded_at">"File diunduh pada: "</string>
     <string name="download">Unduh</string>
-    <string name="read">"Baca "</string>
+    <string name="read">"Dibaca "</string>
     <string name="message_deleted">pesan dihapus</string>
     <string name="project">"Proyek: "</string>
     <string name="task_updated">Tugas diperbarui</string>
@@ -215,5 +215,6 @@
     <string name="resolving_invite">Menyelesaikan Undangan</string>
     <string name="scan_a_project_invite_qr">Gabung dalam Proyek menggunakan QR Code</string>
     <string name="no_other_member_online">Tidak ada anggota lain yang aktif</string>
-
+    <string name="sent_a_file_attachment">" mengirimkan lampiran berkas"</string>
+    <string name="sent_an_image_attachment">" mengirimkan lampiran gambar"</string>
 </resources>
