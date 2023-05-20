@@ -219,4 +219,30 @@
     <string name="sent_an_image_attachment">" mengirimkan lampiran gambar"</string>
     <string name="camera_permission_granted">Izin kamera diberikan</string>
     <string name="camera_permission_denied">Izin kamera ditolak</string>
+    <string name="sent_a_project_invite">" mengirim undangan proyek"</string>
+    <string name="already_in_project">Sudah dalam Proyek</string>
+    <string name="join_project">Gabung Proyek</string>
+    <string name="successfully_joined_the_project">Berhasil bergabung dalam proyek</string>
+    <string name="select_a_project_to_invite_to">Pilih proyek untuk diundang</string>
+    <string name="confirm_invitation">Konfirmasi undangan</string>
+    <string name="are_you_sure_to_send_invite_for">Apakah Anda yakin ingin mengirim undangan untuk \'</string>
+    <string name="yes_dial">Ya</string>
+    <string name="no_dial">Tidak</string>
+    <string name="uploading_please_wait">Mengunggah, harap tunggu...</string>
+    <string name="btn_open">BUKA</string>
+    <string name="btn_download">UNDUH</string>
+    <string name="change_b">Ubah</string>
+    <string name="change_password">Ubah Kata Sandi</string>
+    <string name="edit_display_name">Sunting Nama Tampilan</string>
+    <string name="profile_and_settings">Profil dan Pengaturan</string>
+    <string name="this_account_is_linked_to_a_google_account">Akun ini terhubung dengan akun Google</string>
+    <string name="save">Simpan</string>
+    <string name="cancel">Batal</string>
+    <string name="new_passwords_do_not_match">Kata sandi baru tidak cocok</string>
+    <string name="change_password_2">Ubah Kata Sandi</string>
+    <string name="sign_out">Keluar</string>
+    <string name="no_access">Tidak Ada Akses</string>
+    <string name="it_seems_that_you_are_not_allowed_to_perform_this_action_please_refresh_or_check_if_you_are_still_part_of_the_project">Tampaknya Anda tidak diizinkan untuk melakukan tindakan ini, harap segarkan atau periksa apakah Anda masih menjadi bagian dari proyek.</string>
+    <string name="ok">OK</string>
+
 </resources>

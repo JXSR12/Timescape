@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -36,11 +37,16 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,9 +64,12 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.bluejack22_2.timescape.FullScreenImageActivity;
+import edu.bluejack22_2.timescape.MainActivity;
 import edu.bluejack22_2.timescape.R;
 import edu.bluejack22_2.timescape.model.Chat;
 import edu.bluejack22_2.timescape.model.Message;
+import edu.bluejack22_2.timescape.model.Project;
+import edu.bluejack22_2.timescape.model.ProjectMember;
 import edu.bluejack22_2.timescape.model.User;
 import edu.bluejack22_2.timescape.ui.RoundedImageView;
 
@@ -74,6 +83,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     private Map<String, String> memberDisplayNameMap = new HashMap<>();
     private String projectId = "NONE";
 
+    private HashMap<String, Project> projectCache = new HashMap<>();
 
     public interface MessageLongClickListener {
         void onMessageLongClicked(View view, Message message);
@@ -245,8 +255,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         TextView otherUserFileAttachmentName;
         TextView otherUserFileAttachmentExtension;
         Button otherUserFileAttachmentDownloadButton;
-        TextView selfProjectInviteMessage;
-        TextView otherUserProjectInviteMessage;
+        LinearLayout selfProjectInviteMessage;
+        LinearLayout otherUserProjectInviteMessage;
+        TextView selfProjectInviteTitle;
+        TextView otherUserProjectInviteTitle;
+        Button selfJoinButton;
+        Button otherJoinButton;
         TextView dateSeparator;
         TextView selfUnsentMessage;
         TextView otherUserUnsentMessage;
@@ -291,6 +305,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             otherUserFileAttachmentDownloadButton = itemView.findViewById(R.id.other_user_file_attachment_download_button);
             selfProjectInviteMessage = itemView.findViewById(R.id.self_project_invite_message);
             otherUserProjectInviteMessage = itemView.findViewById(R.id.other_user_project_invite_message);
+            selfProjectInviteTitle = itemView.findViewById(R.id.self_project_invite_title);
+            otherUserProjectInviteTitle = itemView.findViewById(R.id.other_user_project_invite_title);
+            selfJoinButton = itemView.findViewById(R.id.self_project_invite_join_button);
+            otherJoinButton = itemView.findViewById(R.id.other_user_project_invite_join_button);
             dateSeparator = itemView.findViewById(R.id.date_separator);
             selfUnsentMessage = itemView.findViewById(R.id.unsent_message);
             otherUserUnsentMessage = itemView.findViewById(R.id.other_user_unsent_message);
@@ -485,7 +503,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             if (isCurrentUser) {
                 selfImageMessageFrame.setVisibility(View.VISIBLE);
                 // Load the image URL into the ImageView using an image loading library like Glide
-                Glide.with(itemView.getContext()).load(message.getContent()).into(selfImageMessage);
+                Glide.with(itemView.getContext())
+                        .load(message.getContent())
+                        .thumbnail(Glide.with(itemView.getContext())
+                                .load(message.getContent())
+                                .override(32, 32))
+                        .into(selfImageMessage);
 
                 List<String> reads = message.getReads();
                 if (reads != null && !reads.isEmpty()) {
@@ -509,7 +532,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             } else {
                 otherUserImageMessageFrame.setVisibility(View.VISIBLE);
                 // Load the image URL into the ImageView using an image loading library like Glide
-                Glide.with(itemView.getContext()).load(message.getContent()).into(otherUserImageMessage);
+                Glide.with(itemView.getContext())
+                        .load(message.getContent())
+                        .thumbnail(Glide.with(itemView.getContext())
+                                .load(message.getContent())
+                                .override(32, 32))
+                        .into(otherUserImageMessage);
 
                 otherUserImageMessage.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -538,92 +566,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                 selfFileAttachmentName.setText(message.getFileName());
                 String fullExt = message.getFileName().substring(message.getFileName().lastIndexOf(".") + 1);
                 selfFileAttachmentExtension.setText(fullExt.substring(0, Math.min(fullExt.length(), 3)).toUpperCase());
+
+                selfFileAttachmentDownloadButton.setText(isFileExist(message.getFileName()) ? context.getString(R.string.btn_open) : context.getString(R.string.btn_download));
                 selfFileAttachmentDownloadButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        selfFileAttachmentDownloadButton.setVisibility(View.GONE);
-                        ProgressBar progressBar = itemView.findViewById(R.id.self_file_attachment_progress_bar);
-                        progressBar.setVisibility(View.VISIBLE);
-
-                        String fileUrl = message.getContent();
-                        String fileName = message.getFileName();
-                        File localFile;
-
-                        try {
-                            String appName = context.getString(R.string.app_name);
-                            File downloadsFolder = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), appName);
-                            if (!downloadsFolder.exists()) {
-                                downloadsFolder.mkdirs();
-                            }
-                            localFile = new File(downloadsFolder, fileName);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            Toast.makeText(context, context.getString(R.string.error_creating_local_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            progressBar.setVisibility(View.GONE);
-                            selfFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
-                            return;
+                        if (isFileExist(message.getFileName())) {
+                            // Open file
+                            openFile(message.getFileName());
+                        } else {
+                            // Download file
+                            downloadFile(message);
                         }
-
-                        StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(fileUrl);
-                        storageReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                try {
-                                    String appName = context.getString(R.string.app_name);
-                                    String fileNameWithExtension = message.getFileName();
-
-                                    ContentValues values = new ContentValues();
-                                    values.put(MediaStore.Downloads.DISPLAY_NAME, fileNameWithExtension);
-                                    String fileExtension = fileNameWithExtension.substring(fileNameWithExtension.lastIndexOf(".") + 1);
-                                    String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension.toLowerCase());
-                                    values.put(MediaStore.Downloads.MIME_TYPE, mimeType);
-                                    values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + File.separator + appName);
-
-                                    ContentResolver resolver = context.getContentResolver();
-                                    Uri uri = null;
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                        uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
-                                    }
-
-                                    if (uri != null) {
-                                        InputStream inputStream = Files.newInputStream(localFile.toPath());
-                                        OutputStream outputStream = resolver.openOutputStream(uri);
-
-                                        byte[] buffer = new byte[1024];
-                                        int bytesRead;
-                                        while ((bytesRead = inputStream.read(buffer)) != -1) {
-                                            outputStream.write(buffer, 0, bytesRead);
-                                        }
-                                        inputStream.close();
-                                        outputStream.close();
-                                    }
-
-                                    progressBar.setVisibility(View.GONE);
-                                    selfFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
-                                    Toast.makeText(context, R.string.file_downloaded, Toast.LENGTH_SHORT).show();
-                                    Log.d("Download", "File downloaded at: " + uri.toString());
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                    Toast.makeText(context, context.getString(R.string.error_saving_the_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    progressBar.setVisibility(View.GONE);
-                                    selfFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
-                                }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                progressBar.setVisibility(View.GONE);
-                                selfFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
-                                Toast.makeText(context, context.getString(R.string.failed_to_download_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
-                            @Override
-                            public void onProgress(@NonNull FileDownloadTask.TaskSnapshot snapshot) {
-                                double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
-                                progressBar.setProgress((int) Math.floor(progress));
-                            }
-                        });
-
                     }
                 });
             } else {
@@ -631,114 +585,244 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                 otherUserFileAttachmentName.setText(message.getFileName());
                 String fullExt = message.getFileName().substring(message.getFileName().lastIndexOf(".") + 1);
                 otherUserFileAttachmentExtension.setText(fullExt.substring(0, Math.min(fullExt.length(), 3)).toUpperCase());
+                otherUserFileAttachmentDownloadButton.setText(isFileExist(message.getFileName()) ? "OPEN" : "DOWNLOAD");
                 otherUserFileAttachmentDownloadButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        otherUserFileAttachmentDownloadButton.setVisibility(View.GONE);
-                        ProgressBar progressBar = itemView.findViewById(R.id.other_user_file_attachment_progress_bar);
-                        progressBar.setVisibility(View.VISIBLE);
-
-                        String fileUrl = message.getContent();
-                        String fileName = message.getFileName();
-                        File localFile;
-
-                        try {
-                            String appName = context.getString(R.string.app_name);
-                            File downloadsFolder = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), appName);
-                            if (!downloadsFolder.exists()) {
-                                downloadsFolder.mkdirs();
-                            }
-                            localFile = new File(downloadsFolder, fileName);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            Toast.makeText(context, context.getString(R.string.error_creating_local_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            progressBar.setVisibility(View.GONE);
-                            otherUserFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
-                            return;
+                        if (isFileExist(message.getFileName())) {
+                            // Open file
+                            openFile(message.getFileName());
+                        } else {
+                            // Download file
+                            downloadFile(message);
                         }
-
-                        StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(fileUrl);
-                        storageReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                try {
-                                    String appName = context.getString(R.string.app_name);
-                                    String fileNameWithExtension = message.getFileName();
-
-                                    ContentValues values = new ContentValues();
-                                    values.put(MediaStore.Downloads.DISPLAY_NAME, fileNameWithExtension);
-                                    String fileExtension = fileNameWithExtension.substring(fileNameWithExtension.lastIndexOf(".") + 1);
-                                    String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension.toLowerCase());
-                                    values.put(MediaStore.Downloads.MIME_TYPE, mimeType);
-
-                                    values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + File.separator + appName);
-
-                                    ContentResolver resolver = context.getContentResolver();
-                                    Uri uri = null;
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                        uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
-                                    }
-
-                                    if (uri != null) {
-                                        InputStream inputStream = Files.newInputStream(localFile.toPath());
-                                        OutputStream outputStream = resolver.openOutputStream(uri);
-
-                                        byte[] buffer = new byte[1024];
-                                        int bytesRead;
-                                        while ((bytesRead = inputStream.read(buffer)) != -1) {
-                                            outputStream.write(buffer, 0, bytesRead);
-                                        }
-                                        inputStream.close();
-                                        outputStream.close();
-                                    }
-
-                                    progressBar.setVisibility(View.GONE);
-                                    otherUserFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
-                                    Toast.makeText(context, context.getString(R.string.file_downloaded), Toast.LENGTH_SHORT).show();
-                                    Log.d(context.getString(R.string.download), context.getString(R.string.file_downloaded_at) + uri.toString());
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                    Toast.makeText(context, context.getString(R.string.error_saving_the_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    progressBar.setVisibility(View.GONE);
-                                    otherUserFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
-                                }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                progressBar.setVisibility(View.GONE);
-                                otherUserFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
-                                Toast.makeText(context, context.getString(R.string.failed_to_download_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
-                            @Override
-                            public void onProgress(@NonNull FileDownloadTask.TaskSnapshot snapshot) {
-                                double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
-                                progressBar.setProgress((int) Math.floor(progress));
-                            }
-                        });
                     }
                 });
             }
 
         }
 
+        private void openFile(String fileName) {
+            String appName = context.getString(R.string.app_name);
+            File downloadsFolder = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), appName);
+            File localFile = new File(downloadsFolder, fileName);
+
+            Uri fileUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", localFile);
+
+            // Determine MIME type
+            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(fileName);
+            String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+
+            Intent openFileIntent = new Intent(Intent.ACTION_VIEW);
+            openFileIntent.setDataAndType(fileUri, mimeType);
+
+            openFileIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            context.startActivity(openFileIntent);
+        }
+
+
+        private void downloadFile(Message message){
+            selfFileAttachmentDownloadButton.setVisibility(View.GONE);
+            ProgressBar progressBar = itemView.findViewById(R.id.self_file_attachment_progress_bar);
+            progressBar.setVisibility(View.VISIBLE);
+
+            String fileUrl = message.getContent();
+            String fileName = message.getFileName();
+            File localFile;
+
+            try {
+                String appName = context.getString(R.string.app_name);
+                File downloadsFolder = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), appName);
+                if (!downloadsFolder.exists()) {
+                    downloadsFolder.mkdirs();
+                }
+                localFile = new File(downloadsFolder, fileName);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, context.getString(R.string.error_creating_local_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.GONE);
+                selfFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
+                return;
+            }
+
+            StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(fileUrl);
+            storageReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                    try {
+                        String appName = context.getString(R.string.app_name);
+                        String fileNameWithExtension = message.getFileName();
+
+                        ContentValues values = new ContentValues();
+                        values.put(MediaStore.Downloads.DISPLAY_NAME, fileNameWithExtension);
+                        String fileExtension = fileNameWithExtension.substring(fileNameWithExtension.lastIndexOf(".") + 1);
+                        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension.toLowerCase());
+                        values.put(MediaStore.Downloads.MIME_TYPE, mimeType);
+                        values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + File.separator + appName);
+
+                        ContentResolver resolver = context.getContentResolver();
+                        Uri uri = null;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                        }
+
+                        if (uri != null) {
+                            InputStream inputStream = Files.newInputStream(localFile.toPath());
+                            OutputStream outputStream = resolver.openOutputStream(uri);
+
+                            byte[] buffer = new byte[1024];
+                            int bytesRead;
+                            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                outputStream.write(buffer, 0, bytesRead);
+                            }
+                            inputStream.close();
+                            outputStream.close();
+                        }
+
+                        progressBar.setVisibility(View.GONE);
+                        selfFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
+                        Toast.makeText(context, R.string.file_downloaded, Toast.LENGTH_SHORT).show();
+                        Log.d("Download", "File downloaded at: " + uri.toString());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(context, context.getString(R.string.error_saving_the_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                        selfFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    progressBar.setVisibility(View.GONE);
+                    selfFileAttachmentDownloadButton.setVisibility(View.VISIBLE);
+                    Toast.makeText(context, context.getString(R.string.failed_to_download_file) + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(@NonNull FileDownloadTask.TaskSnapshot snapshot) {
+                    double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
+                    progressBar.setProgress((int) Math.floor(progress));
+                }
+            });
+        }
+
+        private boolean isFileExist(String fileName) {
+            String appName = context.getString(R.string.app_name);
+            File downloadsFolder = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), appName);
+            File localFile = new File(downloadsFolder, fileName);
+            return localFile.exists();
+        }
+
+
         private void handleProjectInviteMessage(Message message, boolean isCurrentUser) {
+            LinearLayout projectInviteMessage;
+            TextView projectInviteTitle;
+            Button joinButton;
+
             if (isCurrentUser) {
+                projectInviteMessage = selfProjectInviteMessage;
+                projectInviteTitle = selfProjectInviteTitle;
+                joinButton = selfJoinButton;
+
                 List<String> reads = message.getReads();
                 if (reads != null && !reads.isEmpty()) {
                     int readCountValue = reads.size();
-                    readCount.setText(String.format("%s%d • ", context.getString(R.string.read), readCountValue));
+                    readCount.setText(context.getString(R.string.read) + readCountValue + " • ");
                     readCount.setVisibility(View.VISIBLE);
                 } else {
                     readCount.setVisibility(View.GONE);
                 }
-                selfProjectInviteMessage.setVisibility(View.VISIBLE);
-                selfProjectInviteMessage.setText(message.getContent());
             } else {
-                otherUserProjectInviteMessage.setVisibility(View.VISIBLE);
-                otherUserProjectInviteMessage.setText(message.getContent());
+                projectInviteMessage = otherUserProjectInviteMessage;
+                projectInviteTitle = otherUserProjectInviteTitle;
+                joinButton = otherJoinButton;
             }
+
+            // Show the message
+            projectInviteMessage.setVisibility(View.VISIBLE);
+
+            // Check if the user is already in the project
+            Project cachedProject = projectCache.get(message.getContent());
+            if (cachedProject != null) {
+                handleProject(cachedProject, projectInviteTitle, joinButton, message.getContent(), isCurrentUser);
+            } else {
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("projects").document(message.getContent())
+                        .get()
+                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot.exists()) {
+                                    Project project = documentSnapshot.toObject(Project.class);
+                                    if (project != null) {
+                                        // Cache the project for future use
+                                        projectCache.put(message.getContent(), project);
+                                        handleProject(project, projectInviteTitle, joinButton, message.getContent(), isCurrentUser);
+                                    }
+                                }
+                            }
+                        });
+            }
+        }
+
+        private void handleProject(Project project, TextView projectInviteTitle, Button joinButton, String projectId, boolean isCurrentUser) {
+            projectInviteTitle.setText(project.getTitle());
+            if (project.getMembers().containsKey(FirebaseAuth.getInstance().getCurrentUser().getUid()) || project.getOwner().getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                joinButton.setText(R.string.already_in_project);
+                joinButton.setEnabled(false);
+            } else {
+                joinButton.setText(R.string.join_project);
+                joinButton.setEnabled(true);
+                joinButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addMemberToProject(projectId, FirebaseAuth.getInstance().getCurrentUser().getUid());
+                    }
+                });
+            }
+        }
+
+        private void addMemberToProject(String projectId, String userId) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference projectRef = db.collection("projects").document(projectId);
+            DocumentReference userRef = db.collection("users").document(userId);
+
+            ProjectMember newMember = new ProjectMember(userId, "", Timestamp.now(), "collaborator");
+
+            projectRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if (documentSnapshot.exists()) {
+                        String projectName = "Project Title";
+                        projectName = documentSnapshot.getString("title");
+
+                        String finalProjectName = projectName;
+                        // Add the new member to the project's 'members' field
+                        projectRef.update("members." + userId, newMember)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(context, R.string.successfully_joined_the_project, Toast.LENGTH_SHORT).show();
+                                    ChatAdapter.this.notifyDataSetChanged();
+
+                                    // Get the current user's ID and display name
+                                    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                                    String actorUserId = currentUser.getUid();
+                                    String actorName = currentUser.getDisplayName();
+
+                                    // Get the added user's display name
+                                    userRef.get()
+                                            .addOnSuccessListener(docSnap -> {
+                                                String objectUserName = docSnap.getString("displayName");
+
+                                                // Send the notification
+                                                MainActivity.sendProjectOperationNotification(actorUserId, actorName, projectId, finalProjectName, "ADD", userId, objectUserName);
+                                            })
+                                            .addOnFailureListener(e -> Log.w("ProjectMembersViewModel", "Error getting added user's display name", e));
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(context, R.string.failed_to_add_user_to_the_project, Toast.LENGTH_SHORT).show();
+                                });
+                    }
+                }});
         }
 
         private void handleDateSeparator(Message message) {
@@ -789,6 +873,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                         selfRepliedMessageContent.setText(R.string.sent_a_file);
                     }else if (repliedMessage.getMessage_type() == Message.MessageType.IMAGE){
                         selfRepliedMessageContent.setText(R.string.sent_an_image);
+                    }else if (repliedMessage.getMessage_type() == Message.MessageType.PROJECT_INVITE){
+                        selfRepliedMessageContent.setText(R.string.sent_a_project_invite);
                     }else{
                         selfRepliedMessageContent.setText(repliedMessage.getContent());
                     }
@@ -805,6 +891,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                         otherUserRepliedMessageContent.setText(R.string.sent_a_file);
                     }else if (repliedMessage.getMessage_type() == Message.MessageType.IMAGE){
                         otherUserRepliedMessageContent.setText(R.string.sent_an_image);
+                    }else if (repliedMessage.getMessage_type() == Message.MessageType.PROJECT_INVITE){
+                        selfRepliedMessageContent.setText(R.string.sent_a_project_invite);
                     }else{
                         otherUserRepliedMessageContent.setText(repliedMessage.getContent());
                     }

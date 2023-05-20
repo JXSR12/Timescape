@@ -46,14 +46,16 @@
 
         <TextView
             android:id="@+id/imageFileName"
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
+            android:maxLines="1"
             android:layout_marginTop="28dp"
             android:layout_centerHorizontal="true"
             android:layout_alignParentTop="true"
             android:textStyle="bold"
             android:textSize="20dp"
-            android:text="image_2019232.png"
+            android:text="image_2019232ksakdjasdjsdjsajdsjdsjdajsda.png"
+            android:ellipsize="end"
             android:textColor="@android:color/white" />
     </RelativeLayout>
 

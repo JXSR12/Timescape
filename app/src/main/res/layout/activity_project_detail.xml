@@ -14,7 +14,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_weight="1"
-        app:cardBackgroundColor="#EEEEEE"
+        app:cardBackgroundColor="@color/cardBackground"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp">
 
@@ -207,7 +207,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/project_info_card"
         app:layout_constraintVertical_weight="1"
-        app:cardBackgroundColor="#EEEEEE"
+        app:cardBackgroundColor="@color/cardBackground"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
         >

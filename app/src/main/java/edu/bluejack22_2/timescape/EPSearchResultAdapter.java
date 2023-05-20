@@ -111,9 +111,7 @@ public class EPSearchResultAdapter extends RecyclerView.Adapter<EPSearchResultAd
             }});
     }
 
-
-
-                                public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView displayNameTextView;
         TextView emailTextView;
         ImageView avatarImageView;

@@ -26,6 +26,7 @@
             android:layout_height="wrap_content"
             android:text="Display Name"
             android:textSize="16sp"
+            android:textColor="@color/primaryTextColor"
             android:textStyle="bold" />
 
         <TextView

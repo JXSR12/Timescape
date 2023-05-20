@@ -87,6 +87,8 @@ public class FullScreenImageActivity extends AppCompatActivity {
         topBar = findViewById(R.id.topBar);
         playerView = findViewById(R.id.player_view);
 
+        playerView.setVisibility(View.GONE);
+
         imageUrl = getIntent().getStringExtra("image_url");
         fileName = getIntent().getStringExtra("file_name");
 
@@ -259,6 +261,7 @@ public class FullScreenImageActivity extends AppCompatActivity {
         if (Util.SDK_INT < 24) {
             releasePlayer();
         }
+        player.stop();
     }
 
     @Override
@@ -267,6 +270,7 @@ public class FullScreenImageActivity extends AppCompatActivity {
         if (Util.SDK_INT < 24) {
             releasePlayer();
         }
+        player.stop();
     }
 
 

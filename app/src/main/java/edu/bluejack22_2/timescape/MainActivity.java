@@ -193,6 +193,12 @@ public class MainActivity extends BaseActivity {
             return true;
         }
 
+        if (id == R.id.nav_account) {
+            Intent intent = new Intent(this, UserProfileActivity.class);
+            startActivity(intent);
+            return true;
+        }
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.onNavDestinationSelected(item, navController)
                 || super.onOptionsItemSelected(item);

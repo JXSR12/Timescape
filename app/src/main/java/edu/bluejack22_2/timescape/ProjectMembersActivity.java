@@ -154,6 +154,10 @@ public class ProjectMembersActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
+        String no_access = getString(R.string.no_access);
+        String message = getString(R.string.it_seems_that_you_are_not_allowed_to_perform_this_action_please_refresh_or_check_if_you_are_still_part_of_the_project);
+        String ok = getString(R.string.ok);
+
         mInviteMemberButton.setOnClickListener(v -> {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             db.collection("projects").document(mProjectId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -167,9 +171,9 @@ public class ProjectMembersActivity extends AppCompatActivity {
                         }
                     } else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(ProjectMembersActivity.this);
-                        builder.setTitle("No access")
-                                .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
-                                .setPositiveButton("OK", null)
+                        builder.setTitle(no_access)
+                                .setMessage(message)
+                                .setPositiveButton(ok, null)
                                 .show();
                     }
                 }
@@ -190,9 +194,9 @@ public class ProjectMembersActivity extends AppCompatActivity {
                         }
                     } else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(ProjectMembersActivity.this);
-                        builder.setTitle("No access")
-                                .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
-                                .setPositiveButton("OK", null)
+                        builder.setTitle(no_access)
+                                .setMessage(message)
+                                .setPositiveButton(ok, null)
                                 .show();
                     }
                 }
@@ -224,9 +228,9 @@ public class ProjectMembersActivity extends AppCompatActivity {
                                 .show();
                     } else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(ProjectMembersActivity.this);
-                        builder.setTitle("No access")
-                                .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
-                                .setPositiveButton("OK", null)
+                        builder.setTitle(no_access)
+                                .setMessage(message)
+                                .setPositiveButton(ok, null)
                                 .show();
                     }
                 }

@@ -16,12 +16,13 @@
     <color name="mention_highlight">#36FFE081</color>
 
     <color name="colorRed">#FF3939</color>
+    <color name="cardBackground">#EEEEEE</color>
 
     <color name="colorPrimary">#FF9D0B</color>
     <color name="colorPrimaryDark">#FF8400</color>
     <color name="colorAccent">#FF914D</color>
     <color name="whiteTextColor">@color/white</color>
-    <color name="primaryTextColor">@color/black</color>
+    <color name="primaryTextColor">#3D3D3D</color>
     <color name="loginBkColor">#f0f0f0</color>
     <color name="whiteCardColor">#fff</color>
 

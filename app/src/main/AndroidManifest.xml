@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -21,6 +22,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Timescape"
         tools:targetApi="31">
+
+        <activity
+            android:name=".UserProfileActivity"
+            android:exported="false"
+            android:theme="@style/FullScreenTheme2"/>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="edu.bluejack22_2.timescape.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -28,12 +45,15 @@
             android:theme="@style/Theme.Timescape.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
                     android:host="timescapxtnsn.page.link"
                     android:pathPrefix="/project_invite"
@@ -43,13 +63,13 @@
         <activity
             android:name=".LoginActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan"
-            android:theme="@style/Theme.Timescape.NoActionBar"/>
+            android:theme="@style/Theme.Timescape.NoActionBar"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".RegisterActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan"
-            android:theme="@style/Theme.Timescape.NoActionBar"/>
+            android:theme="@style/Theme.Timescape.NoActionBar"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ProjectDetailActivity"
             android:theme="@style/FullScreenTheme" />
@@ -59,10 +79,11 @@
         <activity
             android:name=".ProjectChatActivity"
             android:theme="@style/FullScreenTheme"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ProjectMembersActivity"
             android:theme="@style/FullScreenTheme2" />
+
         <receiver
             android:name=".NotificationReceiver"
             android:exported="false">
@@ -71,6 +92,7 @@
                 <action android:name="your.package.name.ACTION_MUTE" />
             </intent-filter>
         </receiver>
+
         <service
             android:name=".services.NotificationListenerService"
             android:enabled="true"
@@ -79,10 +101,9 @@
             android:name=".services.MFirebaseMessagingService"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
     </application>
 
 </manifest>

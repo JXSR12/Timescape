@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import edu.bluejack22_2.timescape.MainActivity;
+import edu.bluejack22_2.timescape.R;
 import edu.bluejack22_2.timescape.model.Project;
 import edu.bluejack22_2.timescape.model.ProjectWithTasks;
 import edu.bluejack22_2.timescape.model.Task;
@@ -125,9 +126,9 @@ public class AllTasksViewModel extends ViewModel {
                     } else {
                         // Show the alert dialog
                         AlertDialog.Builder builder = new AlertDialog.Builder(context); // Replace 'context' with actual context
-                        builder.setTitle("No access")
-                                .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
-                                .setPositiveButton("OK", null)
+                        builder.setTitle(R.string.no_access)
+                                .setMessage(R.string.it_seems_that_you_are_not_allowed_to_perform_this_action_please_refresh_or_check_if_you_are_still_part_of_the_project)
+                                .setPositiveButton(R.string.ok, null)
                                 .show();
                     }
                 }

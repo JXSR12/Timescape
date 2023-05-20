@@ -118,7 +118,7 @@ public class ProjectMembersAdapter extends RecyclerView.Adapter<ProjectMembersAd
             mAvatar.setImageDrawable(generateAvatar(member.getUserId()));
             mName.setText(member.getDisplayName());
             if(member.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
-                itemView.setBackgroundColor(Color.parseColor("#AAFFEE63")); //light yellow
+                itemView.setBackgroundColor(Color.parseColor("#55FFEE63")); //light yellow
             }else{
                 itemView.setBackgroundColor(Color.TRANSPARENT);
             }
@@ -126,7 +126,7 @@ public class ProjectMembersAdapter extends RecyclerView.Adapter<ProjectMembersAd
                 mName.setTextColor(Color.parseColor("#FFA500")); // orange
                 mOwnerTag.setVisibility(View.VISIBLE);
             } else {
-                mName.setTextColor(Color.BLACK);
+                mName.setTextColor(mContext.getColor(R.color.primaryTextColor));
                 mOwnerTag.setVisibility(View.GONE);
             }
 

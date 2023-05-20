@@ -3,13 +3,12 @@ package edu.bluejack22_2.timescape;
 import static android.content.ContentValues.TAG;
 
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -19,8 +18,6 @@ import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.text.Editable;
-import android.text.Selection;
-import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -28,19 +25,21 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,11 +48,9 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -61,6 +58,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -68,15 +66,15 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
-import com.google.firebase.firestore.Transaction;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -84,13 +82,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
-import edu.bluejack22_2.timescape.model.ChatDocument;
 import edu.bluejack22_2.timescape.model.Message;
 import edu.bluejack22_2.timescape.model.Project;
 import edu.bluejack22_2.timescape.model.User;
@@ -268,13 +262,70 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         inviteProjectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //1. Open up a modal with a recycler view and a list of projects the user is in
-                //2. Once the user choose or tap on an item, close the modal
-                //3. Now show a confirmation dialog "Are you sure to send invite for 'PROJECT TITLE'?"
-                //4. If the user cancel, do nothing and close the modal.
-                //5. If the user confirms, send a message with PROJECT_INVITE type, with the content of a dynamic link to add the user to the project.
+                // Get the user's ID
+                String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                // Get the document reference of the user
+                DocumentReference userRef = db.collection("users").document(userId);
+
+                // Query for projects where the user is a member
+                Query memberQuery = db.collection("projects").whereEqualTo("members." + userId, true);
+
+                // Query for projects where the user is the owner
+                Query ownerQuery = db.collection("projects").whereEqualTo("owner", userRef);
+
+                // Run the queries
+                Task<QuerySnapshot> memberTask = memberQuery.get();
+                Task<QuerySnapshot> ownerTask = ownerQuery.get();
+
+                // Continue with both tasks
+                Tasks.whenAllSuccess(memberTask, ownerTask).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
+                    @Override
+                    public void onSuccess(List<Object> list) {
+                        // Combine the results
+                        List<Project> projects = new ArrayList<>();
+                        for (Object object : list) {
+                            QuerySnapshot snapshot = (QuerySnapshot) object;
+                            for(DocumentSnapshot ds : snapshot.getDocuments()){
+                                Project p = ds.toObject(Project.class);
+                                if(p != null){
+                                    p.setUid(ds.getId());
+                                }
+                                projects.add(p);
+                            }
+
+                        }
+
+                        // Prepare the list of project titles for the AlertDialog
+                        final CharSequence[] projectTitles = projects.stream().map(Project::getTitle).toArray(CharSequence[]::new);
+
+                        // Create and show the AlertDialog
+                        new AlertDialog.Builder(ProjectChatActivity.this)
+                                .setTitle(R.string.select_a_project_to_invite_to)
+                                .setItems(projectTitles, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // User selected a project, show the confirmation dialog
+                                        new AlertDialog.Builder(ProjectChatActivity.this)
+                                                .setTitle(R.string.confirm_invitation)
+                                                .setMessage(getString(R.string.are_you_sure_to_send_invite_for) + projectTitles[which] + "'?")
+                                                .setPositiveButton(R.string.yes_dial, new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which2) {
+                                                        // User confirmed, send the project invite message
+                                                        sendProjectInviteMessage(projects.get(which).getUid());
+                                                    }
+                                                })
+                                                .setNegativeButton(R.string.no_dial, null)
+                                                .show();
+                                    }
+                                })
+                                .show();
+                    }
+                });
             }
         });
+
 
         final View activityRootView = findViewById(android.R.id.content);
         activityRootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
@@ -353,7 +404,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                                 } else {
                                     // If cursor is at any other part of the spannable, remove the part of the text and convert it to regular text
                                     s.removeSpan(span);
-                                    ForegroundColorSpan defaultColorSpan = new ForegroundColorSpan(Color.BLACK); // Replace with the default text color
+                                    ForegroundColorSpan defaultColorSpan = new ForegroundColorSpan(getColor(R.color.primaryTextColor)); // Replace with the default text color
                                     s.setSpan(defaultColorSpan, spanStart, spanEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                                 }
                                 break;
@@ -1113,6 +1164,41 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         }
     }
 
+    private void sendProjectInviteMessage(String projectId) {
+        // Get the current user's ID
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference messagesCollection = db.collection("chats").document(project.getUid()).collection("messages");
+
+        // Create a new message object
+        Message message = new Message();
+        message.setSender(db.collection("users").document(currentUserId));
+        message.setMessage_type(Message.MessageType.PROJECT_INVITE);
+        message.setContent(projectId);
+        message.setTimestamp(Timestamp.now());
+        message.setId(generateMessageId());
+
+        // Add the message to the messagesCollection
+        messagesCollection.document(message.getId()).set(message)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Project invite message sent successfully");
+                        messageInput.setText("");
+                        onMessageSent(firebaseAuth.getCurrentUser().getDisplayName(), firebaseAuth.getCurrentUser().getDisplayName() + getString(R.string.sent_a_project_invite), message.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error sending project invite message", e);
+                        Toast.makeText(ProjectChatActivity.this, R.string.failed_to_send_message, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+
 
     private void onMessageSent(String senderName, String displayedContent, String messageId) {
         String projectName = project.getTitle();
@@ -1529,9 +1615,39 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
 
     private void uploadFileToFirebaseStorage(Uri fileUri, String folderName, String fileName) {
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(folderName).child(System.currentTimeMillis() + "_" + fileUri.getLastPathSegment());
-        storageReference.putFile(fileUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+        // Create custom layout
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_progress, null);
+
+        // Find views in the custom layout
+        ProgressBar progressBar = dialogView.findViewById(R.id.progressBar);
+        TextView textView = dialogView.findViewById(R.id.textView);
+        textView.setText(R.string.uploading_please_wait);
+
+        // Create alert dialog
+        AlertDialog alertDialog = new AlertDialog.Builder(ProjectChatActivity.this)
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        // Show the dialog
+        alertDialog.show();
+
+        UploadTask uploadTask = storageReference.putFile(fileUri);
+
+        uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
+                int currentProgress = (int) (100 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
+                progressBar.setProgress(currentProgress);
+            }
+        });
+
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                alertDialog.dismiss();
                 storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
@@ -1546,10 +1662,12 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+                alertDialog.dismiss();
                 Toast.makeText(ProjectChatActivity.this, getString(R.string.failed_to_upload) + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
     private void setActiveChat(boolean isActive) {
         firebaseFirestore.collection("activeChats").document(userId)

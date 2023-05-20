@@ -178,7 +178,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
-                    android:text="File Name"
+                    android:text="testfilename.pdf"
+                    android:ellipsize="end"
                     android:textColor="@android:color/white" />
 
                 <RelativeLayout
@@ -233,6 +234,7 @@
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
                     android:text="File Name"
+                    android:ellipsize="end"
                     android:textColor="@android:color/white" />
 
                 <RelativeLayout
@@ -271,37 +273,65 @@
             </LinearLayout>
 
 
-            <TextView
+            <LinearLayout
                 android:id="@+id/self_project_invite_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:background="@drawable/chat_bubble_self"
                 android:padding="8dp"
-                android:text="Project Invite"
-                android:textColor="@android:color/white"
-                android:textIsSelectable="true"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:autoLink="all"
-                android:linksClickable="true"
-                android:visibility="gone" />
+                android:orientation="vertical"
+                android:visibility="gone">
 
-            <TextView
+                <TextView
+                    android:id="@+id/self_project_invite_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Project Invite"
+                    android:textColor="@android:color/white"
+                    android:textIsSelectable="true"
+                    android:textAlignment="center"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true" />
+
+                <Button
+                    android:id="@+id/self_project_invite_join_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#FF6F00"
+                    android:text="Join Project" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/other_user_project_invite_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:background="@drawable/chat_bubble_other"
                 android:padding="8dp"
-                android:text="Project Invite"
-                android:textColor="@android:color/white"
-                android:textIsSelectable="true"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:autoLink="all"
-                android:linksClickable="true"
-                android:visibility="gone" />
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/other_user_project_invite_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Project Invite"
+                    android:textColor="@android:color/white"
+                    android:textIsSelectable="true"
+                    android:textAlignment="center"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true" />
+
+                <Button
+                    android:id="@+id/other_user_project_invite_join_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#F88D0B"
+                    android:text="Join Project" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/other_user_reply_message_layout"

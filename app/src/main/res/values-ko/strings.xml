@@ -219,5 +219,31 @@
     <string name="sent_an_image_attachment">" 이미지 첨부함"</string>
     <string name="camera_permission_granted">카메라 권한 부여됨</string>
     <string name="camera_permission_denied">카메라 권한 거부됨</string>
+    <string name="sent_a_project_invite">님이 프로젝트 초대를 보냈습니다</string>
+    <string name="already_in_project">이미 프로젝트에 참여 중입니다</string>
+    <string name="join_project">프로젝트 참여</string>
+    <string name="successfully_joined_the_project">프로젝트에 성공적으로 참여하였습니다</string>
+    <string name="select_a_project_to_invite_to">초대할 프로젝트를 선택하세요</string>
+    <string name="confirm_invitation">초대 수락</string>
+    <string name="are_you_sure_to_send_invite_for">\'의 초대를 보내시겠습니까?</string>
+    <string name="yes_dial">예</string>
+    <string name="no_dial">아니오</string>
+    <string name="uploading_please_wait">업로드 중입니다. 잠시 기다려주세요...</string>
+    <string name="btn_open">열기</string>
+    <string name="btn_download">다운로드</string>
+    <string name="change_b">변경</string>
+    <string name="change_password">비밀번호 변경</string>
+    <string name="edit_display_name">표시 이름 편집</string>
+    <string name="profile_and_settings">프로필 및 설정</string>
+    <string name="this_account_is_linked_to_a_google_account">이 계정은 Google 계정에 연결되어 있습니다</string>
+    <string name="save">저장</string>
+    <string name="cancel">취소</string>
+    <string name="new_passwords_do_not_match">새 비밀번호가 일치하지 않습니다</string>
+    <string name="change_password_2">비밀번호 변경</string>
+    <string name="sign_out">로그아웃</string>
+    <string name="no_access">접근 권한 없음</string>
+    <string name="it_seems_that_you_are_not_allowed_to_perform_this_action_please_refresh_or_check_if_you_are_still_part_of_the_project">이 작업을 수행할 수 있는 권한이 없는 것 같습니다. 새로고침하거나 프로젝트에 여전히 속해 있는지 확인해주세요.</string>
+    <string name="ok">확인</string>
+
 
 </resources>

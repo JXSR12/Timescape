@@ -137,9 +137,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                             });
                 } else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
-                    builder.setTitle("No access")
-                            .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
-                            .setPositiveButton("OK", null)
+                    builder.setTitle(R.string.no_access)
+                            .setMessage(R.string.it_seems_that_you_are_not_allowed_to_perform_this_action_please_refresh_or_check_if_you_are_still_part_of_the_project)
+                            .setPositiveButton(R.string.ok, null)
                             .show();
                 }
             }
@@ -182,9 +182,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                     builder.create().show();
                 } else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
-                    builder.setTitle("No access")
-                            .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
-                            .setPositiveButton("OK", null)
+                    builder.setTitle(R.string.no_access)
+                            .setMessage(R.string.it_seems_that_you_are_not_allowed_to_perform_this_action_please_refresh_or_check_if_you_are_still_part_of_the_project)
+                            .setPositiveButton(R.string.ok, null)
                             .show();
                 }
             }

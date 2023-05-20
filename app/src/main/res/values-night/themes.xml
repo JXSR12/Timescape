@@ -14,34 +14,4 @@
         <!-- Customize your theme here. -->
         <item name="android:textColorPrimary">#DADADA</item>
     </style>
-
-    <style name="FullScreenTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/orange_def1</item>
-        <item name="colorPrimaryVariant">#705540</item>
-        <item name="colorOnPrimary">#222121</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/orange_acc0</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <item name="android:textColorPrimary">#4E4E4E</item>
-        <!-- Customize your theme here. -->
-    </style>
-
-    <style name="FullScreenTheme2" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/orange_def1</item>
-        <item name="colorPrimaryVariant">#705540</item>
-        <item name="colorOnPrimary">#222121</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/orange_acc0</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <item name="android:textColorPrimary">#4E4E4E</item>
-        <!-- Customize your theme here. -->
-    </style>
 </resources>

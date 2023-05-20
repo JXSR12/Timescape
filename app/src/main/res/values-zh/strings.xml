@@ -219,5 +219,31 @@
     <string name="sent_an_image_attachment">"发送了图片附件"</string>
     <string name="camera_permission_granted">已授予相机权限</string>
     <string name="camera_permission_denied">相机权限被拒绝</string>
+    <string name="sent_a_project_invite">发送了一个项目邀请</string>
+    <string name="already_in_project">已加入项目</string>
+    <string name="join_project">加入项目</string>
+    <string name="successfully_joined_the_project">成功加入项目</string>
+    <string name="select_a_project_to_invite_to">选择要邀请的项目</string>
+    <string name="confirm_invitation">确认邀请</string>
+    <string name="are_you_sure_to_send_invite_for">是否确认发送邀请给 \'</string>
+    <string name="yes_dial">是</string>
+    <string name="no_dial">否</string>
+    <string name="uploading_please_wait">正在上传，请稍候...</string>
+    <string name="btn_open">打开</string>
+    <string name="btn_download">下载</string>
+    <string name="change_b">更改</string>
+    <string name="change_password">更改密码</string>
+    <string name="edit_display_name">编辑显示名称</string>
+    <string name="profile_and_settings">个人资料和设置</string>
+    <string name="this_account_is_linked_to_a_google_account">此帐户已与 Google 帐户关联</string>
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="new_passwords_do_not_match">新密码不匹配</string>
+    <string name="change_password_2">更改密码</string>
+    <string name="sign_out">退出登录</string>
+    <string name="no_access">无权限</string>
+    <string name="it_seems_that_you_are_not_allowed_to_perform_this_action_please_refresh_or_check_if_you_are_still_part_of_the_project">似乎您没有执行此操作的权限，请刷新页面或检查是否仍然是项目的一部分。</string>
+    <string name="ok">确定</string>
+
 
 </resources>
