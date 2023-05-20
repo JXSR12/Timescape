@@ -20,6 +20,8 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
@@ -110,57 +112,83 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     }
 
     private void updateTask(String title, String description, View itemView, Task task) {
-        task.setTitle(title);
-        task.setDescription(description);
-
+        String projectId = task.getProject().getId();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("tasks").document(task.getUid())
-                .set(task)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Snackbar.make(itemView, "Task updated", Snackbar.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Snackbar.make(itemView, "Error while updating task", Snackbar.LENGTH_SHORT).show();
-                    }
-                });
+        db.collection("projects").document(projectId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if ((documentSnapshot.exists() && documentSnapshot.get("members." + FirebaseAuth.getInstance().getCurrentUser().getUid()) != null) || documentSnapshot.getDocumentReference("owner").getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                    task.setTitle(title);
+                    task.setDescription(description);
+
+                    db.collection("tasks").document(task.getUid())
+                            .set(task)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Snackbar.make(itemView, R.string.task_updated, Snackbar.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Snackbar.make(itemView, R.string.error_while_updating_task, Snackbar.LENGTH_SHORT).show();
+                                }
+                            });
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
+                    builder.setTitle("No access")
+                            .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
+                            .setPositiveButton("OK", null)
+                            .show();
+                }
+            }
+        });
     }
 
     private void deleteTask(Task task, View itemView, ViewGroup parentView) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
-        builder.setTitle("Delete this task?")
-                .setMessage("This action cannot be undone.")
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        db.collection("tasks").document(task.getUid())
-                                .delete()
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Snackbar.make(parentView, "Task deleted", Snackbar.LENGTH_SHORT).show();
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Snackbar.make(parentView, "Error while deleting task", Snackbar.LENGTH_SHORT).show();
-                                    }
-                                });
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User cancelled the dialog
-                        dialog.dismiss();
-                    }
-                });
-        // Create the AlertDialog object and return it
-        builder.create().show();
+        String projectId = task.getProject().getId();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("projects").document(projectId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if ((documentSnapshot.exists() && documentSnapshot.get("members." + FirebaseAuth.getInstance().getCurrentUser().getUid()) != null) || documentSnapshot.getDocumentReference("owner").getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
+                    builder.setTitle(R.string.delete_this_task)
+                            .setMessage(R.string.this_action_cannot_be_undone)
+                            .setPositiveButton(R.string.delete_b, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    db.collection("tasks").document(task.getUid())
+                                            .delete()
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Snackbar.make(itemView, R.string.task_deleted, Snackbar.LENGTH_SHORT).show();
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Snackbar.make(itemView, R.string.error_while_deleting_task, Snackbar.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                }
+                            })
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    builder.create().show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
+                    builder.setTitle("No access")
+                            .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
+                            .setPositiveButton("OK", null)
+                            .show();
+                }
+            }
+        });
     }
 
 

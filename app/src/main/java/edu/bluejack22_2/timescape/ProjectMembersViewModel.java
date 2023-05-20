@@ -129,7 +129,7 @@ public class ProjectMembersViewModel extends ViewModel {
         }
     }
 
-    public void removeMember(String projectId, String userId) {
+    public void removeMember(String projectId, String userId, boolean notify) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference projectRef = db.collection("projects").document(projectId);
 
@@ -137,10 +137,8 @@ public class ProjectMembersViewModel extends ViewModel {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if(documentSnapshot.exists()){
-                    String projectName = "Project Title";
-                    projectName = documentSnapshot.getString("title");
+                    String projectName = documentSnapshot.getString("title");
 
-                    String finalProjectName = projectName;
                     projectRef.update("members." + userId, FieldValue.delete())
                             .addOnSuccessListener(aVoid -> {
                                 Log.d("ProjectMembersViewModel", "Member removed successfully");
@@ -154,7 +152,16 @@ public class ProjectMembersViewModel extends ViewModel {
                                         .addOnSuccessListener(docSnap -> {
                                             String objectUserName = docSnap.getString("displayName");
                                             // Send the notification
-                                            MainActivity.sendProjectOperationNotification(actorUserId, actorName, projectId, finalProjectName, "REMOVE", userId, objectUserName);
+                                            if(notify){
+                                                MainActivity.sendProjectOperationNotification(actorUserId, actorName, projectId, projectName, "REMOVE", userId, objectUserName);
+                                            }
+
+                                            // Remove the document from the 'projectAccesses' subcollection of the removed user
+                                            db.collection("users").document(userId)
+                                                    .collection("projectAccesses").document(projectId)
+                                                    .delete()
+                                                    .addOnSuccessListener(aVoid1 -> Log.d("ProjectMembersViewModel", "Project access removed successfully for user"))
+                                                    .addOnFailureListener(e -> Log.w("ProjectMembersViewModel", "Error removing project access for user", e));
                                         })
                                         .addOnFailureListener(e -> Log.w("ProjectMembersViewModel", "Error getting removed user's display name", e));
                             })
@@ -165,25 +172,17 @@ public class ProjectMembersViewModel extends ViewModel {
     }
 
 
+
     public void leaveProject(String projectId) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             String currentUserId = currentUser.getUid();
-            removeMember(projectId, currentUserId);
-        }
+            removeMember(projectId, currentUserId, false);
 
-        // Remove the projectId from the 'project_accesses' array field of all users in the 'users' collection
-        FirebaseFirestore.getInstance().collection("users")
-                .whereArrayContains("project_accesses", projectId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        WriteBatch batch = FirebaseFirestore.getInstance().batch();
-                        for (DocumentSnapshot document : task.getResult()) {
-                            batch.update(document.getReference(), "project_accesses", FieldValue.arrayRemove(projectId));
-                        }
-                        batch.commit();
-                    }
-                });
+            // Remove the document from the 'projectAccesses' subcollection of the current user
+            FirebaseFirestore.getInstance().collection("users").document(currentUserId)
+                    .collection("projectAccesses").document(projectId)
+                    .delete();
+        }
     }
 }

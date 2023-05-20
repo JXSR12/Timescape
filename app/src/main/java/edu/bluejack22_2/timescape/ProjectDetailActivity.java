@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import edu.bluejack22_2.timescape.model.Project;
+import edu.bluejack22_2.timescape.model.ProjectAccess;
 import edu.bluejack22_2.timescape.model.Task;
 
 import com.google.firebase.Timestamp;
@@ -117,26 +118,42 @@ public class ProjectDetailActivity extends BaseActivity {
         taskAdapter = new TaskAdapter(tasks, new TaskAdapter.OnTaskCheckedChangeListener() {
             @Override
             public void onTaskCheckedChanged(Task task, boolean isChecked) {
-                // Update the completed status of the task
-                task.setCompleted(isChecked);
+                // Fetch the project
+                db.collection("projects").document(task.getProject().getId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if ((documentSnapshot.exists() && documentSnapshot.get("members." + FirebaseAuth.getInstance().getCurrentUser().getUid()) != null) || documentSnapshot.getDocumentReference("owner").getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                            // User is a member of the project
+                            // Update the completed status of the task
+                            task.setCompleted(isChecked);
 
-                // Update the task in the database
-                tasksRef.document(task.getUid())
-                        .update("completed", isChecked)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("ProjectDetailActivity", "Task updated successfully");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("ProjectDetailActivity", "Error updating task", e);
-                            }
-                        });
+                            // Update the task in the database
+                            tasksRef.document(task.getUid())
+                                    .update("completed", isChecked)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d("ProjectDetailActivity", "Task updated successfully");
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w("ProjectDetailActivity", "Error updating task", e);
+                                        }
+                                    });
+                        } else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ProjectDetailActivity.this);
+                            builder.setTitle("No access")
+                                    .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
+                                    .setPositiveButton("OK", null)
+                                    .show();
+                        }
+                    }
+                });
             }
         });
+
         tasksRecyclerView.setLayoutManager(new LinearLayoutManager(ProjectDetailActivity.this));
         tasksRecyclerView.setAdapter(taskAdapter);
 
@@ -242,98 +259,101 @@ public class ProjectDetailActivity extends BaseActivity {
         fabEditProject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(ProjectDetailActivity.this);
-                LayoutInflater inflater = getLayoutInflater();
-                View dialogView = inflater.inflate(R.layout.dialog_edit_project, null);
-                builder.setView(dialogView);
+                db.collection("projects").document(projectId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if ((documentSnapshot.exists() && documentSnapshot.get("members." + FirebaseAuth.getInstance().getCurrentUser().getUid()) != null) || documentSnapshot.getDocumentReference("owner").getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ProjectDetailActivity.this);
+                            LayoutInflater inflater = getLayoutInflater();
+                            View dialogView = inflater.inflate(R.layout.dialog_edit_project, null);
+                            builder.setView(dialogView);
 
-                EditText titleEditText = dialogView.findViewById(R.id.title_input);
-                EditText descriptionEditText = dialogView.findViewById(R.id.description_input);
-                EditText deadlineDateEditText = dialogView.findViewById(R.id.deadline_input);
-                SwitchMaterial visibilitySwitch = dialogView.findViewById(R.id.visibility_switch);
-                Button saveChangesButton = dialogView.findViewById(R.id.create_project_button);
+                            EditText titleEditText = dialogView.findViewById(R.id.title_input);
+                            EditText descriptionEditText = dialogView.findViewById(R.id.description_input);
+                            EditText deadlineDateEditText = dialogView.findViewById(R.id.deadline_input);
+                            SwitchMaterial visibilitySwitch = dialogView.findViewById(R.id.visibility_switch);
+                            Button saveChangesButton = dialogView.findViewById(R.id.create_project_button);
 
-                titleEditText.setText(project.getTitle());
-                descriptionEditText.setText(project.getDescription());
-                SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.mmm_dd_yyyy_at_hh_mm), Locale.getDefault());
-                deadlineDateEditText.setText(sdf.format(project.getDeadline_date().toDate()));
-                visibilitySwitch.setChecked(project.isPrivate());
+                            titleEditText.setText(project.getTitle());
+                            descriptionEditText.setText(project.getDescription());
+                            SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.mmm_dd_yyyy_at_hh_mm), Locale.getDefault());
+                            deadlineDateEditText.setText(sdf.format(project.getDeadline_date().toDate()));
+                            visibilitySwitch.setChecked(project.isPrivate());
 
-                // Set up the DatePicker and TimePicker dialogs
-                final Calendar calendar = Calendar.getInstance();
-                deadlineDateEditText.setOnClickListener(v1 -> {
-                    new DatePickerDialog(ProjectDetailActivity.this, (view, year, month, dayOfMonth) -> {
-                        calendar.set(year, month, dayOfMonth);
-                        new TimePickerDialog(ProjectDetailActivity.this, (timeView, hourOfDay, minute) -> {
-                            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                            calendar.set(Calendar.MINUTE, minute);
-                            deadlineDateEditText.setText(sdf.format(calendar.getTime()));
-                        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
-                    }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
-                });
-
-                AlertDialog dialog = builder.create();
-
-                saveChangesButton.setOnClickListener(v1 -> {
-                    String newTitle = titleEditText.getText().toString().trim();
-                    String newDescription = descriptionEditText.getText().toString().trim();
-                    Timestamp newDeadline = new Timestamp(calendar.getTime());
-                    String newDeadlineText = deadlineDateEditText.getText().toString().trim();
-                    boolean newVisibility = visibilitySwitch.isChecked();
-
-                    if (newTitle.isEmpty() || newDescription.isEmpty() || newDeadlineText.isEmpty()) {
-                        Snackbar.make(dialogView, R.string.all_fields_must_be_filled, Snackbar.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-                    // Update the project document in Firestore
-                    db.collection("projects").document(projectId)
-                            .update("title", newTitle,
-                                    "description", newDescription,
-                                    "deadline_date", newDeadline,
-                                    "private", newVisibility)
-                            .addOnSuccessListener(aVoid -> {
-                                // Close the dialog and show success message
-                                dialog.dismiss();
-                                Snackbar.make(dialogView, R.string.project_edited_successfully, Snackbar.LENGTH_LONG).show();
-                            })
-                            .addOnFailureListener(e -> {
-                                // Show error message
-                                Snackbar.make(dialogView, getString(R.string.error_editing_project) + e.getMessage(), Snackbar.LENGTH_LONG).show();
+                            // Set up the DatePicker and TimePicker dialogs
+                            final Calendar calendar = Calendar.getInstance();
+                            deadlineDateEditText.setOnClickListener(v1 -> {
+                                new DatePickerDialog(ProjectDetailActivity.this, (view, year, month, dayOfMonth) -> {
+                                    calendar.set(year, month, dayOfMonth);
+                                    new TimePickerDialog(ProjectDetailActivity.this, (timeView, hourOfDay, minute) -> {
+                                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                                        calendar.set(Calendar.MINUTE, minute);
+                                        deadlineDateEditText.setText(sdf.format(calendar.getTime()));
+                                    }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
+                                }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
                             });
-                });
 
-                dialog.show();
+                            AlertDialog dialog = builder.create();
+
+                            saveChangesButton.setOnClickListener(v1 -> {
+                                String newTitle = titleEditText.getText().toString().trim();
+                                String newDescription = descriptionEditText.getText().toString().trim();
+                                Timestamp newDeadline = new Timestamp(calendar.getTime());
+                                String newDeadlineText = deadlineDateEditText.getText().toString().trim();
+                                boolean newVisibility = visibilitySwitch.isChecked();
+
+                                if (newTitle.isEmpty() || newDescription.isEmpty() || newDeadlineText.isEmpty()) {
+                                    Snackbar.make(dialogView, R.string.all_fields_must_be_filled, Snackbar.LENGTH_SHORT).show();
+                                    return;
+                                }
+
+                                FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                                // Update the project document in Firestore
+                                db.collection("projects").document(projectId)
+                                        .update("title", newTitle,
+                                                "description", newDescription,
+                                                "deadline_date", newDeadline,
+                                                "private", newVisibility)
+                                        .addOnSuccessListener(aVoid -> {
+                                            // Close the dialog and show success message
+                                            dialog.dismiss();
+                                            Snackbar.make(dialogView, R.string.project_edited_successfully, Snackbar.LENGTH_LONG).show();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            // Show error message
+                                            Snackbar.make(dialogView, getString(R.string.error_editing_project) + e.getMessage(), Snackbar.LENGTH_LONG).show();
+                                        });
+                            });
+
+                            dialog.show();
+
+                        } else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ProjectDetailActivity.this);
+                            builder.setTitle("No access")
+                                    .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
+                                    .setPositiveButton("OK", null)
+                                    .show();
+                        }
+                    }
+                });
             }
         });
-
-
 
     }
 
     private void updateRecentAccesses(String projectId) {
-        // Get the current user's document reference
-        DocumentReference userRef = db.collection("users").document(currentUser.getUid());
+        // Get the current user's 'projectAccesses' subcollection reference
+        CollectionReference projectAccessesRef = db.collection("users").document(currentUser.getUid())
+                .collection("projectAccesses");
 
-        // Remove the project id from the array (if it exists) and add it to the beginning of the array
-        userRef.update(
-                        "project_accesses", FieldValue.arrayRemove(projectId),
-                        "project_accesses", FieldValue.arrayUnion(projectId))
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("ProjectDetailActivity", "Recent accesses updated successfully");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("ProjectDetailActivity", "Error updating recent accesses", e);
-                    }
-                });
+        // Update the lastAccessTimestamp of the document corresponding to the projectId
+        projectAccessesRef.document(projectId)
+                .set(new ProjectAccess(projectId, new Timestamp(new Date())))
+                .addOnSuccessListener(aVoid -> Log.d("ProjectDetailActivity", "Recent accesses updated successfully"))
+                .addOnFailureListener(e -> Log.w("ProjectDetailActivity", "Error updating recent accesses", e));
     }
+
 
     private void showAddTaskDialog() {
         // Inflate the layout and create the AlertDialog
@@ -381,45 +401,60 @@ public class ProjectDetailActivity extends BaseActivity {
     }
 
     private void createNewTask(String title, String description) {
-        // Create a new task object
-        final Task newTask = new Task();
-        newTask.setTitle(title);
-        newTask.setDescription(description);
-        newTask.setCompleted(false);
-        newTask.setCreated_date(new Timestamp(new Date()));
-        newTask.setProject(db.collection("projects").document(projectId));
+        db.collection("projects").document(projectId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if ((documentSnapshot.exists() && documentSnapshot.get("members." + FirebaseAuth.getInstance().getCurrentUser().getUid()) != null) || documentSnapshot.getDocumentReference("owner").getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                    // Create a new task object
+                    final Task newTask = new Task();
+                    newTask.setTitle(title);
+                    newTask.setDescription(description);
+                    newTask.setCompleted(false);
+                    newTask.setCreated_date(new Timestamp(new Date()));
+                    newTask.setProject(db.collection("projects").document(projectId));
 
-        // Add the new task to Firestore
-        db.collection("tasks").add(newTask)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        // Set the uid field to the created document ID
-                        newTask.setUid(documentReference.getId());
+                    // Add the new task to Firestore
+                    db.collection("tasks").add(newTask)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    // Set the uid field to the created document ID
+                                    newTask.setUid(documentReference.getId());
 
-                        // Update the Firestore document with the new uid field
-                        documentReference.update("uid", newTask.getUid())
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Snackbar.make(findViewById(android.R.id.content), R.string.task_added_successfully, Snackbar.LENGTH_SHORT).show();
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Snackbar.make(findViewById(android.R.id.content), R.string.error_adding_task, Snackbar.LENGTH_SHORT).show();
-                                    }
-                                });
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Snackbar.make(findViewById(android.R.id.content), R.string.error_adding_task, Snackbar.LENGTH_SHORT).show();
-                    }
-                });
+                                    // Update the Firestore document with the new uid field
+                                    documentReference.update("uid", newTask.getUid())
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Snackbar.make(findViewById(android.R.id.content), R.string.task_added_successfully, Snackbar.LENGTH_SHORT).show();
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Snackbar.make(findViewById(android.R.id.content), R.string.error_adding_task, Snackbar.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Snackbar.make(findViewById(android.R.id.content), R.string.error_adding_task, Snackbar.LENGTH_SHORT).show();
+                                }
+                            });
+                } else {
+                    // Show the alert dialog
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ProjectDetailActivity.this);
+                    builder.setTitle("No access")
+                            .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
+                            .setPositiveButton("OK", null)
+                            .show();
+                }
+            }
+        });
     }
+
 
 
     private void updateProjectDetailsUI() {

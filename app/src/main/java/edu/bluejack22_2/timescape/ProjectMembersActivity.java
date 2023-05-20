@@ -109,7 +109,7 @@ public class ProjectMembersActivity extends AppCompatActivity {
 
         mViewModel = new ViewModelProvider(this).get(ProjectMembersViewModel.class);
 
-        mAdapter = new ProjectMembersAdapter(new ArrayList<>(), this, "", userId -> mViewModel.removeMember(mProjectId, userId));
+        mAdapter = new ProjectMembersAdapter(new ArrayList<>(), this, "", userId -> mViewModel.removeMember(mProjectId, userId, true));
         mRecyclerView.setAdapter(mAdapter);
 
         mViewModel.getmOwnerId().observe(this, ownerId -> {
@@ -155,38 +155,82 @@ public class ProjectMembersActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         mInviteMemberButton.setOnClickListener(v -> {
-            if(!project.isPrivate() || project.getOwner().getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
-                showSearchUserDialog();
-            }else{
-                Snackbar.make(mInviteMemberButton, R.string.only_project_owner_can_invite_members_in_private_projects, BaseTransientBottomBar.LENGTH_SHORT).show();
-            }
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("projects").document(mProjectId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if ((documentSnapshot.exists() && documentSnapshot.get("members." + FirebaseAuth.getInstance().getCurrentUser().getUid()) != null) || documentSnapshot.getDocumentReference("owner").getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                        if(!project.isPrivate() || project.getOwner().getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+                            showSearchUserDialog();
+                        }else{
+                            Snackbar.make(mInviteMemberButton, R.string.only_project_owner_can_invite_members_in_private_projects, BaseTransientBottomBar.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ProjectMembersActivity.this);
+                        builder.setTitle("No access")
+                                .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
+                                .setPositiveButton("OK", null)
+                                .show();
+                    }
+                }
+            });
         });
 
         mProjectInviteLinkButton.setOnClickListener(v -> {
-            if(!project.isPrivate() || project.getOwner().getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
-                showInviteLinkDialog();
-            }else{
-                Snackbar.make(mInviteMemberButton, R.string.only_project_owner_can_generate_invite_links_in_private_projects, BaseTransientBottomBar.LENGTH_SHORT).show();
-            }
-        });
-
-        mLeaveOrDeleteProjectButton.setOnClickListener(v -> {
-            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                if (which == DialogInterface.BUTTON_POSITIVE) {
-                    if (mIsCurrentUserOwner) {
-                        deleteProject(mProjectId);
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("projects").document(mProjectId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if ((documentSnapshot.exists() && documentSnapshot.get("members." + FirebaseAuth.getInstance().getCurrentUser().getUid()) != null) || documentSnapshot.getDocumentReference("owner").getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                        // User is a member of the project
+                        if(!project.isPrivate() || project.getOwner().getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+                            showInviteLinkDialog();
+                        } else {
+                            Snackbar.make(mInviteMemberButton, R.string.only_project_owner_can_generate_invite_links_in_private_projects, BaseTransientBottomBar.LENGTH_SHORT).show();
+                        }
                     } else {
-                        mViewModel.leaveProject(mProjectId);
-                        closeActivityAndNotifyOthers();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ProjectMembersActivity.this);
+                        builder.setTitle("No access")
+                                .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
+                                .setPositiveButton("OK", null)
+                                .show();
                     }
                 }
-            };
+            });
+        });
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(getString(R.string.are_you_sure_you_want_to) + (mIsCurrentUserOwner ? getString(R.string.delete_2) : getString(R.string.leave)) + getString(R.string.this_project))
-                    .setPositiveButton(R.string.yes, dialogClickListener)
-                    .setNegativeButton(R.string.no, dialogClickListener)
-                    .show();
+
+        mLeaveOrDeleteProjectButton.setOnClickListener(v -> {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("projects").document(mProjectId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if ((documentSnapshot.exists() && documentSnapshot.get("members." + FirebaseAuth.getInstance().getCurrentUser().getUid()) != null) || documentSnapshot.getDocumentReference("owner").getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                            if (which == DialogInterface.BUTTON_POSITIVE) {
+                                if (mIsCurrentUserOwner) {
+                                    deleteProject(mProjectId);
+                                } else {
+                                    mViewModel.leaveProject(mProjectId);
+                                    closeActivityAndNotifyOthers();
+                                }
+                            }
+                        };
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ProjectMembersActivity.this);
+                        builder.setMessage(getString(R.string.are_you_sure_you_want_to) + (mIsCurrentUserOwner ? getString(R.string.delete_2) : getString(R.string.leave)) + getString(R.string.this_project))
+                                .setPositiveButton(R.string.yes, dialogClickListener)
+                                .setNegativeButton(R.string.no, dialogClickListener)
+                                .show();
+                    } else {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ProjectMembersActivity.this);
+                        builder.setTitle("No access")
+                                .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
+                                .setPositiveButton("OK", null)
+                                .show();
+                    }
+                }
+            });
         });
     }
 
@@ -297,8 +341,6 @@ public class ProjectMembersActivity extends AppCompatActivity {
         return shortLinkTask;
     }
 
-
-
     private void deleteProject(String projectId) {
         // Delete the project document from the 'projects' collection
         FirebaseFirestore.getInstance().collection("projects").document(projectId).delete();
@@ -316,19 +358,27 @@ public class ProjectMembersActivity extends AppCompatActivity {
                         for (DocumentSnapshot document : task.getResult()) {
                             batch.delete(document.getReference());
                         }
-                        batch.commit();
+                        batch.commit().addOnCompleteListener(batchTask -> {
+                            if (batchTask.isSuccessful()) {
+                                // Remove the document from the 'projectAccesses' subcollection of all users
+                                removeProjectAccessFromAllUsers(projectId);
+                            }
+                        });
                     }
                 });
+    }
 
-        // Remove the projectId from the 'project_accesses' array field of all users in the 'users' collection
+    private void removeProjectAccessFromAllUsers(String projectId) {
+        // Get all the user documents
         FirebaseFirestore.getInstance().collection("users")
-                .whereArrayContains("project_accesses", projectId)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         WriteBatch batch = FirebaseFirestore.getInstance().batch();
                         for (DocumentSnapshot document : task.getResult()) {
-                            batch.update(document.getReference(), "project_accesses", FieldValue.arrayRemove(projectId));
+                            // Remove the document from the 'projectAccesses' subcollection of each user
+                            DocumentReference projectAccessRef = document.getReference().collection("projectAccesses").document(projectId);
+                            batch.delete(projectAccessRef);
                         }
                         batch.commit().addOnCompleteListener(batchTask -> {
                             if (batchTask.isSuccessful()) {

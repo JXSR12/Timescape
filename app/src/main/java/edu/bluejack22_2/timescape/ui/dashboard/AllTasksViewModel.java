@@ -1,11 +1,14 @@
 package edu.bluejack22_2.timescape.ui.dashboard;
 
+import android.content.Context;
 import android.util.Log;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -20,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import edu.bluejack22_2.timescape.MainActivity;
 import edu.bluejack22_2.timescape.model.Project;
 import edu.bluejack22_2.timescape.model.ProjectWithTasks;
 import edu.bluejack22_2.timescape.model.Task;
@@ -107,24 +111,30 @@ public class AllTasksViewModel extends ViewModel {
     }
 
 
-    public void updateTaskStatus(Task task) {
+    public void updateTaskStatus(Task task, Context context) {
         if (currentUser != null) {
-            ProjectWithTasks projectWithTasks = findProjectWithTasksByTaskId(task.getUid());
-            if (projectWithTasks != null) {
-                for (Task projectTask : projectWithTasks.getTasks()) {
-                    if (projectTask.getUid().equals(task.getUid())) {
-                        projectTask.setCompleted(task.isCompleted());
-                        break;
+            String projectId = task.getProject().getId();
+            db.collection("projects").document(projectId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if ((documentSnapshot.exists() && documentSnapshot.get("members." + currentUser.getUid()) != null) || documentSnapshot.getDocumentReference("owner").getId().equals(currentUser.getUid())) {
+                        DocumentReference taskRef = db.collection("tasks").document(task.getUid());
+                        taskRef.update("completed", task.isCompleted())
+                                .addOnSuccessListener(aVoid -> Log.d("AllTasksViewModel", "Task status updated successfully"))
+                                .addOnFailureListener(e -> Log.e("AllTasksViewModel", "Failed to update task status", e));
+                    } else {
+                        // Show the alert dialog
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context); // Replace 'context' with actual context
+                        builder.setTitle("No access")
+                                .setMessage("It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.")
+                                .setPositiveButton("OK", null)
+                                .show();
                     }
                 }
-            }
-
-            DocumentReference taskRef = db.collection("tasks").document(task.getUid());
-            taskRef.update("completed", task.isCompleted())
-                    .addOnSuccessListener(aVoid -> Log.d("AllTasksViewModel", "Task status updated successfully"))
-                    .addOnFailureListener(e -> Log.e("AllTasksViewModel", "Failed to update task status", e));
+            });
         }
     }
+
 
 
     private ProjectWithTasks findProjectWithTasksByTaskId(String taskId) {

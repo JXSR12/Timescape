@@ -4,7 +4,6 @@ import com.google.firebase.Timestamp;
 
 public class ProjectMember {
     private String userId;
-
     private String displayName;
     private Timestamp date_joined;
     private String role;

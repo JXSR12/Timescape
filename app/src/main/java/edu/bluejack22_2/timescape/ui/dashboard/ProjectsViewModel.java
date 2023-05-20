@@ -5,16 +5,20 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import edu.bluejack22_2.timescape.model.Project;
+import edu.bluejack22_2.timescape.model.ProjectAccess;
 
 public class ProjectsViewModel extends ViewModel {
     private final MutableLiveData<List<Project>> recentProjects = new MutableLiveData<>();
@@ -27,40 +31,40 @@ public class ProjectsViewModel extends ViewModel {
     }
 
     private void fetchRecentProjects(FirebaseFirestore db, String userId) {
-        db.collection("users").document(userId)
+        CollectionReference projectAccessesRef = db.collection("users").document(userId)
+                .collection("projectAccesses");
+
+        // Fetch all the documents, ordered by lastAccessTimestamp descending
+        projectAccessesRef.orderBy("lastAccessTimestamp", Query.Direction.DESCENDING)
                 .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    List<String> projectAccesses = (List<String>) documentSnapshot.get("project_accesses");
-                    if (projectAccesses != null) {
-                        // Reverse the projectAccesses list
-                        Collections.reverse(projectAccesses);
+                .addOnSuccessListener(querySnapshot -> {
+                    List<ProjectAccess> projectAccesses = querySnapshot.toObjects(ProjectAccess.class);
 
-                        List<String> recentProjectIds = projectAccesses.subList(0, Math.min(projectAccesses.size(), 4));
-                        List<Project> recentProjectsList = new ArrayList<>();
-                        AtomicInteger counter = new AtomicInteger();
+                    List<String> recentProjectIds = projectAccesses.stream()
+                            .limit(4)
+                            .map(ProjectAccess::getProjectId)
+                            .collect(Collectors.toList());
 
-                        // Iterate through the project access IDs and fetch the projects in the order they appear in the reversed projectAccesses array
-                        for (String projectId : recentProjectIds) {
-                            db.collection("projects").document(projectId)
-                                    .get()
-                                    .addOnSuccessListener(projectSnapshot -> {
-                                        Project project = projectSnapshot.toObject(Project.class);
-                                        if (project != null) {
-                                            project.setUid(projectSnapshot.getId());
-                                            recentProjectsList.add(project);
-                                        }
-                                        if (counter.incrementAndGet() == recentProjectIds.size()) {
-                                            recentProjects.setValue(recentProjectsList);
-                                        }
-                                    });
-                        }
+                    List<Project> recentProjectsList = new ArrayList<>();
+                    AtomicInteger counter = new AtomicInteger();
+
+                    // Iterate through the project access IDs and fetch the projects in the order they appear in the projectAccesses list
+                    for (String projectId : recentProjectIds) {
+                        db.collection("projects").document(projectId)
+                                .get()
+                                .addOnSuccessListener(projectSnapshot -> {
+                                    Project project = projectSnapshot.toObject(Project.class);
+                                    if (project != null) {
+                                        project.setUid(projectSnapshot.getId());
+                                        recentProjectsList.add(project);
+                                    }
+                                    if (counter.incrementAndGet() == recentProjectIds.size()) {
+                                        recentProjects.setValue(recentProjectsList);
+                                    }
+                                });
                     }
                 });
     }
-
-
-
-
 
     private void fetchAllProjects(FirebaseFirestore db, String userId) {
         DocumentReference userRef = db.collection("users").document(userId);
