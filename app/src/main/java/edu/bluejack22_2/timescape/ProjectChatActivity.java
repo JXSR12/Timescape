@@ -105,7 +105,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
     private HashMap<String, String> mentionedUserIds = new HashMap<>();
 
     private String userId;
-    private String projectId;
+    private String projectId = "";
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
     private ListenerRegistration chatDocListener;
@@ -123,6 +123,9 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
     ImageButton inviteProjectButton;
     RelativeLayout replyModeLayout;
     TextView replyModeText;
+
+    int onlineCount = 0;
+    int typingCount = 0;
 
     private boolean replyMode;
     private String repliedMessageId;
@@ -513,7 +516,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                         Message message = document.toObject(Message.class);
 
                         // Check if the last message is not from the current user and mark it as read if visible
-                        if (!firstLoadChat && document.getId().equals(snapshots.getDocuments().get(snapshots.size()-1).getId())) {
+                        if (document.getId().equals(snapshots.getDocuments().get(snapshots.size()-1).getId())) {
                             if (!message.getSender().getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                                 markMessageAsReadIfVisible(message);
                             }
@@ -662,8 +665,10 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
 //    }
 
     private void fetchAndMarkAllMessagesAsRead() {
+        if(FirebaseAuth.getInstance().getCurrentUser() == null) return;
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        if(project == null) return;
         String chatDocumentId = project.getUid(); // Replace with your chat document ID (project ID)
 
         db.collection("chats")
@@ -827,36 +832,73 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                     return;
                 }
 
-                int onlineCount = 0;
-                int typingCount = 0;
+                onlineCount = 0;
+                typingCount = 0;
+                List<String> typingUserIds = new ArrayList<>();
                 String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
                 for (QueryDocumentSnapshot doc : value) {
                     if (doc.exists() && !doc.getId().equals(currentUserId) && projectMemberIds.contains(doc.getId())) {
                         Boolean online = doc.getBoolean("online");
-                        Boolean typing = doc.getBoolean("typing");
 
                         if (online != null && online) {
                             onlineCount++;
                             Log.d(TAG, "Online User ID: " + doc.getId());
                         }
+
+                        Boolean typing = doc.getBoolean("typing");
                         if (typing != null && typing) {
-                            typingCount++;
+                            // Add the user to the list of typing users
+                            typingUserIds.add(doc.getId());
                         }
                     }
                 }
 
-                Log.d(TAG, "Online Count: " + onlineCount);
+                // Check the active chat room of each typing user
+                checkTypingUsersActiveChatRoom(db, typingUserIds, 0);
 
-                updateOnlineStatusDisplay(onlineCount, typingCount);
+                Log.d(TAG, "Online Count: " + onlineCount);
+                updateOnlineStatusDisplay(onlineCount);
             }
         });
     }
 
-    private void updateOnlineStatusDisplay(int onlineCount, int typingCount) {
-        if (typingCount > 0) {
-            actionBarOnlineText.setText(typingCount > 1 ? typingCount + getString(R.string.members_are_typing) : getString(R.string._1_member_is_typing));
-        } else if (onlineCount > 0) {
+    private void checkTypingUsersActiveChatRoom(FirebaseFirestore db, List<String> typingUserIds, int index) {
+        if (index >= typingUserIds.size()) {
+            // All users have been checked, update the UI
+            updateTypingStatusDisplay(typingCount);
+            return;
+        }
+
+        String userId = typingUserIds.get(index);
+        CollectionReference activeChatsRef = db.collection("activeChats");
+        activeChatsRef.document(userId).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                String activeChatProjectId = document.getString("projectId");
+                                if (projectId.equals(activeChatProjectId)) {
+                                    // The user is really typing in this project's chat
+                                    typingCount++;
+                                }
+                            } else {
+                                Log.d(TAG, "No such document");
+                            }
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
+                        }
+
+                        // Check the next user
+                        checkTypingUsersActiveChatRoom(db, typingUserIds, index + 1);
+                    }
+                });
+    }
+
+    private void updateOnlineStatusDisplay(int onlineCount) {
+        if (onlineCount > 0) {
             actionBarOnlineText.setText(onlineCount > 1 ? onlineCount + getString(R.string.other_members_online) : getString(R.string._1_other_member_online));
             actionBarOnlineBullet.setColorFilter(ContextCompat.getColor(this, R.color.green_online));
         } else {
@@ -864,6 +906,15 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             actionBarOnlineBullet.setColorFilter(ContextCompat.getColor(this, R.color.gray_offline));
         }
     }
+
+    private void updateTypingStatusDisplay(int typingCount) {
+        if (typingCount > 0) {
+            actionBarOnlineText.setText(typingCount > 1 ? typingCount + getString(R.string.members_are_typing) : getString(R.string._1_member_is_typing));
+        } else {
+            updateOnlineStatusDisplay(onlineCount);
+        }
+    }
+
 
 
     private final ActivityResultLauncher<Intent> pickFileLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -1510,6 +1561,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         super.onResume();
         isInActivity = true;
         setActiveChat(true);
+        fetchAndMarkAllMessagesAsRead();
 
         FirebaseFirestore.getInstance().collection("projects").document(getIntent().getStringExtra("projectId")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override

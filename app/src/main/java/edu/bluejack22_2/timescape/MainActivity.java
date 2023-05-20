@@ -2,6 +2,7 @@ package edu.bluejack22_2.timescape;
 
 import static android.content.ContentValues.TAG;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -52,7 +53,6 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.auth.UserInfo;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -76,7 +76,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -95,7 +94,6 @@ import edu.bluejack22_2.timescape.ui.dashboard.InvitedMemberAdapter;
 import edu.bluejack22_2.timescape.ui.dashboard.SearchResultAdapter;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -218,11 +216,7 @@ public class MainActivity extends BaseActivity {
         showQrDialog.show();
 
         // Check camera permission
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
-        } else {
-            setupCamera(showQrDialog, qrCodeProgress, qrCodeStatus);
-        }
+        setupCamera(showQrDialog, qrCodeProgress, qrCodeStatus);
     }
 
     private void setupCamera(AlertDialog dialog, ProgressBar qrCodeProgress, TextView qrCodeStatus) {
@@ -238,6 +232,7 @@ public class MainActivity extends BaseActivity {
                 .setAutoFocusEnabled(true)
                 .build();
 
+        SurfaceHolder holder = cameraPreview.getHolder();
         cameraPreview.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
@@ -246,6 +241,7 @@ public class MainActivity extends BaseActivity {
                         cameraSource.start(holder);
                         Log.d("Camera Started", "CAMERA SUCCESSFULLY STARTED");
                     }else{
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
                         Log.d("Camera Error", "CAMERA FAILED TO START");
                     }
                 } catch (IOException e) {
@@ -257,6 +253,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
             }
 
             @Override
@@ -334,11 +331,11 @@ public class MainActivity extends BaseActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                ProgressBar qrCodeProgress = showQrDialog.findViewById(R.id.qr_code_progress);
-                TextView qrCodeStatus = showQrDialog.findViewById(R.id.qr_code_status);
-                setupCamera(showQrDialog, qrCodeProgress, qrCodeStatus);
+                showQrDialog.dismiss();
+                showScanProjectQRDialog();
+                Toast.makeText(this, R.string.camera_permission_granted, Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.camera_permission_denied, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -743,7 +740,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        startServiceIfNotStarted();
     }
 
     @Override

@@ -217,5 +217,7 @@
     <string name="no_other_member_online">다른 멤버가 온라인 상태가 아닙니다</string>
     <string name="sent_a_file_attachment">" 파일 첨부함"</string>
     <string name="sent_an_image_attachment">" 이미지 첨부함"</string>
+    <string name="camera_permission_granted">카메라 권한 부여됨</string>
+    <string name="camera_permission_denied">카메라 권한 거부됨</string>
 
 </resources>

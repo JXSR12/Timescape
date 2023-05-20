@@ -217,4 +217,6 @@
     <string name="no_other_member_online">Tidak ada anggota lain yang aktif</string>
     <string name="sent_a_file_attachment">" mengirimkan lampiran berkas"</string>
     <string name="sent_an_image_attachment">" mengirimkan lampiran gambar"</string>
+    <string name="camera_permission_granted">Izin kamera diberikan</string>
+    <string name="camera_permission_denied">Izin kamera ditolak</string>
 </resources>

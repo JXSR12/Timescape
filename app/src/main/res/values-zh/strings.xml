@@ -217,5 +217,7 @@
     <string name="no_other_member_online">没有其他成员在线</string>
     <string name="sent_a_file_attachment">"发送了文件附件"</string>
     <string name="sent_an_image_attachment">"发送了图片附件"</string>
+    <string name="camera_permission_granted">已授予相机权限</string>
+    <string name="camera_permission_denied">相机权限被拒绝</string>
 
 </resources>
