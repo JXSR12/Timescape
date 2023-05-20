@@ -209,6 +209,11 @@
     <string name="error_checking_phone_number">"전화 번호 확인 중 오류 발생: "</string>
     <string name="phone_number_already_registered">전화 번호가 이미 등록되어 있습니다</string>
     <string name="please_fill_all_fields_correctly_tap_icon_for_more_info">모든 필드를 올바르게 입력하십시오. 자세한 내용을 보려면 (?) 아이콘을 탭하세요</string>
-
+    <string name="deadline_warning">프로젝트 마감일</string>
+    <string name="invalid_qr_code">유효하지 않은 QR 코드</string>
+    <string name="error_processing_content">콘텐츠 처리 오류</string>
+    <string name="resolving_invite">초대 해결 중</string>
+    <string name="scan_a_project_invite_qr">QR 코드를 스캔하여 프로젝트에 참여하세요</string>
+    <string name="no_other_member_online">다른 멤버가 온라인 상태가 아닙니다</string>
 
 </resources>

@@ -209,5 +209,11 @@
     <string name="error_checking_phone_number">"Error saat memeriksa nomor telepon: "</string>
     <string name="phone_number_already_registered">Nomor telepon sudah terdaftar</string>
     <string name="please_fill_all_fields_correctly_tap_icon_for_more_info">Harap isi semua kolom dengan benar, ketuk ikon (?) untuk informasi lebih lanjut</string>
+    <string name="deadline_warning">Batas Waktu Proyek</string>
+    <string name="invalid_qr_code">QR Code Tidak Valid</string>
+    <string name="error_processing_content">Kesalahan dalam Memproses Konten</string>
+    <string name="resolving_invite">Menyelesaikan Undangan</string>
+    <string name="scan_a_project_invite_qr">Gabung dalam Proyek menggunakan QR Code</string>
+    <string name="no_other_member_online">Tidak ada anggota lain yang aktif</string>
 
 </resources>

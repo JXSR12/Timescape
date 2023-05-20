@@ -35,6 +35,15 @@
         android:textIsSelectable="true"
         android:focusable="false" />
 
+    <ImageView
+        android:id="@+id/qr_code_image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/avatar_placeholder_chat"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -70,21 +70,13 @@ public class ChatsFragment extends Fragment implements ChatListAdapter.OnChatIte
         binding = null;
     }
 
-    private void setActiveChat(boolean isActive) {
-        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-        firebaseFirestore.collection("activeChats").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .set(isActive ? Collections.singletonMap("projectId", "ALL") : new HashMap<>());
-    }
-
     @Override
     public void onResume() {
         super.onResume();
-        setActiveChat(true);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        setActiveChat(false);
     }
 }

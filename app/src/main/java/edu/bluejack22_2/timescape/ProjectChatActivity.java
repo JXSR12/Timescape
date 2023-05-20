@@ -721,7 +721,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             actionBarOnlineText.setText(onlineCount > 1 ? onlineCount + getString(R.string.other_members_online) : getString(R.string._1_other_member_online));
             actionBarOnlineBullet.setColorFilter(ContextCompat.getColor(this, R.color.green_online));
         } else {
-            actionBarOnlineText.setText("No other member online");
+            actionBarOnlineText.setText(R.string.no_other_member_online);
             actionBarOnlineBullet.setColorFilter(ContextCompat.getColor(this, R.color.gray_offline));
         }
     }
@@ -854,8 +854,8 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        Map<String, Map<String, Object>> members = (Map<String, Map<String, Object>>) documentSnapshot.get("members");// Assuming 'members' field in project document
-                        members.put(project.getOwner().getId(), null); //This is to also include the owner in the members list.
+                        Map<String, Map<String, Object>> members = (Map<String, Map<String, Object>>) documentSnapshot.get("members"); // Assuming 'members' field in project document
+                        members.put(project.getOwner().getId(), null); // This is to also include the owner in the members list.
                         if (members != null) {
                             for (String id : members.keySet()) {
                                 // Skip sending notification to the sender
@@ -880,16 +880,8 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                                                     notificationData.put("messageId", messageId);
                                                     notificationData.put("notificationType", "PROJECT_CHAT_MESSAGE");
 
-                                                    firebaseFirestore.collection("notifications").document(id)
-                                                            .update("notifs", FieldValue.arrayUnion(notificationData))
-                                                            .addOnFailureListener(new OnFailureListener() {
-                                                                @Override
-                                                                public void onFailure(@NonNull Exception e) {
-                                                                    // If the document doesn't exist, create it with the notifs field
-                                                                    firebaseFirestore.collection("notifications").document(id)
-                                                                            .set(Collections.singletonMap("notifs", Collections.singletonList(notificationData)));
-                                                                }
-                                                            });
+                                                    firebaseFirestore.collection("users").document(id).collection("notifications")
+                                                            .add(notificationData);
                                                 }
                                             }
                                         });
@@ -1191,12 +1183,15 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        setActiveChat(false);
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
-        if (chatDocListener != null) {
-            chatDocListener.remove();
-            chatDocListener = null;
-        }
+        setActiveChat(false);
     }
 
     @Override

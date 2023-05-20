@@ -209,4 +209,10 @@
     <string name="error_checking_phone_number">"Error checking phone number: "</string>
     <string name="phone_number_already_registered">Phone number already registered</string>
     <string name="please_fill_all_fields_correctly_tap_icon_for_more_info">Please fill all fields correctly, tap (?) icon for more info</string>
+    <string name="deadline_warning">Project Deadlines</string>
+    <string name="invalid_qr_code">Invalid QR Code</string>
+    <string name="error_processing_content">Error processing content</string>
+    <string name="resolving_invite">Resolving invite</string>
+    <string name="scan_a_project_invite_qr">Join project using QR code</string>
+    <string name="no_other_member_online">No other member online</string>
 </resources>

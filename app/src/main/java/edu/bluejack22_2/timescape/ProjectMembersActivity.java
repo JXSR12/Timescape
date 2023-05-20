@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +46,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -186,11 +192,11 @@ public class ProjectMembersActivity extends AppCompatActivity {
 
     private void showInviteLinkDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
         LayoutInflater inflater = this.getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_invite_link, null);
         builder.setView(view);
 
+        ImageView qrCodeImageView = view.findViewById(R.id.qr_code_image_view);
         ProgressBar progressBar = view.findViewById(R.id.invite_link_progress);
         TextView inviteLinkTitle = view.findViewById(R.id.invite_link_title);
         EditText inviteLinkEditText = view.findViewById(R.id.invite_link_edit_text);
@@ -200,6 +206,7 @@ public class ProjectMembersActivity extends AppCompatActivity {
         inviteLinkEditText.setVisibility(View.GONE);
         shareInviteLinkButton.setVisibility(View.GONE);
         copyInviteLinkButton.setVisibility(View.GONE);
+        qrCodeImageView.setVisibility(View.GONE);
 
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -210,12 +217,16 @@ public class ProjectMembersActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Uri dynamicLinkUri = task.getResult().getShortLink();
 
+                        Bitmap qrCodeBitmap = generateQRCode(dynamicLinkUri.toString());
+                        qrCodeImageView.setImageBitmap(qrCodeBitmap);
+
                         progressBar.setVisibility(View.GONE);
                         inviteLinkTitle.setText(R.string.project_invite_link);
                         inviteLinkEditText.setVisibility(View.VISIBLE);
                         inviteLinkEditText.setText(dynamicLinkUri.toString());
                         shareInviteLinkButton.setVisibility(View.VISIBLE);
                         copyInviteLinkButton.setVisibility(View.VISIBLE);
+                        qrCodeImageView.setVisibility(View.VISIBLE);
 
                         shareInviteLinkButton.setOnClickListener(v -> {
                             Intent shareIntent = new Intent();
@@ -240,13 +251,36 @@ public class ProjectMembersActivity extends AppCompatActivity {
 
     }
 
+    private Bitmap generateQRCode(String content) {
+        int size = getResources().getDimensionPixelSize(R.dimen.qr_code_size);
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        try {
+            BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, size, size);
+            int width = bitMatrix.getWidth();
+            int height = bitMatrix.getHeight();
+            int[] pixels = new int[width * height];
+            for (int y = 0; y < height; y++) {
+                int offset = y * width;
+                for (int x = 0; x < width; x++) {
+                    pixels[offset + x] = bitMatrix.get(x, y) ? getResources().getColor(R.color.black) : getResources().getColor(R.color.white);
+                }
+            }
+            Bitmap qrCodeBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            qrCodeBitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+            return qrCodeBitmap;
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private Task<ShortDynamicLink> createDynamicLink() {
         String deepLink = "https://timescapxtnsn.page.link/project_invite?projectId=" + mProjectId;
         String fallbackUrl = "https://sites.google.com/view/timescape-landing/home";
 
         DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
                 .setLink(Uri.parse(deepLink))
-                .setDomainUriPrefix("https://timescapxtnsn.page.link")
+                .setDomainUriPrefix("https://jex.ink/c/")
                 .setAndroidParameters(
                         new DynamicLink.AndroidParameters.Builder()
                                 .setFallbackUrl(Uri.parse(fallbackUrl))

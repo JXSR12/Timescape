@@ -4,16 +4,22 @@ import static android.content.ContentValues.TAG;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.MenuItem;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.Menu;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -28,7 +34,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -41,6 +50,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -62,6 +72,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -83,6 +94,15 @@ import edu.bluejack22_2.timescape.ui.dashboard.DashboardViewModel;
 import edu.bluejack22_2.timescape.ui.dashboard.InvitedMemberAdapter;
 import edu.bluejack22_2.timescape.ui.dashboard.SearchResultAdapter;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.vision.CameraSource;
+import com.google.android.gms.vision.Detector;
+import com.google.android.gms.vision.barcode.Barcode;
+import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
+
 public class MainActivity extends BaseActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
@@ -90,9 +110,13 @@ public class MainActivity extends BaseActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
-
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
     TextView quickViewUserName, quickViewUserEmail;
     ImageView quickViewProfilePic;
+
+    AlertDialog showQrDialog;
+
+    final boolean[] isDeepLinkProcessed = {false};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +141,14 @@ public class MainActivity extends BaseActivity {
                 showAddProjectDialog();
             }
         });
+        binding.appBarMain.fabJoinQr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Add project form
+                showScanProjectQRDialog();
+            }
+        });
+
         DrawerLayout drawer = binding.drawerLayout;
 
         NavigationView navigationViewTop = binding.navViewTop;
@@ -151,7 +183,7 @@ public class MainActivity extends BaseActivity {
         handleProjectInviteDeeplink(getIntent());
     }
 
-    private void onDialogClosed(){
+    private void onDialogClosed() {
         dashboardViewModel.setDialogDismissed(true);
     }
 
@@ -166,6 +198,149 @@ public class MainActivity extends BaseActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.onNavDestinationSelected(item, navController)
                 || super.onOptionsItemSelected(item);
+    }
+
+    private void showScanProjectQRDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.dialog_scan_qr, null);
+        builder.setView(view);
+
+        ProgressBar qrCodeProgress = view.findViewById(R.id.qr_code_progress);
+        TextView qrCodeStatus = view.findViewById(R.id.qr_code_status);
+
+        qrCodeProgress.setVisibility(View.GONE);
+        qrCodeStatus.setVisibility(View.GONE);
+
+        showQrDialog = builder.create();
+        showQrDialog.setCancelable(true);
+        showQrDialog.show();
+
+        // Check camera permission
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+        } else {
+            setupCamera(showQrDialog, qrCodeProgress, qrCodeStatus);
+        }
+    }
+
+    private void setupCamera(AlertDialog dialog, ProgressBar qrCodeProgress, TextView qrCodeStatus) {
+        SurfaceView cameraPreview = dialog.findViewById(R.id.camera_preview);
+        FrameLayout focusWindow = dialog.findViewById(R.id.focus_window);
+
+        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(this)
+                .setBarcodeFormats(Barcode.QR_CODE)
+                .build();
+
+        CameraSource cameraSource = new CameraSource.Builder(this, barcodeDetector)
+                .setRequestedPreviewSize(480, 480)
+                .setAutoFocusEnabled(true)
+                .build();
+
+        cameraPreview.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                try {
+                    if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                        cameraSource.start(holder);
+                        Log.d("Camera Started", "CAMERA SUCCESSFULLY STARTED");
+                    }else{
+                        Log.d("Camera Error", "CAMERA FAILED TO START");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e("Camera Exception", "Error starting camera source: " + e.getMessage());
+                    Log.d("Camera Error Caught", "CAMERA FAILED TO START");
+                }
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                cameraSource.stop();
+            }
+        });
+
+        barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
+            @Override
+            public void release() {
+            }
+
+            @Override
+            public void receiveDetections(Detector.Detections<Barcode> detections) {
+                SparseArray<Barcode> qrCodes = detections.getDetectedItems();
+                if (qrCodes.size() != 0) {
+                    String qrCodeText = qrCodes.valueAt(0).displayValue;
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    if (qrCodeText.startsWith("https://jex.ink/c/")) {
+                        handler.post(() -> {
+                            qrCodeStatus.setVisibility(View.VISIBLE);
+                            qrCodeStatus.setText(R.string.resolving_invite);
+                            qrCodeProgress.setVisibility(View.VISIBLE);
+                            focusWindow.setVisibility(View.INVISIBLE);
+                        });
+
+                        // Process the dynamic link
+                        processDynamicLink(qrCodeText, dialog);
+                    } else {
+                        handler.post(() -> {
+                            qrCodeStatus.setText(getString(R.string.invalid_qr_code));
+                            qrCodeStatus.setVisibility(View.VISIBLE);
+                        });
+                    }
+                }else{
+                    qrCodeStatus.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
+    private void processDynamicLink(String qrCodeText, AlertDialog dialog) {
+        FirebaseDynamicLinks.getInstance()
+                .getDynamicLink(Uri.parse(qrCodeText))
+                .addOnCompleteListener(this, new OnCompleteListener<PendingDynamicLinkData>() {
+                    @Override
+                    public void onComplete(@NonNull Task<PendingDynamicLinkData> task) {
+                        if (task.isSuccessful()) {
+                            Uri deepLink = null;
+                            if (task.getResult() != null) {
+                                deepLink = task.getResult().getLink();
+                            }
+
+                            if (deepLink != null && !isDeepLinkProcessed[0]) {
+                                // Execute the link
+                                executeDynamicLink(deepLink);
+                                isDeepLinkProcessed[0] = true;
+                            }
+                        } else {
+                            Toast.makeText(MainActivity.this, R.string.error_processing_content, Toast.LENGTH_SHORT).show();
+                        }
+                        dialog.dismiss();
+                    }
+                });
+    }
+
+    private void executeDynamicLink(Uri deepLink) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, deepLink);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                ProgressBar qrCodeProgress = showQrDialog.findViewById(R.id.qr_code_progress);
+                TextView qrCodeStatus = showQrDialog.findViewById(R.id.qr_code_status);
+                setupCamera(showQrDialog, qrCodeProgress, qrCodeStatus);
+            } else {
+                Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void showAddProjectDialog() {
@@ -454,7 +629,7 @@ public class MainActivity extends BaseActivity {
 
     public static void sendProjectOperationNotification(String actorUserId, String actorName, String projectId, String projectName, String action, String objectUserId, String objectUserName) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference notificationRef = db.collection("notifications").document(objectUserId);
+        CollectionReference notificationsCollection = db.collection("users").document(objectUserId).collection("notifications");
 
         Map<String, Object> notificationData = new HashMap<>();
         notificationData.put("actorUserId", actorUserId);
@@ -466,14 +641,11 @@ public class MainActivity extends BaseActivity {
         notificationData.put("objectUserName", objectUserName);
         notificationData.put("notificationType", "PROJECT_OPERATION_NOTICE");
 
-        notificationRef.update("notifs", FieldValue.arrayUnion(notificationData))
-                .addOnSuccessListener(aVoid -> Log.d("Notification", "Notification sent successfully"))
-                .addOnFailureListener(e -> {
-                    Log.w("Notification", "Error sending notification", e);
-                    // If the document doesn't exist, create it with the 'notifs' field
-                    notificationRef.set(Collections.singletonMap("notifs", Collections.singletonList(notificationData)));
-                });
+        notificationsCollection.add(notificationData)
+                .addOnSuccessListener(documentReference -> Log.d("Notification", "Notification sent successfully"))
+                .addOnFailureListener(e -> Log.w("Notification", "Error sending notification", e));
     }
+
 
 
 
