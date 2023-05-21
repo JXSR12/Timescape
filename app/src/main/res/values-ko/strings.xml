@@ -244,6 +244,11 @@
     <string name="no_access">접근 권한 없음</string>
     <string name="it_seems_that_you_are_not_allowed_to_perform_this_action_please_refresh_or_check_if_you_are_still_part_of_the_project">이 작업을 수행할 수 있는 권한이 없는 것 같습니다. 새로고침하거나 프로젝트에 여전히 속해 있는지 확인해주세요.</string>
     <string name="ok">확인</string>
+    <string name="permission_not_granted_can_t_install_new_version_of_the_app">Permission not granted. Can\'t install new version of the app.</string>
+    <string name="timescape_updater">Timescape Updater</string>
+    <string name="is_available_to_download_and_install_update_the_app_to_get_the_latest_features_and_fixes">" is available to download and install. Update the app to get the latest features and fixes."</string>
+    <string name="install">Install</string>
+    <string name="later">Later</string>
 
 
 </resources>

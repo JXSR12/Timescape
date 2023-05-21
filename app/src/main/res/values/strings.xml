@@ -244,4 +244,9 @@
     <string name="no_access">No access</string>
     <string name="it_seems_that_you_are_not_allowed_to_perform_this_action_please_refresh_or_check_if_you_are_still_part_of_the_project">It seems that you are not allowed to perform this action, please refresh or check if you are still part of the project.</string>
     <string name="ok">OK</string>
+    <string name="permission_not_granted_can_t_install_new_version_of_the_app">Permission not granted. Can\'t install new version of the app.</string>
+    <string name="timescape_updater">Timescape Updater</string>
+    <string name="is_available_to_download_and_install_update_the_app_to_get_the_latest_features_and_fixes">" is available to download and install. Update the app to get the latest features and fixes."</string>
+    <string name="install">Install</string>
+    <string name="later">Later</string>
 </resources>

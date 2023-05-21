@@ -3,14 +3,21 @@ package edu.bluejack22_2.timescape;
 import static android.content.ContentValues.TAG;
 
 import android.Manifest;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -30,15 +37,19 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
+import com.google.android.datatransport.BuildConfig;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -72,6 +83,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -86,6 +98,7 @@ import java.util.Set;
 
 
 import edu.bluejack22_2.timescape.databinding.ActivityMainBinding;
+import edu.bluejack22_2.timescape.model.ApkVersion;
 import edu.bluejack22_2.timescape.model.Project;
 import edu.bluejack22_2.timescape.model.ProjectMember;
 import edu.bluejack22_2.timescape.model.User;
@@ -102,6 +115,7 @@ import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 
 public class MainActivity extends BaseActivity {
+    public static final int INSTALL_PERMISSION_REQUEST_CODE = 123;
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
     private DashboardViewModel dashboardViewModel;
@@ -115,6 +129,9 @@ public class MainActivity extends BaseActivity {
     AlertDialog showQrDialog;
 
     final boolean[] isDeepLinkProcessed = {false};
+
+    UpdaterViewModel updaterViewModel;
+    ApkVersion latestApkVersion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,7 +196,80 @@ public class MainActivity extends BaseActivity {
 
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
         handleProjectInviteDeeplink(getIntent());
+
+        updaterViewModel = new ViewModelProvider(this).get(UpdaterViewModel.class);
+        updaterViewModel.getLatestApkVersion().observe(this, this::checkAndUpdate);
     }
+
+    private void checkAndUpdate(ApkVersion latestApkVersion) {
+        int currentVersionCode = BuildConfig.VERSION_CODE;
+
+        this.latestApkVersion = latestApkVersion;
+        if (latestApkVersion.getVersionCode() > currentVersionCode) {
+            showUpdateDialog(latestApkVersion);
+        }
+    }
+
+    // Create an instance of ActivityResultLauncher
+    private final ActivityResultLauncher<Intent> settingsActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (!getPackageManager().canRequestPackageInstalls()) {
+                    Toast.makeText(this, R.string.permission_not_granted_can_t_install_new_version_of_the_app, Toast.LENGTH_LONG).show();
+                } else {
+                    downloadAndInstallApk(latestApkVersion.getFileUrl());
+                }
+            }
+    );
+
+    private void showUpdateDialog(ApkVersion latestApkVersion) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.timescape_updater);
+        builder.setMessage("Timescape " + latestApkVersion.getVersionName() + getString(R.string.is_available_to_download_and_install_update_the_app_to_get_the_latest_features_and_fixes));
+        builder.setPositiveButton(R.string.install, (dialog, which) -> {
+            if (!getPackageManager().canRequestPackageInstalls()) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                settingsActivityResultLauncher.launch(intent);
+            } else {
+                downloadAndInstallApk(latestApkVersion.getFileUrl());
+            }
+        });
+        builder.setNegativeButton(R.string.later, (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+
+    private void downloadAndInstallApk(String fileUrl) {
+        DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+
+        Uri uri = Uri.parse(fileUrl);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "timescape-latest.apk");
+
+        long downloadID = downloadManager.enqueue(request);
+        BroadcastReceiver onComplete = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                File apkFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "timescape-latest.apk");
+                installApk(apkFile);
+                context.unregisterReceiver(this);
+            }
+        };
+        registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    }
+
+    private void installApk(File apkFile) {
+        {
+            Uri apkUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", apkFile);
+            Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+            intent.setData(apkUri);
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(intent);
+        }
+    }
+
 
     private void onDialogClosed() {
         dashboardViewModel.setDialogDismissed(true);
@@ -342,6 +432,16 @@ public class MainActivity extends BaseActivity {
                 Toast.makeText(this, R.string.camera_permission_granted, Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, R.string.camera_permission_denied, Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if (requestCode == INSTALL_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // permission was granted
+                Toast.makeText(MainActivity.this, "Permission granted!", Toast.LENGTH_SHORT).show();
+            } else {
+                // permission denied
+                Toast.makeText(MainActivity.this, "Permission denied to install applications.", Toast.LENGTH_SHORT).show();
             }
         }
     }
