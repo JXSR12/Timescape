@@ -27,6 +27,7 @@ import androidx.core.content.ContextCompat;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
@@ -49,7 +50,7 @@ public class FullScreenImageActivity extends AppCompatActivity {
 
     RelativeLayout bottomBar;
     RelativeLayout topBar;
-    ImageView fullScreenImageView;
+    PhotoView fullScreenImageView;
     Button downloadImageButton;
     TextView imageFileName;
     ImageButton backButton;
@@ -91,6 +92,10 @@ public class FullScreenImageActivity extends AppCompatActivity {
 
         imageUrl = getIntent().getStringExtra("image_url");
         fileName = getIntent().getStringExtra("file_name");
+
+        fullScreenImageView.setMaximumScale(5.0f);
+        fullScreenImageView.setMinimumScale(1.0f);
+
 
         // Set the file name
         imageFileName.setText(fileName);

@@ -23,6 +23,10 @@ import androidx.core.app.RemoteInput;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
@@ -111,7 +115,7 @@ public class NotificationHelper {
             RemoteInput remoteInput = new RemoteInput.Builder(EXTRA_REPLY)
                     .setLabel(replyLabel)
                     .build();
-            int notificationId = new Random().nextInt(1000000);
+            int notificationId = getNotificationId(projectId);
 
             Intent replyIntent = new Intent(context, NotificationReceiver.class);
             replyIntent.setAction(ACTION_REPLY);
@@ -119,7 +123,8 @@ public class NotificationHelper {
             replyIntent.putExtra(EXTRA_PROJECT_ID, projectId);
             replyIntent.putExtra(EXTRA_PROJECT_NAME, projectName);
             replyIntent.putExtra(EXTRA_NOTIFICATION_ID, notificationId);
-            PendingIntent replyPendingIntent = PendingIntent.getBroadcast(context, 0, replyIntent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_MUTABLE);
+            int uniqueRequestCode = getNotificationId(messageId);
+            PendingIntent replyPendingIntent = PendingIntent.getBroadcast(context, uniqueRequestCode, replyIntent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
             NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
                     R.drawable.round_send_24, replyLabel, replyPendingIntent)
@@ -213,7 +218,7 @@ public class NotificationHelper {
             PendingIntent detailActivityPendingIntent = PendingIntent.getActivity(context, 0, detailActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
             // Create a notification with the specified data
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channel.getId())
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, warningChannel.getId())
                     .setSmallIcon(R.drawable.round_people_24) // Replace with your app's notification icon
                     .setContentTitle(header)
                     .setContentText(content)
@@ -229,4 +234,19 @@ public class NotificationHelper {
             Log.d("SendInbox", "Sending to " + objectUserId);
         }
     }
+
+    private int getNotificationId(String projectId) {
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            // return a default value
+            return 0;
+        }
+        byte[] encodedhash = digest.digest(projectId.getBytes(StandardCharsets.UTF_8));
+        // Get the last 4 bytes of the hash and convert to int. This assumes relatively low collision.
+        return ByteBuffer.wrap(encodedhash, encodedhash.length - 4, 4).getInt();
+    }
+
 }

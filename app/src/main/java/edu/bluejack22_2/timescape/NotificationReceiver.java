@@ -158,7 +158,6 @@ public class NotificationReceiver extends BroadcastReceiver {
 
                         if (members != null) {
                             for (String id : members.keySet()) {
-                                // Skip sending notification to the sender
                                 if (id.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                                     continue;
                                 }

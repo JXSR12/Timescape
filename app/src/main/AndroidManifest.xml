@@ -73,17 +73,29 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ProjectDetailActivity"
-            android:theme="@style/FullScreenTheme" />
+            android:theme="@style/FullScreenTheme"
+            android:launchMode="singleTop"/>
         <activity
             android:name=".FullScreenImageActivity"
             android:theme="@style/FullScreenTheme" />
         <activity
             android:name=".ProjectChatActivity"
             android:theme="@style/FullScreenTheme"
+            android:windowSoftInputMode="adjustResize"
+            android:launchMode="singleTop"/>
+        <activity
+            android:name=".ImageEditingActivity"
+            android:theme="@style/FullScreenTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/FullScreenTheme"/>
+
+        <activity
             android:name=".ProjectMembersActivity"
-            android:theme="@style/FullScreenTheme2" />
+            android:theme="@style/FullScreenTheme2"
+            android:launchMode="singleTop"/>
 
         <receiver
             android:name=".NotificationReceiver"

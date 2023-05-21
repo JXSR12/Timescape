@@ -258,4 +258,5 @@
     <string name="no_phone_number_added">No phone number added</string>
     <string name="you_are_running_the_latest_available_version_of_timescape">You are running the latest available version of Timescape</string>
     <string name="edit_name">Edit Name</string>
+    <string name="confirm">Confirm</string>
 </resources>

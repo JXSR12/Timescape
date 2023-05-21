@@ -258,6 +258,7 @@
     <string name="no_phone_number_added">未添加手机号码</string>
     <string name="you_are_running_the_latest_available_version_of_timescape">您正在运行的是 Timescape 的最新可用版本</string>
     <string name="edit_name">编辑名称</string>
+    <string name="confirm">Confirm</string>
 
 
 </resources>

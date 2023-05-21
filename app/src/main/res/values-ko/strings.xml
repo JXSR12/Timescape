@@ -258,6 +258,7 @@
     <string name="no_phone_number_added">전화번호가 추가되지 않았습니다</string>
     <string name="you_are_running_the_latest_available_version_of_timescape">Timescape의 최신 버전을 실행 중입니다</string>
     <string name="edit_name">이름 편집</string>
+    <string name="confirm">Confirm</string>
 
 
 </resources>

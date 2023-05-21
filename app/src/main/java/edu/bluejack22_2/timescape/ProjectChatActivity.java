@@ -77,7 +77,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.yalantis.ucrop.UCrop;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -976,13 +978,45 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         }
     });
 
-    private final ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK && result.getData() != null && result.getData().getData() != null) {
-            Uri fileUri = result.getData().getData();
-            String fileName = getFileNameFromUri(getApplicationContext(), fileUri);
-            uploadFileToFirebaseStorage(fileUri, "images", fileName);
+    private final ActivityResultLauncher<Intent> cropImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+            Uri croppedImageUri = UCrop.getOutput(result.getData());
+            if (croppedImageUri != null) {
+                String fileName = getFileNameFromUri(getApplicationContext(), croppedImageUri);
+                uploadFileToFirebaseStorage(croppedImageUri, "images", fileName);
+            }
         }
     });
+
+    private final ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_OK && result.getData() != null && result.getData().getData() != null) {
+            Uri sourceUri = result.getData().getData();
+            String originalFileName = getFileNameFromUri(this, sourceUri);
+            String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+            String croppedFileName = originalFileName.substring(0, originalFileName.lastIndexOf(".")) + "-edited" + extension;
+            Uri destinationUri = Uri.fromFile(new File(getCacheDir(), croppedFileName));
+            UCrop.of(sourceUri, destinationUri).withAspectRatio(1, 1).start(ProjectChatActivity.this);
+        }
+    });
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
+            if (data != null) {
+                Uri resultUri = UCrop.getOutput(data);
+                if (resultUri != null) {
+                    String fileName = getFileNameFromUri(getApplicationContext(), resultUri);
+                    uploadFileToFirebaseStorage(resultUri, "images", fileName);
+                }
+            }
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            final Throwable cropError = UCrop.getError(data);
+            // Handle crop error here
+        }
+    }
+
 
     public static String generateMessageId() {
         DocumentReference docRef = FirebaseFirestore.getInstance().collection("dummy").document();
