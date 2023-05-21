@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -37,7 +38,6 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
-import com.google.android.datatransport.BuildConfig;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -113,6 +113,7 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
+
 
 public class MainActivity extends BaseActivity {
     public static final int INSTALL_PERMISSION_REQUEST_CODE = 123;
@@ -202,7 +203,14 @@ public class MainActivity extends BaseActivity {
     }
 
     private void checkAndUpdate(ApkVersion latestApkVersion) {
-        int currentVersionCode = BuildConfig.VERSION_CODE;
+        PackageInfo pInfo;
+        try {
+             pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        int currentVersionCode = pInfo != null ? pInfo.versionCode : 0;
 
         this.latestApkVersion = latestApkVersion;
         if (latestApkVersion.getVersionCode() > currentVersionCode) {
