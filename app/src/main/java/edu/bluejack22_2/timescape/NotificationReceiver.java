@@ -8,6 +8,7 @@ import static edu.bluejack22_2.timescape.BaseActivity.EXTRA_MESSAGE_ID;
 import static edu.bluejack22_2.timescape.BaseActivity.EXTRA_PROJECT_ID;
 import static edu.bluejack22_2.timescape.BaseActivity.EXTRA_PROJECT_NAME;
 import static edu.bluejack22_2.timescape.BaseActivity.EXTRA_REPLY;
+import static edu.bluejack22_2.timescape.ProjectChatActivity.generateMessageId;
 
 import android.app.NotificationManager;
 import android.app.RemoteInput;
@@ -25,6 +26,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -38,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.bluejack22_2.timescape.model.Message;
+import edu.bluejack22_2.timescape.model.Project;
 import edu.bluejack22_2.timescape.model.UserSettings;
 
 public class NotificationReceiver extends BroadcastReceiver {
@@ -106,31 +110,29 @@ public class NotificationReceiver extends BroadcastReceiver {
 
     }
 
-    private void sendReplyMessage(String projectName, String repliedMessageId, String replyText, String projectId) {
-        if (!TextUtils.isEmpty(replyText)) {
-            // Get the current user's ID
+    private void sendReplyMessage(String projectName ,String repliedMessageId, String content, String projectId) {
+        if (!TextUtils.isEmpty(content)) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            DocumentReference chatDocument = db.collection("chats").document(projectId);
+            CollectionReference messagesCollection = db.collection("chats").document(projectId).collection("messages");
 
-            // Create a new message object
             Message message = new Message();
             message.setSender(db.collection("users").document(currentUserId));
             message.setMessage_type(Message.MessageType.REPLY);
-            message.setContent(replyText);
+            message.setContent(content);
             message.setTimestamp(Timestamp.now());
-            message.setId(ProjectChatActivity.generateMessageId());
+            message.setId(generateMessageId());
             message.setReplyingTo(repliedMessageId);
 
-            // Add the message to the chatDocument
-            chatDocument.update("messages", FieldValue.arrayUnion(message))
+            // Add the message to the messagesCollection
+            messagesCollection.document(message.getId()).set(message)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Log.d(TAG, "Reply message sent successfully");
-                            FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-                            onMessageSent(projectName, projectId, firebaseAuth.getCurrentUser().getDisplayName(), message.getContent(), message.getId());
+                            onMessageSent(projectId, projectName, user.getDisplayName(), message.getContent(), message.getId());
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -142,20 +144,22 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
     }
 
-    private void onMessageSent(String projectName, String projectId, String senderName, String displayedContent, String messageId) {
-        // Retrieve all the members of the project
+    private void onMessageSent(String projectId, String projectName, String senderName, String displayedContent, String messageId) {
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        // Retrieve all the members of the project
         firebaseFirestore.collection("projects").document(projectId)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        Map<String, Map<String, Object>> members = (Map<String, Map<String, Object>>) documentSnapshot.get("members");// Assuming 'members' field in project document
+                        Map<String, Map<String, Object>> members = (Map<String, Map<String, Object>>) documentSnapshot.get("members"); // Assuming 'members' field in project document
+                        Project project = documentSnapshot.toObject(Project.class);
+                        members.put(project.getOwner().getId(), null);
+
                         if (members != null) {
                             for (String id : members.keySet()) {
                                 // Skip sending notification to the sender
-                                if (id.equals(firebaseAuth.getCurrentUser().getUid())) {
+                                if (id.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                                     continue;
                                 }
 
@@ -166,7 +170,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                                             @Override
                                             public void onSuccess(DocumentSnapshot documentSnapshot) {
                                                 String activeProjectId = documentSnapshot.getString("projectId");
-                                                if (activeProjectId == null || !activeProjectId.equals(projectId)) {
+                                                if (activeProjectId == null || !(activeProjectId.equals("ALL") || activeProjectId.equals(projectId))) {
                                                     // Save the notification for this member
                                                     Map<String, Object> notificationData = new HashMap<>();
                                                     notificationData.put("senderName", senderName);
@@ -176,16 +180,8 @@ public class NotificationReceiver extends BroadcastReceiver {
                                                     notificationData.put("messageId", messageId);
                                                     notificationData.put("notificationType", "PROJECT_CHAT_MESSAGE");
 
-                                                    firebaseFirestore.collection("notifications").document(id)
-                                                            .update("notifs", FieldValue.arrayUnion(notificationData))
-                                                            .addOnFailureListener(new OnFailureListener() {
-                                                                @Override
-                                                                public void onFailure(@NonNull Exception e) {
-                                                                    // If the document doesn't exist, create it with the notifs field
-                                                                    firebaseFirestore.collection("notifications").document(id)
-                                                                            .set(Collections.singletonMap("notifs", Collections.singletonList(notificationData)));
-                                                                }
-                                                            });
+                                                    firebaseFirestore.collection("users").document(id).collection("notifications")
+                                                            .add(notificationData);
                                                 }
                                             }
                                         });
