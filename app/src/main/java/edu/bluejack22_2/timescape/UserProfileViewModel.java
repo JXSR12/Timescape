@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import edu.bluejack22_2.timescape.model.User;
@@ -28,17 +29,44 @@ public class UserProfileViewModel extends ViewModel {
         return userLiveData;
     }
 
+    private MutableLiveData<String> updateMessage = new MutableLiveData<>();
+
+    public MutableLiveData<String> getUpdateMessage() {
+        return updateMessage;
+    }
+
     public void fetchUserDetails() {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if (firebaseUser != null) {
             String uid = firebaseUser.getUid();
-            String displayName = firebaseUser.getDisplayName();
-            String email = firebaseUser.getEmail();
-            String phoneNumber = firebaseUser.getPhoneNumber();
-            User user = new User(uid, displayName, email, phoneNumber);
-            setUser(user);
+
+            // Reference to Firestore collection
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            // Get user details from Firestore
+            db.collection("users").document(uid)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document != null && document.exists()) {
+                                // Fetch user details from Firestore
+                                String displayName = document.getString("displayName");
+                                String email = document.getString("email");
+                                String phoneNumber = document.getString("phoneNumber");
+
+                                User user = new User(uid, displayName, email, phoneNumber);
+                                setUser(user);
+                            } else {
+                                Log.d(TAG, "No such document");
+                            }
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
+                        }
+                    });
         }
     }
+
 
     public void updateDisplayName(String newDisplayName) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -56,7 +84,10 @@ public class UserProfileViewModel extends ViewModel {
                             FirebaseFirestore db = FirebaseFirestore.getInstance();
                             DocumentReference userRef = db.collection("users").document(user.getUid());
                             userRef.update("displayName", newDisplayName)
-                                    .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                        updateMessage.setValue("Successfully changed display name");
+                                    })
                                     .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
                             fetchUserDetails();
                         }
@@ -80,8 +111,11 @@ public class UserProfileViewModel extends ViewModel {
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful()) {
                                             Log.d(TAG, "User password updated.");
+                                            updateMessage.setValue("Password changed successfully");
                                         }
                                     });
+                        } else {
+                            updateMessage.setValue("The old password you provided is incorrect");
                         }
                     });
         }

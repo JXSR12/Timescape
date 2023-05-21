@@ -249,4 +249,13 @@
     <string name="is_available_to_download_and_install_update_the_app_to_get_the_latest_features_and_fixes">" is available to download and install. Update the app to get the latest features and fixes."</string>
     <string name="install">Install</string>
     <string name="later">Later</string>
+    <string name="old_password">Old password</string>
+    <string name="new_password">New password</string>
+    <string name="confirm_new_password">Confirm new password</string>
+    <string name="new_display_name">New display name</string>
+    <string name="check_for_updates">Check for Updates</string>
+    <string name="unknown_version">unknown version</string>
+    <string name="no_phone_number_added">No phone number added</string>
+    <string name="you_are_running_the_latest_available_version_of_timescape">You are running the latest available version of Timescape</string>
+    <string name="edit_name">Edit Name</string>
 </resources>

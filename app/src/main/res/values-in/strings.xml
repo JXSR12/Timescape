@@ -244,10 +244,19 @@
     <string name="no_access">Tidak Ada Akses</string>
     <string name="it_seems_that_you_are_not_allowed_to_perform_this_action_please_refresh_or_check_if_you_are_still_part_of_the_project">Tampaknya Anda tidak diizinkan untuk melakukan tindakan ini, harap segarkan atau periksa apakah Anda masih menjadi bagian dari proyek.</string>
     <string name="ok">OK</string>
-    <string name="permission_not_granted_can_t_install_new_version_of_the_app">Permission not granted. Can\'t install new version of the app.</string>
-    <string name="timescape_updater">Timescape Updater</string>
-    <string name="is_available_to_download_and_install_update_the_app_to_get_the_latest_features_and_fixes">" is available to download and install. Update the app to get the latest features and fixes."</string>
-    <string name="install">Install</string>
-    <string name="later">Later</string>
+    <string name="permission_not_granted_can_t_install_new_version_of_the_app">Izin tidak diberikan. Tidak dapat menginstal versi baru aplikasi.</string>
+    <string name="timescape_updater">Pembaruan Timescape</string>
+    <string name="is_available_to_download_and_install_update_the_app_to_get_the_latest_features_and_fixes">tersedia untuk diunduh dan diinstal. Perbarui aplikasi untuk mendapatkan fitur dan perbaikan terbaru.</string>
+    <string name="install">Pasang</string>
+    <string name="later">Nanti</string>
+    <string name="old_password">Kata sandi lama</string>
+    <string name="new_password">Kata sandi baru</string>
+    <string name="confirm_new_password">Konfirmasi kata sandi baru</string>
+    <string name="new_display_name">Nama tampilan baru</string>
+    <string name="check_for_updates">Periksa Pembaruan</string>
+    <string name="unknown_version">versi tidak diketahui</string>
+    <string name="no_phone_number_added">Tidak ada nomor telepon yang ditambahkan</string>
+    <string name="you_are_running_the_latest_available_version_of_timescape">Anda sedang menjalankan versi Timescape yang tersedia terbaru</string>
+    <string name="edit_name">Ubah Nama</string>
 
 </resources>

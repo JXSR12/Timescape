@@ -244,11 +244,20 @@
     <string name="no_access">无权限</string>
     <string name="it_seems_that_you_are_not_allowed_to_perform_this_action_please_refresh_or_check_if_you_are_still_part_of_the_project">似乎您没有执行此操作的权限，请刷新页面或检查是否仍然是项目的一部分。</string>
     <string name="ok">确定</string>
-    <string name="permission_not_granted_can_t_install_new_version_of_the_app">Permission not granted. Can\'t install new version of the app.</string>
-    <string name="timescape_updater">Timescape Updater</string>
-    <string name="is_available_to_download_and_install_update_the_app_to_get_the_latest_features_and_fixes">" is available to download and install. Update the app to get the latest features and fixes."</string>
-    <string name="install">Install</string>
-    <string name="later">Later</string>
+    <string name="permission_not_granted_can_t_install_new_version_of_the_app">未获得权限。无法安装应用的新版本。</string>
+    <string name="timescape_updater">Timescape 更新器</string>
+    <string name="is_available_to_download_and_install_update_the_app_to_get_the_latest_features_and_fixes">可以下载和安装。更新应用以获取最新功能和修复。</string>
+    <string name="install">安装</string>
+    <string name="later">稍后</string>
+    <string name="old_password">旧密码</string>
+    <string name="new_password">新密码</string>
+    <string name="confirm_new_password">确认新密码</string>
+    <string name="new_display_name">新显示名称</string>
+    <string name="check_for_updates">检查更新</string>
+    <string name="unknown_version">未知版本</string>
+    <string name="no_phone_number_added">未添加手机号码</string>
+    <string name="you_are_running_the_latest_available_version_of_timescape">您正在运行的是 Timescape 的最新可用版本</string>
+    <string name="edit_name">编辑名称</string>
 
 
 </resources>

@@ -45,7 +45,7 @@
                     android:id="@+id/editDisplayNameButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Edit Name"
+                    android:text="@string/edit_name"
                     android:layout_marginTop="10dp"
                     android:layout_gravity="center_horizontal"
                     app:backgroundTint="@color/colorPrimary"
@@ -79,8 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/change_password"
-            app:backgroundTint="@color/colorPrimary"
-            android:textColor="#FFFFFF" />
+            app:backgroundTint="@color/colorPrimary" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/googleAccountMessage"
@@ -97,8 +96,25 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/sign_out"
-            app:backgroundTint="@color/colorRed"
-            android:textColor="#FFFFFF" />
+            app:backgroundTint="@color/colorRed" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/versionText"
+            android:layout_width="match_parent"
+            android:textAlignment="center"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:textSize="15sp"
+            android:text="[TEMPLATE] Timescape 0.3.4 - P2 ALT"
+            android:textColor="@color/colorPrimaryDark" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/checkUpdatesButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/check_for_updates"
+            app:backgroundTint="#7C7777" />
 
     </LinearLayout>
 </ScrollView>

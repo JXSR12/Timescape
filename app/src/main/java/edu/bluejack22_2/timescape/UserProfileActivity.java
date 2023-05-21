@@ -3,6 +3,9 @@ package edu.bluejack22_2.timescape;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -25,6 +28,7 @@ import java.util.Random;
 import edu.bluejack22_2.timescape.model.User;
 import edu.bluejack22_2.timescape.UserProfileViewModel;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -32,11 +36,12 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 public class UserProfileActivity extends BaseActivity {
 
     private UserProfileViewModel userProfileViewModel;
-    private TextView userDisplayName, userEmail, userPhoneNumber, googleAccountMessage;
+    private TextView userDisplayName, userEmail, userPhoneNumber, googleAccountMessage, versionText;
     private ImageView userAvatar;
     private Button changePasswordButton;
     private Button editDisplayNameButton;
     private Button logOutButton;
+    private Button checkUpdatesButton;
     private FirebaseAuth firebaseAuth;
 
     @Override
@@ -53,6 +58,8 @@ public class UserProfileActivity extends BaseActivity {
         changePasswordButton = findViewById(R.id.changePasswordButton);
         logOutButton = findViewById(R.id.logOutButton);
         editDisplayNameButton = findViewById(R.id.editDisplayNameButton);
+        versionText = findViewById(R.id.versionText);
+        checkUpdatesButton = findViewById(R.id.checkUpdatesButton);
 
         editDisplayNameButton.setOnClickListener(v -> showEditDisplayNameDialog());
         changePasswordButton.setOnClickListener(v -> showChangePasswordDialog());
@@ -75,13 +82,37 @@ public class UserProfileActivity extends BaseActivity {
         userProfileViewModel = new ViewModelProvider(this).get(UserProfileViewModel.class);
         userProfileViewModel.getUserLiveData().observe(this, this::updateUI);
         userProfileViewModel.fetchUserDetails();
+
+        userProfileViewModel.getUpdateMessage().observe(this, message -> {
+            Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG);
+            snackbar.show();
+        });
+
+        PackageInfo pInfo;
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        String currentVersionName = pInfo != null ? pInfo.versionName : getString(R.string.unknown_version);
+        versionText.setText("Timescape " + currentVersionName);
+
+        checkUpdatesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setResult(Activity.RESULT_OK);
+                finish();
+            }
+        });
+
     }
 
     private void updateUI(User user) {
         // Set user info
         userDisplayName.setText(user.getDisplayName());
         userEmail.setText(user.getEmail());
-        userPhoneNumber.setText((user.getPhoneNumber() == null || user.getPhoneNumber().trim().isEmpty()) ? "No phone number added" : user.getPhoneNumber());
+        userPhoneNumber.setText((user.getPhoneNumber() == null || user.getPhoneNumber().trim().isEmpty()) ? getString(R.string.no_phone_number_added) : user.getPhoneNumber());
 
         // Set user avatar
         Drawable avatarDrawable = generateAvatar(user.getUid());
@@ -140,7 +171,7 @@ public class UserProfileActivity extends BaseActivity {
 
         builder.setView(view)
                 .setTitle(R.string.change_password)
-                .setPositiveButton("Save", (dialog, which) -> {
+                .setPositiveButton(R.string.save, (dialog, which) -> {
                     String oldPassword = editOldPassword.getText().toString();
                     String newPassword = editNewPassword.getText().toString();
                     String confirmPassword = editConfirmPassword.getText().toString();

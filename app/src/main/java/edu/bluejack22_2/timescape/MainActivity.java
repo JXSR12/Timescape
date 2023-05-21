@@ -3,6 +3,7 @@ package edu.bluejack22_2.timescape;
 import static android.content.ContentValues.TAG;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -134,6 +135,8 @@ public class MainActivity extends BaseActivity {
     UpdaterViewModel updaterViewModel;
     ApkVersion latestApkVersion;
 
+    ActivityResultLauncher<Intent> mStartForResult;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -181,8 +184,8 @@ public class MainActivity extends BaseActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationViewTop, navController);
         NavigationUI.setupWithNavController(navigationViewBottom, navController);
-        binding.navViewTop.setNavigationItemSelectedListener(this::onNavigationItemSelected);
-        binding.navViewBottom.setNavigationItemSelectedListener(this::onNavigationItemSelected);
+        binding.navViewTop.setNavigationItemSelectedListener(item1 -> onNavigationItemSelected(item1));
+        binding.navViewBottom.setNavigationItemSelectedListener(item -> onNavigationItemSelected(item));
 
         mAuthStateListener = firebaseAuth -> {
             FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -199,10 +202,18 @@ public class MainActivity extends BaseActivity {
         handleProjectInviteDeeplink(getIntent());
 
         updaterViewModel = new ViewModelProvider(this).get(UpdaterViewModel.class);
-        updaterViewModel.getLatestApkVersion().observe(this, this::checkAndUpdate);
+        updaterViewModel.getLatestApkVersion().observe(this, latestApkVersion2 -> checkAndUpdate(latestApkVersion2, false));
+
+        mStartForResult = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    updaterViewModel.getLatestApkVersion().observe(this, latestApkVersion1 -> checkAndUpdate(latestApkVersion1, true));
+                }
+            });
     }
 
-    private void checkAndUpdate(ApkVersion latestApkVersion) {
+    private void checkAndUpdate(ApkVersion latestApkVersion, boolean showToast) {
         PackageInfo pInfo;
         try {
              pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -215,6 +226,10 @@ public class MainActivity extends BaseActivity {
         this.latestApkVersion = latestApkVersion;
         if (latestApkVersion.getVersionCode() > currentVersionCode) {
             showUpdateDialog(latestApkVersion);
+        }else{
+            if(showToast){
+                Toast.makeText(this, R.string.you_are_running_the_latest_available_version_of_timescape, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -292,8 +307,9 @@ public class MainActivity extends BaseActivity {
         }
 
         if (id == R.id.nav_account) {
-            Intent intent = new Intent(this, UserProfileActivity.class);
-            startActivity(intent);
+            Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
+            mStartForResult.launch(intent);
+
             return true;
         }
 
