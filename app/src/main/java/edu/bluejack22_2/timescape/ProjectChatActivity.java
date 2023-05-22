@@ -2,6 +2,8 @@ package edu.bluejack22_2.timescape;
 
 import static android.content.ContentValues.TAG;
 
+import static edu.bluejack22_2.timescape.ui.chats.ChatAdapter.isUserAtBottom;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -119,6 +121,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
     ImageButton attachImageButton;
     ImageButton inviteProjectButton;
     RelativeLayout replyModeLayout;
+    RelativeLayout newMessageLayout;
     TextView replyModeText;
 
     int onlineCount = 0;
@@ -140,12 +143,18 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         setSupportActionBar(toolbar);
 
         messageInput = findViewById(R.id.message_input);
+
         sendMessageButton = findViewById(R.id.send_message_button);
+        sendMessageButton.setVisibility(View.GONE);
+
         attachFileButton = findViewById(R.id.attach_file_button);
         attachImageButton = findViewById(R.id.attach_image_button);
         inviteProjectButton = findViewById(R.id.send_project_invite_button);
         replyModeLayout = findViewById(R.id.reply_mode_layout);
         replyModeText = findViewById(R.id.reply_mode_text);
+
+        newMessageLayout = findViewById(R.id.new_message_layout);
+        newMessageLayout.setVisibility(View.GONE);
 
         chatRecyclerView = findViewById(R.id.chat_recycler_view);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -256,9 +265,27 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         attachImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pickImage();
+                PopupMenu popupMenu = new PopupMenu(ProjectChatActivity.this, attachImageButton);
+                popupMenu.getMenuInflater().inflate(R.menu.attach_menu, popupMenu.getMenu());
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if(item.getItemId() == R.id.photo_item){
+                            pickImage();
+                            return true;
+                        }else if (item.getItemId() == R.id.video_item){
+                            pickVideo();
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+
+                popupMenu.show();
             }
         });
+
 
 
         inviteProjectButton.setOnClickListener(new View.OnClickListener() {
@@ -439,8 +466,50 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             }
 
         });
+
+        messageInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not needed for this implementation
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Check if the input text is empty
+                boolean isInputEmpty = s.toString().trim().isEmpty();
+
+                // Update the visibility of the sendMessageButton
+                if (isInputEmpty) {
+                    sendMessageButton.setVisibility(View.GONE);
+                } else {
+                    sendMessageButton.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Not needed for this implementation
+            }
+        });
+
+        chatRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                // Check if the user is at the bottom of the recyclerView
+                boolean isUserAtBottom = isUserAtBottom(recyclerView, false);
+
+                // Set the visibility of newMessageLayout based on the scroll position
+                if (isUserAtBottom) {
+                    newMessageLayout.setVisibility(View.GONE);
+                }
+            }
+        });
+
         getProjectMembers(projectId);
         initTypingStatusListener();
+
+
     }
 
     private void insertMention(EditText messageInput, String mentionDisplayName, String mentionId) {
@@ -581,9 +650,16 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                     Log.d(TAG, "Current data: null");
                 }
 
-                chatAdapter.setMessages(messages, chatRecyclerView);
+                chatAdapter.setMessages(messages, chatRecyclerView, newMessageLayout);
+
+                if(firstLoadChat){
+                    chatRecyclerView.scrollToPosition(chatAdapter.getLastItemPosition());
+                    firstLoadChat = false;
+                }
             }
         });
+
+
     }
 
     private void markMessageAsReadIfVisible(Message message) {
@@ -998,6 +1074,16 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         }
     });
 
+    private final ActivityResultLauncher<Intent> pickVideoLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null && result.getData().getData() != null) {
+            Uri sourceUri = result.getData().getData();
+            if (sourceUri != null) {
+                String fileName = getFileNameFromUri(getApplicationContext(), sourceUri);
+                uploadFileToFirebaseStorage(sourceUri, "videos", fileName);
+            }
+        }
+    });
+
     private final ActivityResultLauncher<Intent> editImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
             Uri resultUri = result.getData().getData();
@@ -1012,6 +1098,12 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         pickImageLauncher.launch(intent);
+    }
+
+    private void pickVideo() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("video/*");
+        pickVideoLauncher.launch(intent);
     }
 
     private void startImageEditingActivity(Uri sourceUri) {
@@ -1783,5 +1875,10 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    public void scrollToBottom(View view) {
+        chatRecyclerView.scrollToPosition(chatAdapter.getLastItemPosition());
+        newMessageLayout.setVisibility(View.GONE);
     }
 }

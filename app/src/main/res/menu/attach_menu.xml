@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/photo_item"
+        android:title="@string/photo"
+        android:icon="@drawable/round_image_24"
+        android:iconTint="@color/primaryTextColor"/>
+    <item
+        android:id="@+id/video_item"
+        android:title="@string/video"
+        android:icon="@drawable/round_video_library_24"
+        android:iconTint="@color/primaryTextColor"/>
+</menu>

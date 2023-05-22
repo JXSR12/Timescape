@@ -23,12 +23,14 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -112,7 +114,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         }
     }
 
-    public void setMessages(List<Message> messages, RecyclerView recyclerView) {
+    public void setMessages(List<Message> messages, RecyclerView recyclerView, RelativeLayout newMessageLayout) {
         if (this.messages == null) {
             this.messages = new ArrayList<>();
         } else {
@@ -155,8 +157,30 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             previousMessage = message;
         }
 
+        Log.d("SETMESSAGE", "RAN");
+        if (isUserAtBottom(recyclerView, false)) {
+            recyclerView.scrollToPosition(getLastItemPosition());
+            Log.d("SETMESSAGE", "AT BOTTOM");
+        } else {
+            newMessageLayout.setVisibility(View.VISIBLE);
+            Log.d("SETMESSAGE", "NOT AT BOTTOM");
+        }
+
         notifyDataSetChanged();
-        recyclerView.scrollToPosition(getLastItemPosition());
+    }
+
+    public static boolean isUserAtBottom(RecyclerView recyclerView, boolean newMessage) {
+        LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+        int lastVisibleItemPosition = 0;
+        if (layoutManager != null) {
+            lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+        }
+        int itemCount = 0;
+        if (layoutManager != null) {
+            itemCount = layoutManager.getItemCount();
+        }
+        int addition = newMessage ? 2 : 1;
+        return lastVisibleItemPosition == (itemCount - addition);
     }
 
 

@@ -2,25 +2,31 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/recentProjectCard"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    android:minHeight="?attr/listPreferredItemHeight"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
 
-    <TextView
-        android:id="@+id/recentProjectTitle"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:ellipsize="end"
-        android:maxLines="3"
-        android:minLines="3"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/recentProjectTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:minLines="3"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+    </LinearLayout>
 
 </androidx.cardview.widget.CardView>

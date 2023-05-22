@@ -259,4 +259,7 @@
     <string name="you_are_running_the_latest_available_version_of_timescape">You are running the latest available version of Timescape</string>
     <string name="edit_name">Edit Name</string>
     <string name="confirm">Confirm</string>
+    <string name="photo">Photo</string>
+    <string name="video">Video</string>
+    <string name="unread_messages_below">Unread messages below</string>
 </resources>

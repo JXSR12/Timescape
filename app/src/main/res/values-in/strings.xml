@@ -259,5 +259,8 @@
     <string name="you_are_running_the_latest_available_version_of_timescape">Anda sedang menjalankan versi Timescape yang tersedia terbaru</string>
     <string name="edit_name">Ubah Nama</string>
     <string name="confirm">Konfirmasi</string>
+    <string name="photo">Foto</string>
+    <string name="video">Video</string>
+    <string name="unread_messages_below">Pesan belum dibaca di bawah</string>
 
 </resources>
