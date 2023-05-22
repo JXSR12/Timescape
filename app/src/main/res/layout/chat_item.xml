@@ -103,6 +103,13 @@
                     android:scaleType="centerCrop"
                     android:src="@drawable/timescape_logo_1" />
 
+                <ImageView
+                    android:id="@+id/other_user_image_video_overlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/round_play_circle_outline_24"
+                    android:visibility="gone" />
+
             </FrameLayout>
 
 
@@ -121,7 +128,14 @@
                     android:scaleType="centerCrop"
                     android:src="@drawable/timescape_logo_1" />
 
+                <ImageView
+                    android:id="@+id/self_image_video_overlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/round_play_circle_outline_24"
+                    android:visibility="gone" />
             </FrameLayout>
+
 
 
             <TextView

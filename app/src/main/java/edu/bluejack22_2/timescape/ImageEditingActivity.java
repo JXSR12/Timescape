@@ -58,6 +58,8 @@ public class ImageEditingActivity extends AppCompatActivity {
         mGestureCropImageView.setTargetAspectRatio(0);
 
         mOverlayView = uCropView.getOverlayView();
+        mOverlayView.setFreestyleCropMode(OverlayView.FREESTYLE_CROP_MODE_ENABLE);
+        mOverlayView.setDimmedColor(Color.argb(180, 0, 0, 0));
         Button confirmButton = findViewById(R.id.confirmButton);
         Button cancelButton = findViewById(R.id.cancelButton);
 
@@ -84,7 +86,7 @@ public class ImageEditingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Use UCrop to crop the image and save the result to the destinationUri
-                mGestureCropImageView.cropAndSaveImage(Bitmap.CompressFormat.JPEG, 100, new BitmapCropCallback() {
+                mGestureCropImageView.cropAndSaveImage(Bitmap.CompressFormat.PNG, 100, new BitmapCropCallback() {
                     @Override
                     public void onBitmapCropped(@NonNull Uri resultUri, int offsetX, int offsetY, int imageWidth, int imageHeight) {
                         // The image was successfully cropped and saved to resultUri.

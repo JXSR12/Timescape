@@ -262,7 +262,7 @@
     <string name="photo">照片</string>
     <string name="video">视频</string>
     <string name="unread_messages_below">未读消息在下方</string>
-    <string name="please_wait">Please wait...</string>
+    <string name="please_wait">请稍候...</string>
 
 
 </resources>

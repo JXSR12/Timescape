@@ -299,7 +299,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         TextView otherUserTextMessage;
         RoundedImageView selfImageMessage;
         FrameLayout selfImageMessageFrame;
+        ImageView selfImageVideoOverlay;
         FrameLayout otherUserImageMessageFrame;
+        ImageView otherUserImageVideoOverlay;
         RoundedImageView otherUserImageMessage;
         LinearLayout selfFileAttachmentMessage;
         TextView selfFileAttachmentName;
@@ -346,8 +348,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             selfTextMessage = itemView.findViewById(R.id.self_text_message);
             otherUserTextMessage = itemView.findViewById(R.id.other_user_text_message);
             selfImageMessage = itemView.findViewById(R.id.self_image_message);
+            selfImageVideoOverlay = itemView.findViewById(R.id.self_image_video_overlay);
             selfImageMessageFrame = itemView.findViewById(R.id.self_image_message_frame);
             otherUserImageMessage = itemView.findViewById(R.id.other_user_image_message);
+            otherUserImageVideoOverlay = itemView.findViewById(R.id.other_user_image_video_overlay);
             otherUserImageMessageFrame = itemView.findViewById(R.id.other_user_image_message_frame);
             selfFileAttachmentMessage = itemView.findViewById(R.id.self_file_attachment_message);
             selfFileAttachmentName = itemView.findViewById(R.id.self_file_attachment_name);
@@ -558,8 +562,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                     .diskCacheStrategy(DiskCacheStrategy.ALL); // Enable caching
             int targetImageSize = calculateTargetImageSize(); // Calculate an appropriate target size
             int thumbnailSize = 32; // Set the thumbnail size
+
+            // Check if the message content is a video
+            boolean isVideo = isVideoMessage(message.getContent()); // Implement this method to check the mime type or other conditions
+
             if (isCurrentUser) {
                 selfImageMessageFrame.setVisibility(View.VISIBLE);
+
                 // Load the image URL into the ImageView using an image loading library like Glide
                 Glide.with(itemView.getContext())
                         .load(message.getContent())
@@ -571,6 +580,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                                 .override(thumbnailSize, thumbnailSize))
                         .apply(requestOptions.override(targetImageSize, targetImageSize))
                         .into(selfImageMessage);
+
+                // Set the video overlay visibility based on whether it is a video or not
+                if (isVideo) {
+                    selfImageVideoOverlay.setVisibility(View.VISIBLE);
+                } else {
+                    selfImageVideoOverlay.setVisibility(View.GONE);
+                }
 
                 List<String> reads = message.getReads();
                 if (reads != null && !reads.isEmpty()) {
@@ -593,6 +609,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
             } else {
                 otherUserImageMessageFrame.setVisibility(View.VISIBLE);
+
                 // Load the image URL into the ImageView using an image loading library like Glide
                 Glide.with(itemView.getContext())
                         .load(message.getContent())
@@ -605,6 +622,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                         .apply(requestOptions.override(targetImageSize, targetImageSize))
                         .into(otherUserImageMessage);
 
+                // Set the video overlay visibility based on whether it is a video or not
+                if (isVideo) {
+                    otherUserImageVideoOverlay.setVisibility(View.VISIBLE);
+                } else {
+                    otherUserImageVideoOverlay.setVisibility(View.GONE);
+                }
+
                 otherUserImageMessage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -615,7 +639,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                     }
                 });
             }
+        }
 
+        private boolean isVideoMessage(String url) {
+            String expectedSegment = "https://firebasestorage.googleapis.com/v0/b/timescapeandroid.appspot.com/o/videos";
+            return url.startsWith(expectedSegment);
         }
 
         private int calculateTargetImageSize() {
@@ -1004,6 +1032,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             otherUserUnsentMessage.setVisibility(View.GONE);
             selfReplyMessageLayout.setVisibility(View.GONE);
             otherUserReplyMessageLayout.setVisibility(View.GONE);
+            selfImageVideoOverlay.setVisibility(View.GONE);
+            otherUserImageVideoOverlay.setVisibility(View.GONE);
         }
     }
 }
