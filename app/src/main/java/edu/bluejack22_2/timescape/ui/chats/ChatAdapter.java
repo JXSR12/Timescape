@@ -9,12 +9,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -31,6 +33,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -500,14 +504,22 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
 
         private void handleImageMessage(Message message, boolean isCurrentUser) {
+            RequestOptions requestOptions = new RequestOptions()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL); // Enable caching
+            int targetImageSize = calculateTargetImageSize(); // Calculate an appropriate target size
+            int thumbnailSize = 32; // Set the thumbnail size
             if (isCurrentUser) {
                 selfImageMessageFrame.setVisibility(View.VISIBLE);
                 // Load the image URL into the ImageView using an image loading library like Glide
                 Glide.with(itemView.getContext())
                         .load(message.getContent())
+                        .placeholder(R.drawable.placeholder_image) // Placeholder image
+                        .error(R.drawable.error_image) // Error image
                         .thumbnail(Glide.with(itemView.getContext())
                                 .load(message.getContent())
-                                .override(32, 32))
+                                .apply(requestOptions)
+                                .override(thumbnailSize, thumbnailSize))
+                        .apply(requestOptions.override(targetImageSize, targetImageSize))
                         .into(selfImageMessage);
 
                 List<String> reads = message.getReads();
@@ -534,9 +546,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                 // Load the image URL into the ImageView using an image loading library like Glide
                 Glide.with(itemView.getContext())
                         .load(message.getContent())
+                        .placeholder(R.drawable.placeholder_image) // Placeholder image
+                        .error(R.drawable.error_image) // Error image
                         .thumbnail(Glide.with(itemView.getContext())
                                 .load(message.getContent())
-                                .override(32, 32))
+                                .apply(requestOptions)
+                                .override(thumbnailSize, thumbnailSize))
+                        .apply(requestOptions.override(targetImageSize, targetImageSize))
                         .into(otherUserImageMessage);
 
                 otherUserImageMessage.setOnClickListener(new View.OnClickListener() {
@@ -551,6 +567,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             }
 
         }
+
+        private int calculateTargetImageSize() {
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
+
+            // Calculate the target size based on the device's display dimensions
+            int targetSize = Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels);
+            // You can also apply additional logic to adjust the target size as per your requirements
+
+            return targetSize;
+        }
+
 
         private void handleFileAttachmentMessage(Message message, boolean isCurrentUser) {
             if (isCurrentUser) {

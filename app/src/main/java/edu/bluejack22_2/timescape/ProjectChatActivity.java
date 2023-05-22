@@ -3,6 +3,7 @@ package edu.bluejack22_2.timescape;
 import static android.content.ContentValues.TAG;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -255,8 +256,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         attachImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                pickImageLauncher.launch(intent);
+                pickImage();
             }
         });
 
@@ -978,27 +978,53 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         }
     });
 
-    private final ActivityResultLauncher<Intent> cropImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-            Uri croppedImageUri = UCrop.getOutput(result.getData());
-            if (croppedImageUri != null) {
-                String fileName = getFileNameFromUri(getApplicationContext(), croppedImageUri);
-                uploadFileToFirebaseStorage(croppedImageUri, "images", fileName);
+//    private final ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+//        if (result.getResultCode() == RESULT_OK && result.getData() != null && result.getData().getData() != null) {
+//            Uri sourceUri = result.getData().getData();
+//            String originalFileName = getFileNameFromUri(this, sourceUri);
+//            String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+//            String croppedFileName = originalFileName.substring(0, originalFileName.lastIndexOf(".")) + "-edited" + extension;
+//            Uri destinationUri = Uri.fromFile(new File(getCacheDir(), croppedFileName));
+//
+//            UCrop.of(sourceUri, destinationUri)
+//                    .start(ProjectChatActivity.this);
+//        }
+//    });
+
+    private final ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null && result.getData().getData() != null) {
+            Uri sourceUri = result.getData().getData();
+            startImageEditingActivity(sourceUri);
+        }
+    });
+
+    private final ActivityResultLauncher<Intent> editImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+            Uri resultUri = result.getData().getData();
+            if (resultUri != null) {
+                String fileName = getFileNameFromUri(getApplicationContext(), resultUri);
+                uploadFileToFirebaseStorage(resultUri, "images", fileName);
             }
         }
     });
 
-    private final ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK && result.getData() != null && result.getData().getData() != null) {
-            Uri sourceUri = result.getData().getData();
-            String originalFileName = getFileNameFromUri(this, sourceUri);
-            String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-            String croppedFileName = originalFileName.substring(0, originalFileName.lastIndexOf(".")) + "-edited" + extension;
-            Uri destinationUri = Uri.fromFile(new File(getCacheDir(), croppedFileName));
-            UCrop.of(sourceUri, destinationUri).withAspectRatio(1, 1).start(ProjectChatActivity.this);
-        }
-    });
+    private void pickImage() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        pickImageLauncher.launch(intent);
+    }
 
+    private void startImageEditingActivity(Uri sourceUri) {
+        String originalFileName = getFileNameFromUri(this, sourceUri);
+        String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+        String croppedFileName = originalFileName.substring(0, originalFileName.lastIndexOf(".")) + "-edited" + extension;
+        Uri destinationUri = Uri.fromFile(new File(getCacheDir(), croppedFileName));
+
+        Intent intent = new Intent(ProjectChatActivity.this, ImageEditingActivity.class);
+        intent.putExtra("sourceUri", sourceUri.toString());
+        intent.putExtra("destinationUri", destinationUri.toString());
+        editImageLauncher.launch(intent);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -1013,7 +1039,6 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             }
         } else if (resultCode == UCrop.RESULT_ERROR) {
             final Throwable cropError = UCrop.getError(data);
-            // Handle crop error here
         }
     }
 
@@ -1508,7 +1533,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
 
     private void sendReplyMessage(String repliedMessageId) {
         String messageContent = messageInput.getText().toString().trim();
-
+        messageInput.setText("");
         if (!TextUtils.isEmpty(messageContent)) {
             // Get the current user's ID
             String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -1533,7 +1558,6 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                         @Override
                         public void onSuccess(Void aVoid) {
                             Log.d(TAG, "Reply message sent successfully");
-                            messageInput.setText("");
                             exitReplyMode(null);
                             onMessageSent(firebaseAuth.getCurrentUser().getDisplayName(), message.getContent(), message.getId());
                         }
@@ -1556,6 +1580,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             sendReplyMessage(repliedMessageId);
         } else {
             String messageContent = messageInput.getText().toString().trim();
+            messageInput.setText("");
 
             if (!TextUtils.isEmpty(messageContent)) {
                 // Get the current user's ID
@@ -1580,7 +1605,6 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Log.d(TAG, "Message sent successfully");
-                                messageInput.setText("");
                                 onMessageSent(firebaseAuth.getCurrentUser().getDisplayName(), message.getContent(), message.getId());
                             }
                         })

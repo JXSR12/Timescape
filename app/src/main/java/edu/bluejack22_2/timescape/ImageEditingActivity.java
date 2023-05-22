@@ -4,23 +4,31 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.yalantis.ucrop.UCrop;
+import com.yalantis.ucrop.callback.BitmapCropCallback;
+import com.yalantis.ucrop.view.CropImageView;
 import com.yalantis.ucrop.view.GestureCropImageView;
 import com.yalantis.ucrop.view.OverlayView;
 import com.yalantis.ucrop.view.UCropView;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class ImageEditingActivity extends AppCompatActivity {
 
@@ -46,15 +54,22 @@ public class ImageEditingActivity extends AppCompatActivity {
         uCropView.getCropImageView().setScaleEnabled(true);
 
         mGestureCropImageView = uCropView.getCropImageView();
+
+        mGestureCropImageView.setTargetAspectRatio(0);
+
         mOverlayView = uCropView.getOverlayView();
         Button confirmButton = findViewById(R.id.confirmButton);
         Button cancelButton = findViewById(R.id.cancelButton);
 
         // Get image Uri from the intent that started this activity
-        sourceUri = getIntent().getData();
+        String sourceUriString = getIntent().getStringExtra("sourceUri");
+        sourceUri = Uri.parse(sourceUriString);
+        String destinationUriString = getIntent().getStringExtra("destinationUri");
+        destinationUri = Uri.parse(destinationUriString);
         if (sourceUri != null) {
             try {
-                mGestureCropImageView.setImageUri(sourceUri, null);
+                mGestureCropImageView.setImageUri(sourceUri, destinationUri);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -63,20 +78,38 @@ public class ImageEditingActivity extends AppCompatActivity {
             mOverlayView.setShowCropFrame(true);
             mOverlayView.setShowCropGrid(true);
         }
-
-        // Get the original file name and append "-cropped" before the extension
-        String originalFileName = getFileNameFromUri(this, sourceUri);
-        String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-        String croppedFileName = originalFileName.substring(0, originalFileName.lastIndexOf(".")) + "-cropped" + extension;
-        destinationUri = Uri.fromFile(new File(getCacheDir(), croppedFileName));
+        destinationUri = Uri.parse(destinationUriString);
 
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Use UCrop to crop the image and save the result to the destinationUri
-                UCrop.of(sourceUri, destinationUri).start(ImageEditingActivity.this);
+                mGestureCropImageView.cropAndSaveImage(Bitmap.CompressFormat.JPEG, 100, new BitmapCropCallback() {
+                    @Override
+                    public void onBitmapCropped(@NonNull Uri resultUri, int offsetX, int offsetY, int imageWidth, int imageHeight) {
+                        // The image was successfully cropped and saved to resultUri.
+                        // You can now do something with the resultUri.
+
+                        // Create a new intent and put the destinationUri as an extra
+                        Intent intent = new Intent();
+                        intent.setData(resultUri);
+                        setResult(RESULT_OK, intent);
+
+                        // Close this activity
+                        finish();
+                    }
+
+                    @Override
+                    public void onCropFailure(@NonNull Throwable t) {
+                        // Something went wrong during cropping or saving.
+                        // You should handle this error.
+                        Log.e("ImageEditingActivity", "Crop failure", t);
+                    }
+                });
             }
         });
+
+
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override

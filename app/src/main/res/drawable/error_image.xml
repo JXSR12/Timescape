@@ -1,0 +1,9 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Add any desired shape properties here, such as background color, corner radius, etc. -->
+    <solid android:color="#880000" /> <!-- Error background color -->
+    <corners android:radius="8dp" /> <!-- Rounded corners, adjust the radius as needed -->
+    <stroke
+        android:color="#CCCCCC"
+        android:width="10dp" /> <!-- Border color and width, adjust as needed -->
+    <!-- Add any additional elements, such as error icon or text, to indicate the error state -->
+</shape>

@@ -88,6 +88,7 @@ public class FullScreenImageActivity extends AppCompatActivity {
         topBar = findViewById(R.id.topBar);
         playerView = findViewById(R.id.player_view);
 
+        fullScreenImageView.setVisibility(View.VISIBLE);
         playerView.setVisibility(View.GONE);
 
         imageUrl = getIntent().getStringExtra("image_url");
@@ -118,6 +119,7 @@ public class FullScreenImageActivity extends AppCompatActivity {
                 String mimeType = storageMetadata.getContentType();
                 if (mimeType != null && mimeType.startsWith("video")) {
                     initializePlayer();
+                    showVideo();
                 } else {
                     loadImage();
                 }
@@ -163,6 +165,9 @@ public class FullScreenImageActivity extends AppCompatActivity {
             player.prepare();
             player.play();
         }
+    }
+
+    private void showVideo(){
         playerView.setVisibility(View.VISIBLE);
         fullScreenImageView.setVisibility(View.GONE);
     }

@@ -1,0 +1,4 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Add any desired shape properties here, such as background color, corner radius, etc. -->
+    <solid android:color="#CCCCCC" /> <!-- Placeholder background color -->
+</shape>
