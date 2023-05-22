@@ -19,13 +19,27 @@
         android:layout_marginStart="16dp"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/projectTitleTextView"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:text="Project Title"
-            android:textSize="16sp" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/projectTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="Project Title"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/muteImageView"
+                android:layout_width="16dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/outline_notifications_off_24"
+                android:visibility="gone" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/latestMessageTextView"

@@ -120,6 +120,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
     ImageButton attachFileButton;
     ImageButton attachImageButton;
     ImageButton inviteProjectButton;
+    ImageButton muteButton;
     RelativeLayout replyModeLayout;
     RelativeLayout newMessageLayout;
     TextView replyModeText;
@@ -179,46 +180,63 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             actionBarTitle = customActionBarView.findViewById(R.id.project_title);
             actionBarOnlineText = customActionBarView.findViewById(R.id.online_status);
             actionBarOnlineBullet = customActionBarView.findViewById(R.id.online_status_bullet);
+            muteButton = customActionBarView.findViewById(R.id.mute_button);
+            checkMuteStatusAndUpdateButton();
+            muteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    DocumentReference mutedChatRef = db.collection("settings").document(userId)
+                            .collection("mutedChats").document(projectId);
+
+                    mutedChatRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    // Chat is currently muted, so we unmute it.
+                                    mutedChatRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Toast.makeText(ProjectChatActivity.this, R.string.chat_notifications_enabled, Toast.LENGTH_SHORT).show();
+                                            muteButton.setImageResource(R.drawable.outline_notifications_24);
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(ProjectChatActivity.this, R.string.failed_to_enable_notifications, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                } else {
+                                    // Chat is not currently muted, so we mute it.
+                                    mutedChatRef.set(new HashMap<>()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Toast.makeText(ProjectChatActivity.this, R.string.chat_notifications_disabled, Toast.LENGTH_SHORT).show();
+                                            muteButton.setImageResource(R.drawable.outline_notifications_off_24);
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(ProjectChatActivity.this, R.string.failed_to_disable_notifications, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            } else {
+                                Toast.makeText(ProjectChatActivity.this, R.string.error_checking_notification_setting, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            });
+
 
             // Set the custom view for the ActionBar
             actionBar.setCustomView(customActionBarView);
             actionBar.setDisplayShowCustomEnabled(true);
         }
-
-//        String projectId = getIntent().getStringExtra("projectId");
-//        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        DocumentReference chatDocument = db.collection("chats").document(projectId);
-//        DocumentReference projectDocument = db.collection("projects").document(projectId);
-//
-//        projectDocument
-//                .addSnapshotListener((value, error) -> {
-//                    if (error != null) {
-//                        // Handle error
-//                        return;
-//                    }
-//
-//                    if (value != null && value.exists()) {
-//                        project = value.toObject(Project.class);
-//                        project.setUid(value.getId());
-//                        project.setOwner(value.getDocumentReference("owner"));
-//                        actionBarTitle.setText(project.getTitle());
-//                        setupChatDocumentListener();
-//                        fetchAndMarkAllMessagesAsRead();
-//                    }
-//                });
-//
-//        db.runTransaction(new Transaction.Function<Void>() {
-//            @Override
-//            public Void apply(Transaction transaction) throws FirebaseFirestoreException {
-//                DocumentSnapshot snapshot = transaction.get(chatDocument);
-//                if (!snapshot.exists() || !snapshot.contains("messages")) {
-//                    transaction.set(chatDocument, new HashMap<String, Object>() {{
-//                        put("messages", new ArrayList<Message>());
-//                    }});
-//                }
-//                return null;
-//            }
-//        });
 
         String projectId = getIntent().getStringExtra("projectId");
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -414,7 +432,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                 int mentionEndIndex = inputText.lastIndexOf('@');
                 int cursorPosition = messageInput.getSelectionStart();
 
-                if (beforeText.length() > inputText.length()) { // Backspace detected
+                if (beforeText.length() > inputText.length() && !inputText.isEmpty()) { // Backspace detected
                     if (cursorPosition > 0 && cursorPosition <= s.length()) {
                         MentionClickableSpan[] allSpans = s.getSpans(0, s.length(), MentionClickableSpan.class);
                         boolean foundSpan = false;
@@ -516,8 +534,34 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
 
     }
 
+    private void checkMuteStatusAndUpdateButton() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DocumentReference mutedChatRef = db.collection("settings").document(userId)
+                .collection("mutedChats").document(projectId);
+
+        mutedChatRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // Chat is currently muted
+                        muteButton.setImageResource(R.drawable.outline_notifications_off_24);
+                    } else {
+                        // Chat is not currently muted
+                        muteButton.setImageResource(R.drawable.outline_notifications_24);
+                    }
+                } else {
+                    Log.e(TAG, "Error checking mute status", task.getException());
+                }
+            }
+        });
+    }
+
+
     private void insertMention(EditText messageInput, String mentionDisplayName, String mentionId) {
-        SpannableString mentionSpannable = new SpannableString(mentionDisplayName);
+        SpannableString mentionSpannable = new SpannableString(mentionDisplayName + " ");
 
         MentionClickableSpan mentionClickableSpan = new MentionClickableSpan(mentionId);
         mentionSpannable.setSpan(mentionClickableSpan, 0, mentionDisplayName.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -529,6 +573,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         Editable messageEditable = messageInput.getText();
         messageEditable.insert(cursorPosition, mentionSpannable);
     }
+
 
     private HashMap<String, String> getMentionsFromEditable(Editable editable) {
         HashMap<String, String> mentions = new HashMap<>();
@@ -687,7 +732,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                 }
 
                 // Check if the message has not been read by the current user
-                if (!reads.contains(currentUserId) && !message.getSender().getId().equals(currentUserId)) {
+                if (!reads.contains(currentUserId) && message.getSender() != null && !message.getSender().getId().equals(currentUserId)) {
                     reads.add(currentUserId);
                     message.setReads(reads);
 
@@ -1377,26 +1422,40 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                                     continue;
                                 }
 
-                                // Check if the member is in the chat room with the same projectId
-                                firebaseFirestore.collection("activeChats").document(id)
+                                // Check if the member has muted the chat
+                                firebaseFirestore.collection("settings").document(id)
+                                        .collection("mutedChats").document(projectId)
                                         .get()
                                         .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                             @Override
                                             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                                String activeProjectId = documentSnapshot.getString("projectId");
-                                                if (activeProjectId == null || !(activeProjectId.equals("ALL") || activeProjectId.equals(projectId))) {
-                                                    // Save the notification for this member
-                                                    Map<String, Object> notificationData = new HashMap<>();
-                                                    notificationData.put("senderName", senderName);
-                                                    notificationData.put("projectId", projectId);
-                                                    notificationData.put("projectName", projectName);
-                                                    notificationData.put("content", displayedContent);
-                                                    notificationData.put("messageId", messageId);
-                                                    notificationData.put("notificationType", "PROJECT_CHAT_MESSAGE");
-
-                                                    firebaseFirestore.collection("users").document(id).collection("notifications")
-                                                            .add(notificationData);
+                                                if (documentSnapshot.exists()) {
+                                                    // Chat is muted, skip notification
+                                                    return;
                                                 }
+
+                                                // Check if the member is in the chat room with the same projectId
+                                                firebaseFirestore.collection("activeChats").document(id)
+                                                        .get()
+                                                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                            @Override
+                                                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                                String activeProjectId = documentSnapshot.getString("projectId");
+                                                                if (activeProjectId == null || !(activeProjectId.equals("ALL") || activeProjectId.equals(projectId))) {
+                                                                    // Save the notification for this member
+                                                                    Map<String, Object> notificationData = new HashMap<>();
+                                                                    notificationData.put("senderName", senderName);
+                                                                    notificationData.put("projectId", projectId);
+                                                                    notificationData.put("projectName", projectName);
+                                                                    notificationData.put("content", displayedContent);
+                                                                    notificationData.put("messageId", messageId);
+                                                                    notificationData.put("notificationType", "PROJECT_CHAT_MESSAGE");
+
+                                                                    firebaseFirestore.collection("users").document(id).collection("notifications")
+                                                                            .add(notificationData);
+                                                                }
+                                                            }
+                                                        });
                                             }
                                         });
                             }
@@ -1404,6 +1463,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                     }
                 });
     }
+
 
 
     @Override

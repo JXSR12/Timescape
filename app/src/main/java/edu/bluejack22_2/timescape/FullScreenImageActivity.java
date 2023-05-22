@@ -1,7 +1,8 @@
 package edu.bluejack22_2.timescape;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.ContentValues;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -9,11 +10,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
-import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,45 +21,32 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.github.chrisbanes.photoview.PhotoView;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.ui.StyledPlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
-import com.google.firebase.storage.StorageReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
+
+import edu.bluejack22_2.timescape.model.Message;
 
 public class FullScreenImageActivity extends AppCompatActivity {
 
     RelativeLayout bottomBar;
     RelativeLayout topBar;
-    PhotoView fullScreenImageView;
-    Button downloadImageButton;
+    ViewPager2 viewPager;
     TextView imageFileName;
     ImageButton backButton;
+    Button downloadImageButton;
 
-    StyledPlayerView playerView;
-    ExoPlayer player;
-
-    private String imageUrl;
-    private String fileName;
+    private String currentImageUrl;
+    private String currentFileName;
+    private String projectId;
+    private int currentPosition;
 
     private Handler hideUIHandler = new Handler();
     private Runnable hideUIRunnable = new Runnable() {
@@ -74,76 +61,29 @@ public class FullScreenImageActivity extends AppCompatActivity {
         hideUIHandler.postDelayed(hideUIRunnable, 3000);
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_full_screen_image);
 
         backButton = findViewById(R.id.backButton);
-        fullScreenImageView = findViewById(R.id.fullScreenImageView);
         imageFileName = findViewById(R.id.imageFileName);
-        downloadImageButton = findViewById(R.id.downloadImageButton);
         bottomBar = findViewById(R.id.bottomBar);
         topBar = findViewById(R.id.topBar);
-        playerView = findViewById(R.id.player_view);
+        viewPager = findViewById(R.id.view_pager);
+        downloadImageButton = findViewById(R.id.downloadImageButton);
 
-        fullScreenImageView.setVisibility(View.VISIBLE);
-        playerView.setVisibility(View.GONE);
+        projectId = getIntent().getStringExtra("project_id");
+        currentPosition = 0;
 
-        imageUrl = getIntent().getStringExtra("image_url");
-        fileName = getIntent().getStringExtra("file_name");
-
-        fullScreenImageView.setMaximumScale(5.0f);
-        fullScreenImageView.setMinimumScale(1.0f);
-
-
-        // Set the file name
-        imageFileName.setText(fileName);
-
-        // Set the download button click listener
-        downloadImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                downloadImage(imageUrl, fileName);
-            }
-        });
-
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReferenceFromUrl(imageUrl);
-
-        Task<StorageMetadata> metadataTask = storageRef.getMetadata();
-        metadataTask.addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-            @Override
-            public void onSuccess(StorageMetadata storageMetadata) {
-                String mimeType = storageMetadata.getContentType();
-                if (mimeType != null && mimeType.startsWith("video")) {
-                    initializePlayer();
-                    showVideo();
-                } else {
-                    loadImage();
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-            }
-        });
-
-        fullScreenImageView.setOnClickListener(new View.OnClickListener() {
+        viewPager.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toggleUIVisibility();
             }
         });
 
-        playerView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleUIVisibility();
-            }
-        });
+        fetchImageVideoMessages();
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,41 +91,18 @@ public class FullScreenImageActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        downloadImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                downloadImage(currentImageUrl, currentFileName);
+            }
+        });
+
+
         resetHideUITimer();
     }
 
-    private void initializePlayer() {
-        if (player == null) {
-            player = new ExoPlayer.Builder(this).build();
-
-            playerView.setPlayer(player);
-
-            MediaItem mediaItem = MediaItem.fromUri(imageUrl);
-            player.setMediaItem(mediaItem);
-            player.prepare();
-            player.play();
-        }
-    }
-
-    private void showVideo(){
-        playerView.setVisibility(View.VISIBLE);
-        fullScreenImageView.setVisibility(View.GONE);
-    }
-
-    private void loadImage(){
-        Glide.with(this)
-                .load(imageUrl)
-                .into(fullScreenImageView);
-        playerView.setVisibility(View.GONE);
-        fullScreenImageView.setVisibility(View.VISIBLE);
-    }
-
-    private void releasePlayer() {
-        if (player != null) {
-            player.release();
-            player = null;
-        }
-    }
     private void downloadImage(String imageUrl, String fileName) {
         if (imageUrl == null) {
             Toast.makeText(this, "Error: Image URL is null", Toast.LENGTH_SHORT).show();
@@ -234,7 +151,57 @@ public class FullScreenImageActivity extends AppCompatActivity {
         }
     }
 
-    private void toggleUIVisibility() {
+    private void fetchImageVideoMessages() {
+        FirebaseFirestore.getInstance()
+                .collection("chats")
+                .document(projectId)
+                .collection("messages")
+                .whereEqualTo("message_type", Message.MessageType.IMAGE)
+                .orderBy("timestamp")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Message> messages = queryDocumentSnapshots.toObjects(Message.class);
+                    setupViewPager(messages);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to fetch image/video messages", e);
+                });
+    }
+
+    private void setupViewPager(List<Message> messages) {
+        MyPagerAdapter adapter = new MyPagerAdapter(this, messages);
+        viewPager.setAdapter(adapter);
+        viewPager.setCurrentItem(currentPosition);
+
+
+        currentImageUrl = messages.get(currentPosition).getContent();
+        currentFileName = messages.get(currentPosition).getFileName();
+        imageFileName.setText(messages.get(currentPosition).getFileName());
+
+        String messageId = getIntent().getStringExtra("message_id");
+
+        // Find the position of the message with this `messageId` in `messages`
+        int position = 0;
+        for (Message message : messages) {
+            if (messageId.equals(message.getId())) {
+                break;
+            }
+            position++;
+        }
+        // Use `position` as the initial position for the `ViewPager`
+        viewPager.setCurrentItem(position);
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                currentImageUrl = messages.get(position).getContent();
+                currentFileName = messages.get(position).getFileName();
+                imageFileName.setText(messages.get(position).getFileName());
+            }
+        });
+    }
+
+    void toggleUIVisibility() {
         int newVisibility = bottomBar.getVisibility() == View.VISIBLE ? View.INVISIBLE : View.VISIBLE;
 
         topBar.setVisibility(newVisibility);
@@ -248,41 +215,4 @@ public class FullScreenImageActivity extends AppCompatActivity {
             hideUIHandler.removeCallbacks(hideUIRunnable);
         }
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (Util.SDK_INT >= 24) {
-            initializePlayer();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (Util.SDK_INT < 24 || player == null) {
-            initializePlayer();
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (Util.SDK_INT < 24) {
-            releasePlayer();
-        }
-        player.stop();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (Util.SDK_INT < 24) {
-            releasePlayer();
-        }
-        player.stop();
-    }
-
-
-    }
-
+}

@@ -25,6 +25,8 @@ public class Message {
     private String fileName;
     private String replyingTo;
     private Timestamp timestamp;
+
+    private Date timestampAsDate;
     private HashMap<String, String> mentions;
     private List<String> reads;
     public Message(){
@@ -115,6 +117,10 @@ public class Message {
     }
     public Date getTimestampAsDate() {
         return timestamp.toDate();
+    }
+
+    public void setTimestampAsDate(Date timestampAsDate) {
+        this.timestampAsDate = timestampAsDate;
     }
 
     public boolean isCurrentUser(String currentUserId) {

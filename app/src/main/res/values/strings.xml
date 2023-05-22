@@ -264,4 +264,14 @@
     <string name="unread_messages_below">Unread messages below</string>
     <string name="please_wait">Please wait...</string>
     <string name="downloading_latest_app_package">Downloading latest app package</string>
+    <string name="chat_notifications_enabled">Chat notifications enabled</string>
+    <string name="failed_to_enable_notifications">Failed to enable notifications</string>
+    <string name="chat_notifications_disabled">Chat notifications disabled</string>
+    <string name="failed_to_disable_notifications">Failed to disable notifications</string>
+    <string name="error_checking_notification_setting">Error checking notification setting</string>
+    <string name="mute_chat">Mute chat</string>
+    <string name="unmute_chat">Unmute chat</string>
+    <string name="failed_to_get_user_settings">Failed to get user settings</string>
+    <string name="failed_to_disable_chat_notifications">Failed to disable chat notifications</string>
+    <string name="failed_to_enable_chat_notifications">Failed to enable chat notifications</string>
 </resources>

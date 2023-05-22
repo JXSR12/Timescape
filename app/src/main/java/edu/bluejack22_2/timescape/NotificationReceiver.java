@@ -62,45 +62,20 @@ public class NotificationReceiver extends BroadcastReceiver {
                 NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.cancel(notificationId);
             }
-        } else if (ACTION_MUTE.equals(action)) {
+        }else if (ACTION_MUTE.equals(action)) {
             String projectId = intent.getStringExtra(EXTRA_PROJECT_ID);
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-            db.collection("settings").document(userId).get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        List<String> mutedChats;
-                        if (documentSnapshot.exists()) {
-                            mutedChats = documentSnapshot.toObject(UserSettings.class).getMutedChats();
-                        } else {
-                            mutedChats = new ArrayList<>();
-                        }
-
-                        if (!mutedChats.contains(projectId)) {
-                            mutedChats.add(projectId);
-                        }
-
-                        Map<String, Object> data = new HashMap<>();
-                        data.put("mutedChats", mutedChats);
-
-                        db.collection("settings").document(userId).set(data, SetOptions.merge())
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(context, R.string.chat_has_been_muted, Toast.LENGTH_SHORT).show();
-                                    int notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0);
-                                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                                    notificationManager.cancel(notificationId);
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(context, R.string.failed_to_mute_chat, Toast.LENGTH_SHORT).show();
-                                    int notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0);
-                                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                                    notificationManager.cancel(notificationId);
-                                });
-
-
+            db.collection("settings").document(userId).collection("mutedChats").document(projectId)
+                    .set(new HashMap<>())
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(context, R.string.chat_has_been_muted, Toast.LENGTH_SHORT).show();
+                        int notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0);
+                        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                        notificationManager.cancel(notificationId);
                     })
                     .addOnFailureListener(e -> {
-                        Log.e(TAG, "Failed to get user settings", e);
                         Toast.makeText(context, R.string.failed_to_mute_chat, Toast.LENGTH_SHORT).show();
                         int notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0);
                         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

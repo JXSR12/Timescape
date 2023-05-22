@@ -85,6 +85,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     private Context context;
     private FirebaseAuth firebaseAuth;
 
+    private Map<Integer, Integer> imageMessageIndices = new HashMap<>();
+
     private int unreadBelowCount = 0;
 
     private RecyclerView recyclerView;
@@ -102,9 +104,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     }
     private MessageLongClickListener messageLongClickListener;
 
-    public ChatAdapter(Context context, FirebaseAuth firebaseAuth, MessageLongClickListener messageLongClickListener, RecyclerView recyclerView, String projectId) { // Modify this line
+    public ChatAdapter(Context context, FirebaseAuth firebaseAuth, MessageLongClickListener messageLongClickListener, RecyclerView recyclerView, String projectId) {
         this.context = context;
-        this.firebaseAuth = firebaseAuth; // Add this line
+        this.firebaseAuth = firebaseAuth;
         this.messageLongClickListener = messageLongClickListener;
         this.recyclerView = recyclerView;
         this.projectId = projectId;
@@ -258,6 +260,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             holder.repliedMessagePosition = findPositionOfRepliedMessage(message.getReplyingTo(), messages);
             holder.selfRepliedMessageContent.setTag(holder);
             holder.otherUserRepliedMessageContent.setTag(holder);
+        }
+        if (message.getMessage_type() == Message.MessageType.IMAGE) {
+            imageMessageIndices.put(position, imageMessageIndices.size());
         }
 //        Log.d("ChatAdapter", "Binding message at position " + position + ": " + message.getContent());
     }
@@ -600,10 +605,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                 selfImageMessage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent fullScreenIntent = new Intent(context, FullScreenImageActivity.class);
-                        fullScreenIntent.putExtra("image_url", message.getContent());
-                        fullScreenIntent.putExtra("file_name", message.getFileName() != null ? message.getFileName() : "Untitled Image");
-                        context.startActivity(fullScreenIntent);
+                        int position = getBindingAdapterPosition(); // get the adapter position
+                        if (position != RecyclerView.NO_POSITION && imageMessageIndices.containsKey(position)) { // check if item still exists and is an image message
+                            Intent fullScreenIntent = new Intent(context, FullScreenImageActivity.class);
+                            fullScreenIntent.putExtra("project_id", projectId);
+                            fullScreenIntent.putExtra("message_id", message.getId());
+                            context.startActivity(fullScreenIntent);
+                        }
                     }
                 });
 
@@ -632,10 +640,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                 otherUserImageMessage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent fullScreenIntent = new Intent(context, FullScreenImageActivity.class);
-                        fullScreenIntent.putExtra("image_url", message.getContent());
-                        fullScreenIntent.putExtra("file_name", message.getFileName() != null ? message.getFileName() : "Untitled Image");
-                        context.startActivity(fullScreenIntent);
+                        int position = getBindingAdapterPosition(); // get the adapter position
+                        if (position != RecyclerView.NO_POSITION && imageMessageIndices.containsKey(position)) { // check if item still exists and is an image message
+                            Intent fullScreenIntent = new Intent(context, FullScreenImageActivity.class);
+                            fullScreenIntent.putExtra("project_id", projectId);
+                            fullScreenIntent.putExtra("message_id", message.getId());
+                            context.startActivity(fullScreenIntent);
+                        }
                     }
                 });
             }

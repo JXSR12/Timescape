@@ -73,6 +73,7 @@ public class ChatsFragment extends Fragment implements ChatListAdapter.OnChatIte
     @Override
     public void onResume() {
         super.onResume();
+        chatListAdapter.notifyDataSetChanged();
     }
 
     @Override

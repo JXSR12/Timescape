@@ -6,22 +6,13 @@
     android:layout_height="match_parent"
     android:background="@android:color/black">
 
-    <com.google.android.exoplayer2.ui.StyledPlayerView
-        android:id="@+id/player_view"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/topBar"
         android:layout_above="@+id/bottomBar"
-        android:layout_centerInParent="true"
-        app:use_controller="true" />
-
-    <com.github.chrisbanes.photoview.PhotoView
-        android:id="@+id/fullScreenImageView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:src="@drawable/timescape_logo_drawable"
-        android:scaleType="centerInside" />
+        android:layout_centerInParent="true" />
 
     <RelativeLayout
         android:id="@+id/topBar"
@@ -30,6 +21,7 @@
         android:layout_alignParentTop="true"
         android:paddingBottom="16dp"
         android:background="#B9000000">
+
         <ImageButton
             android:id="@+id/backButton"
             android:layout_width="wrap_content"
@@ -54,7 +46,6 @@
             android:layout_alignParentTop="true"
             android:textStyle="bold"
             android:textSize="20dp"
-            android:text="image_2019232ksakdjasdjsdjsajdsjdsjdajsda.png"
             android:ellipsize="end"
             android:textColor="@android:color/white" />
     </RelativeLayout>

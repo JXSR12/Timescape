@@ -1,0 +1,5 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/mute_chat"
+        android:title="@string/mute_chat" />
+</menu>
