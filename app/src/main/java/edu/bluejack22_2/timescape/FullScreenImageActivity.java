@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -88,7 +89,7 @@ public class FullScreenImageActivity extends AppCompatActivity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                onBackPressed();
             }
         });
 
@@ -122,6 +123,10 @@ public class FullScreenImageActivity extends AppCompatActivity {
                     public void onLoadCleared(@Nullable Drawable placeholder) {
                     }
                 });
+    }
+
+    public boolean isUIVisible(){
+        return bottomBar.getVisibility() == View.VISIBLE;
     }
 
     private void saveImageToGallery(Bitmap bitmap, String fileName) {
@@ -171,8 +176,7 @@ public class FullScreenImageActivity extends AppCompatActivity {
     private void setupViewPager(List<Message> messages) {
         MyPagerAdapter adapter = new MyPagerAdapter(this, messages);
         viewPager.setAdapter(adapter);
-        viewPager.setCurrentItem(currentPosition);
-
+        viewPager.setCurrentItem(currentPosition, false);
 
         currentImageUrl = messages.get(currentPosition).getContent();
         currentFileName = messages.get(currentPosition).getFileName();
@@ -188,8 +192,7 @@ public class FullScreenImageActivity extends AppCompatActivity {
             }
             position++;
         }
-        // Use `position` as the initial position for the `ViewPager`
-        viewPager.setCurrentItem(position);
+        viewPager.setCurrentItem(position, false);
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
@@ -214,5 +217,11 @@ public class FullScreenImageActivity extends AppCompatActivity {
         } else {
             hideUIHandler.removeCallbacks(hideUIRunnable);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        ExoPlayerManager.getInstance().stopAllPlayers();
     }
 }

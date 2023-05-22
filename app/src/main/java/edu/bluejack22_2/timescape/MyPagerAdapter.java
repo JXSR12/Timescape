@@ -50,16 +50,30 @@ public class MyPagerAdapter extends RecyclerView.Adapter<MyPagerAdapter.ViewHold
                 holder.playerView.setVisibility(View.VISIBLE);
                 holder.fullScreenImageView.setVisibility(View.GONE);
                 ExoPlayer player = new ExoPlayer.Builder(context).build();
+                ExoPlayerManager.getInstance().registerPlayer(player);
+
                 holder.playerView.setPlayer(player);
 
                 MediaItem mediaItem = MediaItem.fromUri(message.getContent());
                 player.setMediaItem(mediaItem);
                 player.prepare();
                 player.play();
+                holder.playerView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        FullScreenImageActivity activity = (FullScreenImageActivity) context;
+                        activity.toggleUIVisibility();
+                        if(!activity.isUIVisible()){
+                            holder.playerView.hideController();
+                        }
+                        player.setPlayWhenReady(!activity.isUIVisible());
+                    }
+                });
             } else {
                 holder.playerView.setVisibility(View.GONE);
                 holder.fullScreenImageView.setVisibility(View.VISIBLE);
                 Glide.with(context).load(message.getContent()).into(holder.fullScreenImageView);
+                holder.fullScreenImageView.setOnClickListener(v -> ((FullScreenImageActivity) context).toggleUIVisibility());
             }
         }).addOnFailureListener(e -> {
             Log.e("MyPagerAdapter", "Failed to fetch mime type", e);
@@ -68,8 +82,6 @@ public class MyPagerAdapter extends RecyclerView.Adapter<MyPagerAdapter.ViewHold
         });
 
         holder.itemView.setOnClickListener(v -> ((FullScreenImageActivity) context).toggleUIVisibility());
-        holder.playerView.setOnClickListener(v -> ((FullScreenImageActivity) context).toggleUIVisibility());
-        holder.fullScreenImageView.setOnClickListener(v -> ((FullScreenImageActivity) context).toggleUIVisibility());
     }
 
     @Override
