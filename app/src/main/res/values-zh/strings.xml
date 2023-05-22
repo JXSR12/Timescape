@@ -263,6 +263,7 @@
     <string name="video">视频</string>
     <string name="unread_messages_below">未读消息在下方</string>
     <string name="please_wait">请稍候...</string>
+    <string name="downloading_latest_app_package">正在下载最新的应用包</string>
 
 
 </resources>

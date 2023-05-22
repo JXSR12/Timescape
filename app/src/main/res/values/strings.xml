@@ -263,4 +263,5 @@
     <string name="video">Video</string>
     <string name="unread_messages_below">Unread messages below</string>
     <string name="please_wait">Please wait...</string>
+    <string name="downloading_latest_app_package">Downloading latest app package</string>
 </resources>

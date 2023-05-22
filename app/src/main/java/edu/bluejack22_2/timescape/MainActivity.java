@@ -3,6 +3,7 @@ package edu.bluejack22_2.timescape;
 import static android.content.ContentValues.TAG;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -278,7 +279,7 @@ public class MainActivity extends BaseActivity {
         }
 
         final AlertDialog progressDialog = new AlertDialog.Builder(this)
-                .setTitle("Downloading latest app package")
+                .setTitle(R.string.downloading_latest_app_package)
                 .setCancelable(false)
                 .setView(R.layout.dialog_progress_general_text)
                 .show();
@@ -292,7 +293,7 @@ public class MainActivity extends BaseActivity {
                 query.setFilterById(downloadID);
                 Cursor cursor = downloadManager.query(query);
                 if (cursor.moveToFirst()) {
-                    String filePath = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                    @SuppressLint("Range") String filePath = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
                     File downloadedFile = new File(Uri.parse(filePath).getPath());
                     installApk(downloadedFile);
                 }

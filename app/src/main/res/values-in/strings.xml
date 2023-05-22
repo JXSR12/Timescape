@@ -263,5 +263,6 @@
     <string name="video">Video</string>
     <string name="unread_messages_below">Pesan belum dibaca di bawah</string>
     <string name="please_wait">Harap tunggu...</string>
+    <string name="downloading_latest_app_package">Mengunduh paket aplikasi terbaru</string>
 
 </resources>
