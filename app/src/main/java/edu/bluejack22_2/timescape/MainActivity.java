@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -271,17 +272,43 @@ public class MainActivity extends BaseActivity {
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "timescape-latest.apk");
 
+        File apkFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "timescape-latest.apk");
+        if (apkFile.exists()) {
+            apkFile.delete();
+        }
+
+        final AlertDialog progressDialog = new AlertDialog.Builder(this)
+                .setTitle("Downloading latest app package")
+                .setCancelable(false)
+                .setView(R.layout.dialog_progress_general_text)
+                .show();
+
         long downloadID = downloadManager.enqueue(request);
         BroadcastReceiver onComplete = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                File apkFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "timescape-latest.apk");
-                installApk(apkFile);
+                // Get the downloaded file path from the DownloadManager query
+                DownloadManager.Query query = new DownloadManager.Query();
+                query.setFilterById(downloadID);
+                Cursor cursor = downloadManager.query(query);
+                if (cursor.moveToFirst()) {
+                    String filePath = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                    File downloadedFile = new File(Uri.parse(filePath).getPath());
+                    installApk(downloadedFile);
+                }
+                cursor.close();
+
+                progressDialog.dismiss();
                 context.unregisterReceiver(this);
             }
         };
         registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
+
+
+
+
+
 
     private void installApk(File apkFile) {
         {

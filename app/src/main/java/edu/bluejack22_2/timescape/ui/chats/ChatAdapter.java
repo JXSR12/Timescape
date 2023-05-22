@@ -85,6 +85,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     private Context context;
     private FirebaseAuth firebaseAuth;
 
+    private int unreadBelowCount = 0;
+
     private RecyclerView recyclerView;
     private Map<String, String> memberDisplayNameMap = new HashMap<>();
     private String projectId = "NONE";
@@ -114,7 +116,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         }
     }
 
-    public void setMessages(List<Message> messages, RecyclerView recyclerView, RelativeLayout newMessageLayout) {
+    public void setMessages(List<Message> messages, RecyclerView recyclerView, RelativeLayout newMessageLayout, boolean alwaysScroll) {
+        int prevCount = this.messages != null ? this.messages.size() : 0;
+        boolean shouldScroll = false;
+
         if (this.messages == null) {
             this.messages = new ArrayList<>();
         } else {
@@ -155,18 +160,39 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
             // Update previousMessage
             previousMessage = message;
+
+            // Check if the message is from the current user and should scroll to the bottom
+            if (alwaysScroll) {
+                shouldScroll = true;
+            }
         }
 
+        int curCount = this.messages.size();
+
         Log.d("SETMESSAGE", "RAN");
-        if (isUserAtBottom(recyclerView, false)) {
-            recyclerView.scrollToPosition(getLastItemPosition());
-            Log.d("SETMESSAGE", "AT BOTTOM");
-        } else {
-            newMessageLayout.setVisibility(View.VISIBLE);
-            Log.d("SETMESSAGE", "NOT AT BOTTOM");
+        Log.d("SETMESSAGE", "PREV COUNT: " + prevCount + " | CUR COUNT: " + curCount);
+        if (curCount != prevCount) {
+            if (shouldScroll || isUserAtBottom(recyclerView, true)) {
+                recyclerView.postDelayed(() -> {
+                    recyclerView.scrollToPosition(getLastItemPosition());
+                }, 50);
+                Log.d("SETMESSAGE", "AT BOTTOM");
+            } else {
+                this.unreadBelowCount++;
+                newMessageLayout.setVisibility(View.VISIBLE);
+                Log.d("SETMESSAGE", "NOT AT BOTTOM");
+            }
         }
 
         notifyDataSetChanged();
+    }
+
+    public void setUnreadBelowCount(int unreadBelowCount) {
+        this.unreadBelowCount = unreadBelowCount;
+    }
+
+    public int getUnreadBelowCount() {
+        return unreadBelowCount;
     }
 
     public static boolean isUserAtBottom(RecyclerView recyclerView, boolean newMessage) {

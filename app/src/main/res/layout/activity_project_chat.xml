@@ -87,6 +87,7 @@
         android:layout_height="wrap_content"
         android:background="#8FFF5900"
         android:padding="8dp"
+        android:onClick="scrollToBottom"
         app:layout_constraintBottom_toTopOf="@id/reply_mode_layout"
         android:visibility="gone">
 

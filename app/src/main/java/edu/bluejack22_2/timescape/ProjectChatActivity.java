@@ -501,6 +501,10 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
 
                 // Set the visibility of newMessageLayout based on the scroll position
                 if (isUserAtBottom) {
+                    for(int i = 0; i <= chatAdapter.getUnreadBelowCount(); i++){
+                        markMessageAsReadIfVisible(chatAdapter.getMessageAt(chatAdapter.getLastItemPosition() - i), true);
+                    }
+                    chatAdapter.setUnreadBelowCount(0);
                     newMessageLayout.setVisibility(View.GONE);
                 }
             }
@@ -633,6 +637,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
 
                 List<Message> messages = new ArrayList<>();
                 boolean idChanges = false;
+                boolean lastMessageSelf = false;
                 if (snapshots != null) {
                     for (QueryDocumentSnapshot document : snapshots) {
                         Message message = document.toObject(Message.class);
@@ -640,7 +645,10 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                         // Check if the last message is not from the current user and mark it as read if visible
                         if (document.getId().equals(snapshots.getDocuments().get(snapshots.size()-1).getId())) {
                             if (!message.getSender().getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                                markMessageAsReadIfVisible(message);
+                                markMessageAsReadIfVisible(message, false);
+                                lastMessageSelf = false;
+                            }else{
+                                lastMessageSelf = true;
                             }
                         }
 
@@ -650,7 +658,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                     Log.d(TAG, "Current data: null");
                 }
 
-                chatAdapter.setMessages(messages, chatRecyclerView, newMessageLayout);
+                chatAdapter.setMessages(messages, chatRecyclerView, newMessageLayout, lastMessageSelf);
 
                 if(firstLoadChat){
                     chatRecyclerView.scrollToPosition(chatAdapter.getLastItemPosition());
@@ -662,7 +670,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
 
     }
 
-    private void markMessageAsReadIfVisible(Message message) {
+    private void markMessageAsReadIfVisible(Message message, boolean ignoreVisiblity) {
         LinearLayoutManager layoutManager = (LinearLayoutManager) chatRecyclerView.getLayoutManager();
         if (layoutManager != null && isInActivity) {
             int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
@@ -670,7 +678,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             int lastMessagePosition = chatAdapter.getItemCount() - 1;
 
             // Check if the last message is visible
-            if (lastMessagePosition >= firstVisibleItemPosition && lastMessagePosition <= lastVisibleItemPosition) {
+            if (ignoreVisiblity || (lastMessagePosition >= firstVisibleItemPosition && lastMessagePosition <= lastVisibleItemPosition)) {
                 String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 ArrayList<String> reads = (ArrayList<String>) message.getReads();
 
@@ -679,7 +687,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                 }
 
                 // Check if the message has not been read by the current user
-                if (!reads.contains(currentUserId)) {
+                if (!reads.contains(currentUserId) && !message.getSender().getId().equals(currentUserId)) {
                     reads.add(currentUserId);
                     message.setReads(reads);
 

@@ -262,7 +262,7 @@
     <string name="photo">사진</string>
     <string name="video">동영상</string>
     <string name="unread_messages_below">읽지 않은 메시지 아래로</string>
-
+    <string name="please_wait">Please wait...</string>
 
 
 </resources>

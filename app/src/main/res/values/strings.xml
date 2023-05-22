@@ -262,4 +262,5 @@
     <string name="photo">Photo</string>
     <string name="video">Video</string>
     <string name="unread_messages_below">Unread messages below</string>
+    <string name="please_wait">Please wait...</string>
 </resources>
