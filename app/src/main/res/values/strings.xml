@@ -284,6 +284,7 @@
     <string name="share_message">Share message</string>
     <string name="no_reads_yet">No reads yet</string>
     <string name="read_more">Read more</string>
+    <string name="generating_invite_link">Generating Invite Link</string>
     <string-array name="project_completed_filter_options">
         <item>All Completion Status</item>
         <item>Completed Only</item>

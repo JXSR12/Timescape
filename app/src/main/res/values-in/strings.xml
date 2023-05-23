@@ -131,8 +131,8 @@
     <string name="failed_to_mute_chat">Gagal mematikan suara obrolan</string>
     <string name="members_are_typing">" anggota sedang mengetik..."</string>
     <string name="_1_member_is_typing">1 anggota sedang mengetik...</string>
-    <string name="other_members_online">" anggota lain online"</string>
-    <string name="_1_other_member_online">1 anggota lain online</string>
+    <string name="other_members_online">" anggota lain aktif"</string>
+    <string name="_1_other_member_online">1 anggota lain aktif</string>
     <string name="failed_to_send_message">Gagal mengirim pesan</string>
     <string name="please_enter_a_message">Silakan masukkan pesan</string>
     <string name="replied_message_unavailable">Pesan yang dibalas tidak tersedia</string>
@@ -178,12 +178,12 @@
     <string name="more">Lebih Banyak</string>
     <string name="project_invite_link_3">Tautan Undangan Proyek</string>
     <string name="invite_member">Undang Anggota</string>
-    <string name="s_ago">s yang lalu</string>
-    <string name="m_ago">m yang lalu</string>
-    <string name="h_ago">h yang lalu</string>
-    <string name="d_ago">d yang lalu</string>
-    <string name="mo_ago">bln yang lalu</string>
-    <string name="y_ago">thn yang lalu</string>
+    <string name="s_ago"> detik lalu</string>
+    <string name="m_ago"> menit lalu</string>
+    <string name="h_ago"> jam lalu</string>
+    <string name="d_ago"> hari lalu</string>
+    <string name="mo_ago"> bulan lalu</string>
+    <string name="y_ago"> tahun lalu</string>
     <string name="projects">Proyek</string>
     <string name="all_tasks">Semua Tugas</string>
     <string name="tasks_for_today">Tugas Hari Ini</string>
@@ -206,7 +206,7 @@
     <string name="phone">Nomor Telepon</string>
     <string name="email_address">Alamat Email</string>
     <string name="registration_failed">"Registrasi gagal: "</string>
-    <string name="error_checking_phone_number">"Error saat memeriksa nomor telepon: "</string>
+    <string name="error_checking_phone_number">"Gagal saat memeriksa nomor telepon: "</string>
     <string name="phone_number_already_registered">Nomor telepon sudah terdaftar</string>
     <string name="please_fill_all_fields_correctly_tap_icon_for_more_info">Harap isi semua kolom dengan benar, ketuk ikon (?) untuk informasi lebih lanjut</string>
     <string name="deadline_warning">Batas Waktu Proyek</string>
@@ -270,7 +270,7 @@
     <string name="failed_to_disable_notifications">Gagal menonaktifkan notifikasi</string>
     <string name="error_checking_notification_setting">Kesalahan saat memeriksa pengaturan notifikasi</string>
     <string name="mute_chat">Diamkan obrolan</string>
-    <string name="unmute_chat">Buka diam obrolan</string>
+    <string name="unmute_chat">Aktifkan obrolan</string>
     <string name="failed_to_get_user_settings">Gagal mendapatkan pengaturan pengguna</string>
     <string name="failed_to_disable_chat_notifications">Gagal menonaktifkan notifikasi obrolan</string>
     <string name="failed_to_enable_chat_notifications">Gagal mengaktifkan notifikasi obrolan</string>
@@ -284,6 +284,7 @@
     <string name="share_message">Bagikan pesan</string>
     <string name="no_reads_yet">Belum ada yang membaca</string>
     <string name="read_more">Baca lebih lanjut</string>
+    <string name="generating_invite_link">Membuat Tautan Undangan</string>
     <string-array name="project_completed_filter_options">
         <item>Semua Status Selesai</item>
         <item>Hanya yang Selesai</item>
