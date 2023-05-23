@@ -148,9 +148,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
                 String msgDate = dateFormat.format(message.getTimestampAsDate());
                 if (msgDate.equals(todayDate)) {
-                    dateSeparator.setContent("Today");
+                    dateSeparator.setContent(context.getString(R.string.today));
                 } else if (msgDate.equals(yesterdayDate)) {
-                    dateSeparator.setContent("Yesterday");
+                    dateSeparator.setContent(context.getString(R.string.yesterday));
                 } else {
                     dateSeparator.setContent(msgDate);
                 }

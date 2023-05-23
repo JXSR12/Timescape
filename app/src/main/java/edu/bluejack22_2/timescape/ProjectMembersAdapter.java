@@ -132,7 +132,7 @@ public class ProjectMembersAdapter extends RecyclerView.Adapter<ProjectMembersAd
 
             DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
             String joinedDate = dateFormat.format(member.getDate_joined().toDate());
-            mDateJoined.setText("Joined on " + joinedDate);
+            mDateJoined.setText(mContext.getString(R.string.joined_on) + joinedDate);
 
             if (isCurrentUserOwner) {
                 mRemoveButton.setVisibility(View.VISIBLE);

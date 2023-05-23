@@ -34,6 +34,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -348,8 +349,14 @@ public class ProjectDetailActivity extends BaseActivity {
                 .collection("projectAccesses");
 
         // Update the lastAccessTimestamp of the document corresponding to the projectId
+        ProjectAccess pa = new ProjectAccess(projectId, new Timestamp(new Date()));
+
+        Map<String, Object> accessMap = new HashMap<>();
+        accessMap.put("projectId", pa.getProjectId());
+        accessMap.put("lastAccessTimestamp", FieldValue.serverTimestamp());
+
         projectAccessesRef.document(projectId)
-                .set(new ProjectAccess(projectId, new Timestamp(new Date())))
+                .set(accessMap)
                 .addOnSuccessListener(aVoid -> Log.d("ProjectDetailActivity", "Recent accesses updated successfully"))
                 .addOnFailureListener(e -> Log.w("ProjectDetailActivity", "Error updating recent accesses", e));
     }

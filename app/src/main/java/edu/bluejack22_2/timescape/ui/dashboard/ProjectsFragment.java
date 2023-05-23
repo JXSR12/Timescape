@@ -8,8 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import edu.bluejack22_2.timescape.ProjectDetailActivity;
+import edu.bluejack22_2.timescape.R;
 import edu.bluejack22_2.timescape.databinding.FragmentProjectsBinding;
 import edu.bluejack22_2.timescape.model.Project;
 
@@ -58,9 +61,11 @@ public class ProjectsFragment extends Fragment {
 
         if (currentUser != null) {
             // Set up the SwipeRefreshLayout
+            projectsViewModel.setContext(getContext());
+
             SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
             swipeRefreshLayout.setOnRefreshListener(() -> {
-                projectsViewModel.fetchData(currentUser.getUid());
+                projectsViewModel.fetchData(currentUser.getUid(), false);
                 swipeRefreshLayout.setRefreshing(false);
             });
 
@@ -79,6 +84,14 @@ public class ProjectsFragment extends Fragment {
                 });
             });
 
+            ArrayAdapter<CharSequence> filterAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.project_completed_filter_options, android.R.layout.simple_spinner_item);
+            filterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            binding.filterCompletionSpinner.setAdapter(filterAdapter);
+
+            ArrayAdapter<CharSequence> filterAdapter2 = ArrayAdapter.createFromResource(requireContext(), R.array.project_deadline_filter_options, android.R.layout.simple_spinner_item);
+            filterAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            binding.filterDeadlineSpinner.setAdapter(filterAdapter2);
+
             projectsViewModel.getAllProjects().observe(getViewLifecycleOwner(), projects -> {
                 ListView listView = binding.allProjectsListView;
                 ProjectListAdapter adapter = new ProjectListAdapter(getContext(), projects);
@@ -93,7 +106,7 @@ public class ProjectsFragment extends Fragment {
                 });
             });
 
-            projectsViewModel.fetchData(currentUser.getUid());
+            projectsViewModel.fetchData(currentUser.getUid(), false);
         }
 
         ListView allProjectsListView = binding.allProjectsListView;
@@ -112,6 +125,31 @@ public class ProjectsFragment extends Fragment {
             }
         });
 
+        Spinner filterDeadlineSpinner = binding.filterDeadlineSpinner;
+        filterDeadlineSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                projectsViewModel.setDeadlineFilter((String) parent.getItemAtPosition(position));
+                projectsViewModel.fetchData(firebaseAuth.getCurrentUser().getUid(), true);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        Spinner filterCompletionSpinner = binding.filterCompletionSpinner;
+        filterCompletionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                projectsViewModel.setCompletionFilter((String) parent.getItemAtPosition(position));
+                projectsViewModel.fetchData(firebaseAuth.getCurrentUser().getUid(), true);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
 
 
 
@@ -123,7 +161,7 @@ public class ProjectsFragment extends Fragment {
         super.onResume();
         // Refresh the projects data
         if (firebaseAuth.getCurrentUser() != null) {
-            projectsViewModel.fetchData(firebaseAuth.getCurrentUser().getUid());
+            projectsViewModel.fetchData(firebaseAuth.getCurrentUser().getUid(), false);
         }
     }
 
@@ -146,7 +184,7 @@ public class ProjectsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         if (currentUser != null) {
-            projectsViewModel.fetchData(currentUser.getUid());
+            projectsViewModel.fetchData(currentUser.getUid(), false);
         }
     }
 

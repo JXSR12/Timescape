@@ -264,15 +264,33 @@
     <string name="unread_messages_below">Pesan belum dibaca di bawah</string>
     <string name="please_wait">Harap tunggu...</string>
     <string name="downloading_latest_app_package">Mengunduh paket aplikasi terbaru</string>
-    <string name="chat_notifications_enabled">Chat notifications enabled</string>
-    <string name="failed_to_enable_notifications">Failed to enable notifications</string>
-    <string name="chat_notifications_disabled">Chat notifications disabled</string>
-    <string name="failed_to_disable_notifications">Failed to disable notifications</string>
-    <string name="error_checking_notification_setting">Error checking notification setting</string>
-    <string name="mute_chat">Mute chat</string>
-    <string name="unmute_chat">Unmute chat</string>
-    <string name="failed_to_get_user_settings">Failed to get user settings</string>
-    <string name="failed_to_disable_chat_notifications">Failed to disable chat notifications</string>
-    <string name="failed_to_enable_chat_notifications">Failed to enable chat notifications</string>
-
+    <string name="chat_notifications_enabled">Notifikasi obrolan diaktifkan</string>
+    <string name="failed_to_enable_notifications">Gagal mengaktifkan notifikasi</string>
+    <string name="chat_notifications_disabled">Notifikasi obrolan dinonaktifkan</string>
+    <string name="failed_to_disable_notifications">Gagal menonaktifkan notifikasi</string>
+    <string name="error_checking_notification_setting">Kesalahan saat memeriksa pengaturan notifikasi</string>
+    <string name="mute_chat">Diamkan obrolan</string>
+    <string name="unmute_chat">Buka diam obrolan</string>
+    <string name="failed_to_get_user_settings">Gagal mendapatkan pengaturan pengguna</string>
+    <string name="failed_to_disable_chat_notifications">Gagal menonaktifkan notifikasi obrolan</string>
+    <string name="failed_to_enable_chat_notifications">Gagal mengaktifkan notifikasi obrolan</string>
+    <string name="owner">(Pemilik)</string>
+    <string name="joined_on">Bergabung pada </string>
+    <string name="today">Hari ini</string>
+    <string name="yesterday">Kemarin</string>
+    <string-array name="project_completed_filter_options">
+        <item>Semua Status Selesai</item>
+        <item>Hanya yang Selesai</item>
+        <item>Hanya yang Belum Selesai</item>
+    </string-array>
+    <string-array name="project_deadline_filter_options">
+        <item>Semua Status Batas Waktu</item>
+        <item>Hanya Batas Waktu Mendatang</item>
+        <item>Hanya Batas Waktu Telah Lewat</item>
+    </string-array>
+    <string-array name="filter_options">
+        <item>Tampilkan Semua</item>
+        <item>Batas Waktu Terdekat yang Akan Datang</item>
+        <item>Batas Waktu Telah Lewat</item>
+    </string-array>
 </resources>

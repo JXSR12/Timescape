@@ -19,6 +19,8 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -148,6 +150,57 @@ public class AllTasksViewModel extends ViewModel {
         }
         return null;
     }
+
+    public void fetchAndSortProjectsAndTasks(boolean upcoming) {
+        if (currentUser != null) {
+            fetchAllProjects(db, currentUser.getUid(), projects -> {
+                List<ProjectWithTasks> projectWithTasksList = new ArrayList<>();
+
+                // Filter projects based on deadline
+                Timestamp now = new Timestamp(new Date());
+                List<Project> filteredProjects = new ArrayList<>();
+                for (Project project : projects) {
+                    if ((upcoming && project.getDeadline_date() != null && project.getDeadline_date().compareTo(now) > 0) ||
+                            (!upcoming && project.getDeadline_date() != null && project.getDeadline_date().compareTo(now) <= 0)) {
+                        filteredProjects.add(project);
+                    }
+                }
+
+                // Sort filtered projects based on the deadline
+                if (upcoming) {
+                    Collections.sort(filteredProjects, (p1, p2) -> p1.getDeadline_date().compareTo(p2.getDeadline_date()));
+                } else {
+                    Collections.sort(filteredProjects, (p1, p2) -> p2.getDeadline_date().compareTo(p1.getDeadline_date()));
+                }
+
+                for (Project project : filteredProjects) {
+                    // Create a ProjectWithTasks object with an empty tasks list for each project
+                    ProjectWithTasks projectWithTasks = new ProjectWithTasks(project, new ArrayList<>());
+                    projectWithTasksList.add(projectWithTasks);
+
+                    // Real-time listener for tasks updates for each project
+                    DocumentReference projectRef = db.collection("projects").document(project.getUid());
+                    db.collection("tasks")
+                            .whereEqualTo("project", projectRef)
+                            .orderBy("created_date", Query.Direction.ASCENDING)
+                            .addSnapshotListener((value, error) -> {
+                                if (error != null) {
+                                    // Handle error
+                                    return;
+                                }
+
+                                List<Task> updatedTasks = value.toObjects(Task.class);
+                                projectWithTasks.getTasks().clear();
+                                projectWithTasks.getTasks().addAll(updatedTasks);
+
+                                allProjectsWithTasks.setValue(projectWithTasksList);
+                            });
+                }
+            });
+        }
+    }
+
+
 
 
     interface OnProjectsLoadedCallback {

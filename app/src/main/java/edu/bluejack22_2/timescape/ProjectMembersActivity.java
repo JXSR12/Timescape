@@ -324,7 +324,7 @@ public class ProjectMembersActivity extends AppCompatActivity {
 
     private Task<ShortDynamicLink> createDynamicLink() {
         String deepLink = "https://timescapxtnsn.page.link/project_invite?projectId=" + mProjectId;
-        String fallbackUrl = "https://sites.google.com/view/timescape-landing/home";
+        String fallbackUrl = "https://jex.ink/";
 
         DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
                 .setLink(Uri.parse(deepLink))
@@ -348,7 +348,6 @@ public class ProjectMembersActivity extends AppCompatActivity {
     private void deleteProject(String projectId) {
         // Delete the project document from the 'projects' collection
         FirebaseFirestore.getInstance().collection("projects").document(projectId).delete();
-
         // Delete the chat document from the 'chats' collection
         FirebaseFirestore.getInstance().collection("chats").document(projectId).delete();
 

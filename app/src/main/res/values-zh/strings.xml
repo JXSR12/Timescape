@@ -264,16 +264,35 @@
     <string name="unread_messages_below">未读消息在下方</string>
     <string name="please_wait">请稍候...</string>
     <string name="downloading_latest_app_package">正在下载最新的应用包</string>
-    <string name="chat_notifications_enabled">Chat notifications enabled</string>
-    <string name="failed_to_enable_notifications">Failed to enable notifications</string>
-    <string name="chat_notifications_disabled">Chat notifications disabled</string>
-    <string name="failed_to_disable_notifications">Failed to disable notifications</string>
-    <string name="error_checking_notification_setting">Error checking notification setting</string>
-    <string name="mute_chat">Mute chat</string>
-    <string name="unmute_chat">Unmute chat</string>
-    <string name="failed_to_get_user_settings">Failed to get user settings</string>
-    <string name="failed_to_disable_chat_notifications">Failed to disable chat notifications</string>
-    <string name="failed_to_enable_chat_notifications">Failed to enable chat notifications</string>
+    <string name="chat_notifications_enabled">已启用聊天通知</string>
+    <string name="failed_to_enable_notifications">无法启用通知</string>
+    <string name="chat_notifications_disabled">已禁用聊天通知</string>
+    <string name="failed_to_disable_notifications">无法禁用通知</string>
+    <string name="error_checking_notification_setting">检查通知设置时出错</string>
+    <string name="mute_chat">静音聊天</string>
+    <string name="unmute_chat">取消静音聊天</string>
+    <string name="failed_to_get_user_settings">无法获取用户设置</string>
+    <string name="failed_to_disable_chat_notifications">无法禁用聊天通知</string>
+    <string name="failed_to_enable_chat_notifications">无法启用聊天通知</string>
+    <string name="owner">(所有者)</string>
+    <string name="joined_on">加入于 </string>
+    <string name="today">今天</string>
+    <string name="yesterday">昨天</string>
+    <string-array name="project_completed_filter_options">
+        <item>所有完成状态</item>
+        <item>仅已完成</item>
+        <item>仅未完成</item>
+    </string-array>
+    <string-array name="project_deadline_filter_options">
+        <item>所有截止日期状态</item>
+        <item>仅即将到期</item>
+        <item>仅已过期</item>
+    </string-array>
+    <string-array name="filter_options">
+        <item>显示全部</item>
+        <item>最近的即将到期</item>
+        <item>已过期</item>
+    </string-array>
 
 
 </resources>

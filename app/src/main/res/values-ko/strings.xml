@@ -264,15 +264,35 @@
     <string name="unread_messages_below">읽지 않은 메시지 아래로</string>
     <string name="please_wait">잠시 기다려주세요...</string>
     <string name="downloading_latest_app_package">최신 앱 패키지 다운로드 중</string>
-    <string name="chat_notifications_enabled">Chat notifications enabled</string>
-    <string name="failed_to_enable_notifications">Failed to enable notifications</string>
-    <string name="chat_notifications_disabled">Chat notifications disabled</string>
-    <string name="failed_to_disable_notifications">Failed to disable notifications</string>
-    <string name="mute_chat">Mute chat</string>
-    <string name="unmute_chat">Unmute chat</string>
-    <string name="failed_to_get_user_settings">Failed to get user settings</string>
-    <string name="failed_to_disable_chat_notifications">Failed to disable chat notifications</string>
-    <string name="failed_to_enable_chat_notifications">Failed to enable chat notifications</string>
+    <string name="chat_notifications_enabled">채팅 알림 활성화됨</string>
+    <string name="failed_to_enable_notifications">알림 활성화 실패</string>
+    <string name="chat_notifications_disabled">채팅 알림 비활성화됨</string>
+    <string name="failed_to_disable_notifications">알림 비활성화 실패</string>
+    <string name="error_checking_notification_setting">알림 설정 확인 중 오류 발생</string>
+    <string name="mute_chat">채팅 음소거</string>
+    <string name="unmute_chat">채팅 음소거 해제</string>
+    <string name="failed_to_get_user_settings">사용자 설정 가져오기 실패</string>
+    <string name="failed_to_disable_chat_notifications">채팅 알림 비활성화 실패</string>
+    <string name="failed_to_enable_chat_notifications">채팅 알림 활성화 실패</string>
+    <string name="owner">(소유자)</string>
+    <string name="joined_on">"가입일: "</string>
+    <string name="today">오늘</string>
+    <string name="yesterday">어제</string>
+    <string-array name="project_completed_filter_options">
+        <item>모든 완료 상태</item>
+        <item>완료된 항목만</item>
+        <item>미완료된 항목만</item>
+    </string-array>
+    <string-array name="project_deadline_filter_options">
+        <item>모든 마감 상태</item>
+        <item>임박한 마감일만</item>
+        <item>지난 마감일만</item>
+    </string-array>
+    <string-array name="filter_options">
+        <item>모두 표시</item>
+        <item>가장 가까운 임박한 마감일</item>
+        <item>지난 마감일</item>
+    </string-array>
 
 
 </resources>

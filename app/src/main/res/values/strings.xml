@@ -274,4 +274,23 @@
     <string name="failed_to_get_user_settings">Failed to get user settings</string>
     <string name="failed_to_disable_chat_notifications">Failed to disable chat notifications</string>
     <string name="failed_to_enable_chat_notifications">Failed to enable chat notifications</string>
+    <string name="owner">(Owner)</string>
+    <string name="joined_on">"Joined on "</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string-array name="project_completed_filter_options">
+        <item>All Completion Status</item>
+        <item>Completed Only</item>
+        <item>Uncompleted Only</item>
+    </string-array>
+    <string-array name="project_deadline_filter_options">
+        <item>All Deadline Status</item>
+        <item>Upcoming Deadline</item>
+        <item>Passed Deadline</item>
+    </string-array>
+    <string-array name="filter_options">
+        <item>Display All</item>
+        <item>Nearest Upcoming Deadline</item>
+        <item>Passed Deadline</item>
+    </string-array>
 </resources>

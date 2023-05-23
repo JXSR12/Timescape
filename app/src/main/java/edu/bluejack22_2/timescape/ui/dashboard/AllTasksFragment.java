@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +38,7 @@ public class AllTasksFragment extends Fragment {
         View root = binding.getRoot();
 
         // Set up the RecyclerView
+
         binding.tasksRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         groupedTasksAdapter = new GroupedTasksAdapter(requireContext(), new ArrayList<>(), allTasksViewModel);
         binding.tasksRecyclerView.setAdapter(groupedTasksAdapter);
@@ -54,12 +57,47 @@ public class AllTasksFragment extends Fragment {
 
         // Set up the SwipeRefreshLayout
         binding.swipeRefreshLayout.setOnRefreshListener(() -> {
-            allTasksViewModel.fetchProjectsAndTasks();
+            String selectedFilter = binding.filterSpinner.getSelectedItem().toString();
+            if (selectedFilter.equals("Nearest Upcoming Deadline")) {
+                allTasksViewModel.fetchAndSortProjectsAndTasks(true);
+            } else if (selectedFilter.equals("Passed Deadline")) {
+                allTasksViewModel.fetchAndSortProjectsAndTasks(false);
+            } else {
+                allTasksViewModel.fetchProjectsAndTasks();
+            }
             binding.swipeRefreshLayout.setRefreshing(false);
         });
 
+
         // Fetch data
         allTasksViewModel.fetchProjectsAndTasks();
+
+        // Set up Spinner
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(), R.array.filter_options, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.filterSpinner.setAdapter(adapter);
+
+        binding.filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:  // Default
+                        allTasksViewModel.fetchProjectsAndTasks();
+                        break;
+                    case 1:  // Nearest Upcoming Deadline
+                        allTasksViewModel.fetchAndSortProjectsAndTasks(true);
+                        break;
+                    case 2:  // Passed Deadline
+                        allTasksViewModel.fetchAndSortProjectsAndTasks(false);
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
 
         return root;
     }
