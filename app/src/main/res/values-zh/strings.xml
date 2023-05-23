@@ -278,6 +278,12 @@
     <string name="joined_on">加入于 </string>
     <string name="today">今天</string>
     <string name="yesterday">昨天</string>
+    <string name="view_reads">已阅读</string>
+    <string name="has_been_read_by">已被以下人阅读</string>
+    <string name="close">关闭</string>
+    <string name="share_message">分享消息</string>
+    <string name="no_reads_yet">尚未阅读</string>
+    <string name="read_more">阅读更多</string>
     <string-array name="project_completed_filter_options">
         <item>所有完成状态</item>
         <item>仅已完成</item>

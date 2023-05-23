@@ -6,7 +6,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-class MentionClickableSpan extends ClickableSpan {
+public class MentionClickableSpan extends ClickableSpan {
     private String userId;
 
     public MentionClickableSpan(String userId) {

@@ -278,6 +278,12 @@
     <string name="joined_on">"Joined on "</string>
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
+    <string name="view_reads">Reads</string>
+    <string name="has_been_read_by">Has been read by</string>
+    <string name="close">Close</string>
+    <string name="share_message">Share message</string>
+    <string name="no_reads_yet">No reads yet</string>
+    <string name="read_more">Read more</string>
     <string-array name="project_completed_filter_options">
         <item>All Completion Status</item>
         <item>Completed Only</item>

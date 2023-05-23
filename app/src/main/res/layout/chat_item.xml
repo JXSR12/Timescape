@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -55,38 +56,102 @@
                 android:textColor="@android:color/darker_gray"
                 android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/other_user_text_message"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="left"
                 android:background="@drawable/chat_bubble_other"
-                android:padding="8dp"
-                android:text="Other user's message"
-                android:textColor="@android:color/white"
-                android:textColorLink="#FFC67F"
-                android:textIsSelectable="true"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:autoLink="all"
-                android:linksClickable="true"
-                android:visibility="gone" />
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/self_text_message"
+                <TextView
+                    android:id="@+id/other_user_text_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="Other user's message"
+                    android:textColorLink="#FFC67F"
+                    android:textColor="@android:color/white"
+                    android:textIsSelectable="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:autoLink="all"
+                    android:linksClickable="true"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/other_user_text_message_read_more"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    android:clickable="true"
+                    android:padding="4dp"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:text="@string/read_more"
+                        android:padding="2dp"
+                        android:textColorLink="#FFC67F"
+                        android:textColor="@android:color/white"
+                        tools:ignore="RtlCompat" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:background="@drawable/chat_bubble_self"
-                android:padding="8dp"
-                android:text="Self message"
-                android:textColorLink="#CF3B00"
-                android:textColor="@android:color/white"
-                android:textIsSelectable="true"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:autoLink="all"
-                android:linksClickable="true"
-                android:visibility="gone" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/self_text_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:padding="8dp"
+                    android:text="Self message"
+                    android:textColorLink="#CF3B00"
+                    android:textColor="@android:color/white"
+                    android:textIsSelectable="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:autoLink="all"
+                    android:linksClickable="true"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/self_text_message_read_more"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    android:clickable="true"
+                    android:padding="4dp"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:textAlignment="center"
+                        android:text="@string/read_more"
+                        android:padding="2dp"
+                        android:textColorLink="#CF3B00"
+                        android:textColor="@color/white"
+                        tools:ignore="RtlCompat" />
+                </LinearLayout>
+            </LinearLayout>
+
 
             <FrameLayout
                 android:id="@+id/other_user_image_message_frame"
@@ -358,8 +423,10 @@
                 android:layout_gravity="left">
 
                 <LinearLayout
+                    android:id="@+id/other_user_replied_top"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -396,12 +463,51 @@
                     android:layout_marginBottom="4dp"
                     android:background="#32FFFFFF" /> />
 
-                <TextView
-                    android:id="@+id/other_user_reply_message"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Other user's reply"
-                    android:textColor="@android:color/white" />
+                    android:background="@drawable/chat_bubble_other"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/other_user_reply_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Other user's reply might be long very long very very very long which needs to be clipped that's why we created the read more."
+                        android:textColorLink="#FFC67F"
+                        android:textColor="@android:color/white"
+                        android:textIsSelectable="true"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:autoLink="all"
+                        android:linksClickable="true"
+                        android:visibility="visible" />
+
+                    <LinearLayout
+                        android:id="@+id/other_user_reply_message_read_more"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone"
+                        android:clickable="true"
+                        android:padding="4dp"
+                        android:orientation="vertical">
+
+                        <com.google.android.material.divider.MaterialDivider
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textAlignment="center"
+                            android:text="@string/read_more"
+                            android:padding="2dp"
+                            android:textColorLink="#FFC67F"
+                            android:textColor="@android:color/white"
+                            tools:ignore="RtlCompat" />
+                    </LinearLayout>
+                </LinearLayout>
+
             </LinearLayout>
 
             <LinearLayout
@@ -415,8 +521,10 @@
                 android:visibility="gone">
 
                 <LinearLayout
+                    android:id="@+id/self_replied_top"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -453,12 +561,54 @@
                     android:layout_marginBottom="4dp"
                     android:background="#32FFFFFF" />
 
-                <TextView
-                    android:id="@+id/self_reply_message"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="This is the replier's reply to the message, this message might be long and will not be clipped."
-                    android:textColor="@android:color/white" />
+                    android:layout_gravity="right"
+                    android:background="@drawable/chat_bubble_self"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/self_reply_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:text="This is the replier's reply to the message, this message might be long and will not be clipped."
+                        android:textColorLink="#CF3B00"
+                        android:textColor="@android:color/white"
+                        android:textIsSelectable="true"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:autoLink="all"
+                        android:linksClickable="true"
+                        android:visibility="visible" />
+
+                    <LinearLayout
+                        android:id="@+id/self_reply_message_read_more"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clickable="true"
+                        android:padding="4dp"
+                        android:visibility="gone"
+                        android:orientation="vertical">
+
+                        <com.google.android.material.divider.MaterialDivider
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right"
+                            android:textAlignment="center"
+                            android:text="@string/read_more"
+                            android:padding="2dp"
+                            android:textColorLink="#CF3B00"
+                            android:textColor="@android:color/white"
+                            tools:ignore="RtlCompat" />
+                    </LinearLayout>
+                </LinearLayout>
+
 
 
             </LinearLayout>

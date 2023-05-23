@@ -1262,7 +1262,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                         Intent shareIntent = new Intent(Intent.ACTION_SEND);
                         shareIntent.setType("text/plain");
                         shareIntent.putExtra(Intent.EXTRA_TEXT, message.getContent());
-                        startActivity(Intent.createChooser(shareIntent, "Share message"));
+                        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_message)));
                         return true;
                     }else if (item.getItemId() == R.id.unsend_message) {
                         long currentTime = System.currentTimeMillis();
@@ -1286,7 +1286,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                                     if (document.exists()) {
                                         Message messageToUpdate = document.toObject(Message.class);
                                         messageToUpdate.setMessage_type(Message.MessageType.UNSENT);
-                                        messageToUpdate.setContent("message deleted");
+                                        messageToUpdate.setContent(getString(R.string.message_deleted));
                                         messageDocRef.set(messageToUpdate)
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
@@ -1307,7 +1307,33 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                             }
                         });
                         return true;
+                    }else if (item.getItemId() == R.id.view_reads) {
+                        // Create an alert dialog
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ProjectChatActivity.this);
+                        builder.setTitle(R.string.has_been_read_by);
+
+                        // Create the adapter and set it to the ListView of the AlertDialog
+                        List<String> readers = message.getReads();
+                        if(readers == null) readers = new ArrayList<>();
+                        ReadersAdapter adapter = new ReadersAdapter(ProjectChatActivity.this, readers);
+                        builder.setAdapter(adapter, null);
+
+                        builder.setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                        AlertDialog dialog = builder.create();
+                        if(readers.size() == 0){
+                            dialog.setMessage(getString(R.string.no_reads_yet));
+                        }
+                        dialog.show();
+
+                        return true;
                     }
+
                     return false;
                 }
             });
@@ -1347,6 +1373,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
 
     private void sendReplyMessage(String repliedMessageId) {
         String messageContent = messageInput.getText().toString().trim();
+        Editable inputEditable = messageInput.getEditableText();
         messageInput.setText("");
         if (!TextUtils.isEmpty(messageContent)) {
             // Get the current user's ID
@@ -1362,7 +1389,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             message.setContent(messageContent);
             message.setId(generateMessageId());
             message.setReplyingTo(repliedMessageId);
-            mentionedUserIds = getMentionsFromEditable(messageInput.getText());
+            mentionedUserIds = getMentionsFromEditable(inputEditable);
             message.setMentions(mentionedUserIds);
 
             // Create a map of the message to add the server timestamp
@@ -1398,13 +1425,21 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         }
     }
 
-
+    public String convertWithIteration(Map<String, ?> map) {
+        StringBuilder mapAsString = new StringBuilder("{");
+        for (String key : map.keySet()) {
+            mapAsString.append(key + "=" + map.get(key) + ", ");
+        }
+        mapAsString.delete(mapAsString.length()-2, mapAsString.length()).append("}");
+        return mapAsString.toString();
+    }
 
     private void sendMessage() {
         if (replyMode) {
             sendReplyMessage(repliedMessageId);
         } else {
             String messageContent = messageInput.getText().toString().trim();
+            Editable inputEditable = messageInput.getEditableText();
             messageInput.setText("");
 
             if (!TextUtils.isEmpty(messageContent)) {
@@ -1421,8 +1456,9 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                 message.setContent(messageContent);
                 // We're not setting the timestamp here, it will be set in Firestore.
                 message.setId(generateMessageId());
-                mentionedUserIds = getMentionsFromEditable(messageInput.getText());
+                mentionedUserIds = getMentionsFromEditable(inputEditable);
                 message.setMentions(mentionedUserIds);
+
 
                 // Create a map of the message to add the server timestamp
                 Map<String, Object> messageMap = new HashMap<>();

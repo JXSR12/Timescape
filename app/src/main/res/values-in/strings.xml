@@ -278,6 +278,12 @@
     <string name="joined_on">Bergabung pada </string>
     <string name="today">Hari ini</string>
     <string name="yesterday">Kemarin</string>
+    <string name="view_reads">Dibaca</string>
+    <string name="has_been_read_by">Telah dibaca oleh</string>
+    <string name="close">Tutup</string>
+    <string name="share_message">Bagikan pesan</string>
+    <string name="no_reads_yet">Belum ada yang membaca</string>
+    <string name="read_more">Baca lebih lanjut</string>
     <string-array name="project_completed_filter_options">
         <item>Semua Status Selesai</item>
         <item>Hanya yang Selesai</item>

@@ -11,4 +11,7 @@
     <item
         android:id="@+id/unsend_message"
         android:title="@string/unsend_message" />
+    <item
+        android:id="@+id/view_reads"
+        android:title="@string/view_reads" />
 </menu>

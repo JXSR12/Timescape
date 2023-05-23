@@ -3,12 +3,19 @@ package edu.bluejack22_2.timescape.ui.chats;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -24,10 +31,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -72,6 +81,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.bluejack22_2.timescape.FullScreenImageActivity;
 import edu.bluejack22_2.timescape.MainActivity;
+import edu.bluejack22_2.timescape.MentionClickableSpan;
 import edu.bluejack22_2.timescape.R;
 import edu.bluejack22_2.timescape.model.Chat;
 import edu.bluejack22_2.timescape.model.Message;
@@ -297,8 +307,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         }
     }
 
+    private String getCachedDisplayNameAsString(String userId){
+        return memberDisplayNameMap.getOrDefault(userId, "UNKNOWN USER");
+    }
+
     public class ChatViewHolder extends RecyclerView.ViewHolder {
 
+        private static final int MAX_CHARACTERS_PER_LINE = 100;
         LinearLayout chatItemRoot;
 
         TextView selfTextMessage;
@@ -342,6 +357,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         TextView selfRepliedName;
         TextView selfRepliedMessageContent;
         TextView selfReplyMessage;
+
+        LinearLayout selfRepliedTop;
+        LinearLayout otherUserRepliedTop;
 
         TextView readCount;
 
@@ -395,6 +413,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             selfRepliedMessageContent = itemView.findViewById(R.id.self_replied_message_content);
             selfReplyMessage = itemView.findViewById(R.id.self_reply_message);
 
+            otherUserRepliedTop = itemView.findViewById(R.id.other_user_replied_top);
+            selfRepliedTop = itemView.findViewById(R.id.self_replied_top);
+
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
@@ -423,12 +444,21 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             });
 
             if (otherUserRepliedMessageContent != null) {
+                otherUserRepliedTop.setOnClickListener(onReplyTopPartClicked);
                 otherUserRepliedMessageContent.setOnClickListener(onReplyTopPartClicked);
             }
 
             if (selfRepliedMessageContent != null) {
+                selfRepliedTop.setOnClickListener(onReplyTopPartClicked);
                 selfRepliedMessageContent.setOnClickListener(onReplyTopPartClicked);
             }
+
+            selfTextMessage.setMovementMethod(LinkMovementMethod.getInstance());
+            otherUserTextMessage.setMovementMethod(LinkMovementMethod.getInstance());
+            selfReplyMessage.setMovementMethod(LinkMovementMethod.getInstance());
+            otherUserReplyMessage.setMovementMethod(LinkMovementMethod.getInstance());
+            selfRepliedMessageContent.setMovementMethod(LinkMovementMethod.getInstance());
+            otherUserRepliedMessageContent.setMovementMethod(LinkMovementMethod.getInstance());
         }
 
         public void bind(Message message, boolean isCurrentUser, int position) { // Modify this line
@@ -536,18 +566,37 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             HashMap<String, String> mentions = message.getMentions();
             List<String> reads = message.getReads();
 
-            Log.d("Checking for mentions", mentions != null ? "Mentions count: " + mentions.size() : "No mentions");
-
             if (mentions != null && mentions.containsValue(currentUserId)) {
                 chatItemRoot.setBackgroundColor(ContextCompat.getColor(context, R.color.mention_highlight)); // Semi-transparent yellow
-                Log.d("Mentioned Message", "This comes from a message mentioning you");
             } else {
                 chatItemRoot.setBackgroundColor(Color.TRANSPARENT);
             }
 
             if (isCurrentUser) {
                 selfTextMessage.setVisibility(View.VISIBLE);
-                selfTextMessage.setText(message.getContent());
+                selfTextMessage.setText(formatMentions(message.getContent(), mentions));
+
+                String content = message.getContent();
+                int estimatedLines = content.length() / MAX_CHARACTERS_PER_LINE;
+                estimatedLines += content.split("\n|\r").length;
+
+                if (estimatedLines > 20) {
+                    selfTextMessage.setMaxLines(5);
+                    selfTextMessage.setEllipsize(TextUtils.TruncateAt.END);
+                    LinearLayout readMoreLayout = itemView.findViewById(R.id.self_text_message_read_more);
+                    readMoreLayout.setVisibility(View.VISIBLE);
+                    readMoreLayout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            showDialog(content, getCachedDisplayNameAsString(message.getSender().getId()));
+                        }
+                    });
+                } else {
+                    selfTextMessage.setMaxLines(1000);
+                    LinearLayout readMoreLayout = itemView.findViewById(R.id.self_text_message_read_more);
+                    readMoreLayout.setVisibility(View.GONE);
+                }
+
                 if (reads != null && !reads.isEmpty()) {
                     int readCountValue = reads.size();
                     readCount.setText(context.getString(R.string.read) + readCountValue + " • ");
@@ -558,7 +607,28 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
             } else {
                 otherUserTextMessage.setVisibility(View.VISIBLE);
-                otherUserTextMessage.setText(message.getContent());
+                otherUserTextMessage.setText(formatMentions(message.getContent(), mentions));
+
+                String content = message.getContent();
+                int estimatedLines = content.length() / MAX_CHARACTERS_PER_LINE;
+                estimatedLines += content.split("\n|\r").length;
+
+                if (estimatedLines > 20) {
+                    otherUserTextMessage.setMaxLines(5);
+                    otherUserTextMessage.setEllipsize(TextUtils.TruncateAt.END);
+                    LinearLayout readMoreLayout = itemView.findViewById(R.id.other_user_text_message_read_more);
+                    readMoreLayout.setVisibility(View.VISIBLE);
+                    readMoreLayout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            showDialog(content, getCachedDisplayNameAsString(message.getSender().getId()));
+                        }
+                    });
+                } else {
+                    otherUserTextMessage.setMaxLines(1000);
+                    LinearLayout readMoreLayout = itemView.findViewById(R.id.other_user_text_message_read_more);
+                    readMoreLayout.setVisibility(View.GONE);
+                }
             }
         }
 
@@ -973,6 +1043,17 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                 }
             }
 
+            String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            HashMap<String, String> mentions = message.getMentions();
+            Log.d("Checking for mentions", mentions != null ? "Mentions count: " + mentions.size() : "No mentions");
+
+            if (mentions != null && mentions.containsValue(currentUserId)) {
+                chatItemRoot.setBackgroundColor(ContextCompat.getColor(context, R.color.mention_highlight)); // Semi-transparent yellow
+                Log.d("Mentioned Message", "This comes from a message mentioning you");
+            } else {
+                chatItemRoot.setBackgroundColor(Color.TRANSPARENT);
+            }
+
             // If the replied message is found, set the appropriate fields
             if (repliedMessage != null) {
                 if (isCurrentUser) {
@@ -985,7 +1066,29 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                         readCount.setVisibility(View.GONE);
                     }
                     selfReplyMessageLayout.setVisibility(View.VISIBLE);
-                    selfReplyMessage.setText(message.getContent());
+                    selfReplyMessage.setText(formatMentions(message.getContent(), mentions));
+
+                    String content = message.getContent();
+                    int estimatedLines = content.length() / MAX_CHARACTERS_PER_LINE;
+                    estimatedLines += content.split("\n|\r").length;
+
+                    if (estimatedLines > 20) {
+                        selfReplyMessage.setMaxLines(5);
+                        selfReplyMessage.setEllipsize(TextUtils.TruncateAt.END);
+                        LinearLayout readMoreLayout = itemView.findViewById(R.id.self_reply_message_read_more);
+                        readMoreLayout.setVisibility(View.VISIBLE);
+                        readMoreLayout.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showDialog(content, getCachedDisplayNameAsString(message.getSender().getId()));
+                            }
+                        });
+                    } else {
+                        selfReplyMessage.setMaxLines(1000);
+                        LinearLayout readMoreLayout = itemView.findViewById(R.id.self_reply_message_read_more);
+                        readMoreLayout.setVisibility(View.GONE);
+                    }
+
 
                     selfRepliedAvatar.setImageDrawable(generateAvatar(repliedMessage.getSender().getId()));
                     showRepliedDisplayName(selfRepliedName, repliedMessage);
@@ -997,13 +1100,34 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                     }else if (repliedMessage.getMessage_type() == Message.MessageType.PROJECT_INVITE){
                         selfRepliedMessageContent.setText(R.string.sent_a_project_invite);
                     }else{
-                        selfRepliedMessageContent.setText(repliedMessage.getContent());
+                        selfRepliedMessageContent.setText(formatMentions(repliedMessage.getContent(), repliedMessage.getMentions()));
                     }
 
 
                 } else {
                     otherUserReplyMessageLayout.setVisibility(View.VISIBLE);
-                    otherUserReplyMessage.setText(message.getContent());
+                    otherUserReplyMessage.setText(formatMentions(message.getContent(), mentions));
+
+                    String content = message.getContent();
+                    int estimatedLines = content.length() / MAX_CHARACTERS_PER_LINE;
+                    estimatedLines += content.split("\n|\r").length;
+
+                    if (estimatedLines > 20) {
+                        otherUserReplyMessage.setMaxLines(5);
+                        otherUserReplyMessage.setEllipsize(TextUtils.TruncateAt.END);
+                        LinearLayout readMoreLayout = itemView.findViewById(R.id.other_user_reply_message_read_more);
+                        readMoreLayout.setVisibility(View.VISIBLE);
+                        readMoreLayout.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showDialog(content, getCachedDisplayNameAsString(message.getSender().getId()));
+                            }
+                        });
+                    } else {
+                        otherUserReplyMessage.setMaxLines(1000);
+                        LinearLayout readMoreLayout = itemView.findViewById(R.id.other_user_reply_message_read_more);
+                        readMoreLayout.setVisibility(View.GONE);
+                    }
 
                     otherUserRepliedAvatar.setImageDrawable(generateAvatar(repliedMessage.getSender().getId()));
                     showRepliedDisplayName(otherUserRepliedName, repliedMessage);
@@ -1015,14 +1139,70 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                     }else if (repliedMessage.getMessage_type() == Message.MessageType.PROJECT_INVITE){
                         selfRepliedMessageContent.setText(R.string.sent_a_project_invite);
                     }else{
-                        otherUserRepliedMessageContent.setText(repliedMessage.getContent());
+                        otherUserRepliedMessageContent.setText(formatMentions(repliedMessage.getContent(), repliedMessage.getMentions()));
                     }
                 }
             }
         }
 
+        private void showDialog(String messageContent, String senderName) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+            // Create scroll view and text view
+            ScrollView scrollView = new ScrollView(context);
+            TextView messageTextView = new TextView(context);
+
+            // Configure text view
+            messageTextView.setText(messageContent);
+            messageTextView.setPadding(15, 15, 15, 15); // optional padding
+            messageTextView.setTextSize(18); // optional text size
+
+            // Add text view to scroll view
+            scrollView.addView(messageTextView);
+            scrollView.setPadding(5, 20, 5, 5);
+
+            // Configure the dialog
+            builder.setTitle(senderName)
+                    .setView(scrollView)
+                    .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    });
+
+            // Create and show the dialog
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        }
+
+
         private void showRepliedDisplayName(TextView repliedName, Message message) {
             getCachedDisplayName(message.getSender().getId(), repliedName);
+        }
+
+        private Spannable formatMentions(String content, HashMap<String, String> mentions) {
+            SpannableStringBuilder formattedContent = new SpannableStringBuilder(content);
+
+            // For each mention in the message
+            for (Map.Entry<String, String> entry : mentions.entrySet()) {
+                String mentionTag = entry.getKey().split("_")[0];  // The mention tag in the format <@User Name>
+                int start = Integer.parseInt(entry.getKey().split("_")[1]); // The index where the mention tag starts
+                String userId = entry.getValue();  // The user id of the mentioned user
+                String currentName = getCachedDisplayNameAsString(userId);  // The current name of the mentioned user
+
+                // Replace the mention tag with the current name
+                String currentMentionTag = "<@" + currentName + ">";
+                formattedContent.replace(start, start + mentionTag.length(), currentMentionTag);
+
+                // Mark the current mention tag as a blue span
+                MentionClickableSpan mentionClickableSpan = new MentionClickableSpan(userId);
+                formattedContent.setSpan(mentionClickableSpan, start, start + currentMentionTag.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.BLUE);  // Replace with desired color
+                formattedContent.setSpan(colorSpan, start, start + currentMentionTag.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+
+            return formattedContent;
         }
 
 
@@ -1049,6 +1229,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             otherUserReplyMessageLayout.setVisibility(View.GONE);
             selfImageVideoOverlay.setVisibility(View.GONE);
             otherUserImageVideoOverlay.setVisibility(View.GONE);
+            itemView.findViewById(R.id.self_reply_message_read_more).setVisibility(View.GONE);
+            itemView.findViewById(R.id.other_user_reply_message_read_more).setVisibility(View.GONE);
+            itemView.findViewById(R.id.self_text_message_read_more).setVisibility(View.GONE);
+            itemView.findViewById(R.id.other_user_reply_message_read_more).setVisibility(View.GONE);
         }
     }
 }
