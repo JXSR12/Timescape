@@ -46,6 +46,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
@@ -904,7 +905,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             DocumentReference projectRef = db.collection("projects").document(projectId);
             DocumentReference userRef = db.collection("users").document(userId);
 
-            ProjectMember newMember = new ProjectMember(userId, "", Timestamp.now(), "collaborator");
+            Map<String, Object> newMemberMap = new HashMap<>();
+            newMemberMap.put("userId", userId);
+            newMemberMap.put("role", "collaborator");
+            newMemberMap.put("date_joined", FieldValue.serverTimestamp());
 
             projectRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
@@ -915,7 +919,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
                         String finalProjectName = projectName;
                         // Add the new member to the project's 'members' field
-                        projectRef.update("members." + userId, newMember)
+                        projectRef.update("members." + userId, newMemberMap)
                                 .addOnSuccessListener(aVoid -> {
                                     Toast.makeText(context, R.string.successfully_joined_the_project, Toast.LENGTH_SHORT).show();
                                     ChatAdapter.this.notifyDataSetChanged();

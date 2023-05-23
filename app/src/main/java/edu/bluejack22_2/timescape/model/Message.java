@@ -5,6 +5,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +26,6 @@ public class Message {
     private String fileName;
     private String replyingTo;
     private Timestamp timestamp;
-
     private Date timestampAsDate;
     private HashMap<String, String> mentions;
     private List<String> reads;
@@ -116,9 +116,8 @@ public class Message {
         this.timestamp = timestamp;
     }
     public Date getTimestampAsDate() {
-        return timestamp.toDate();
+        return timestamp != null ? timestamp.toDate() : Date.from(Instant.now());
     }
-
     public void setTimestampAsDate(Date timestampAsDate) {
         this.timestampAsDate = timestampAsDate;
     }

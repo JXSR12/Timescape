@@ -69,6 +69,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -587,86 +588,6 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         return mentions;
     }
 
-//    private ListenerRegistration setupChatDocumentListener() {
-//        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//
-//        DocumentReference chatDocument = db.collection("chats").document(project.getUid());
-//        return chatDocument.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//            @Override
-//            public void onEvent(@Nullable DocumentSnapshot snapshot,
-//                                @Nullable FirebaseFirestoreException e) {
-//                if (e != null) {
-//                    Log.w(TAG, "Listen failed.", e);
-//                    return;
-//                }
-//
-//                if (snapshot != null && snapshot.exists()) {
-//                    List<Message> messages = new ArrayList<>();
-//                    List<HashMap<String, Object>> documents = (List<HashMap<String, Object>>) snapshot.get("messages");
-//                    boolean idChanges = false;
-//                    if(documents == null) return;
-//
-//                    if(!firstLoadChat) {
-//                        HashMap<String, Object> lastMessage = documents.get(documents.size() - 1);
-//                        // Check if the last message is not from the current user and mark it as read if visible
-//                        String lastMessageSenderId = ((DocumentReference) lastMessage.get("sender")).getId();
-//                        if (!lastMessageSenderId.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-//                            Message message = new Message();
-//                            if (lastMessage.get("id") == null) {
-//                                String newId = generateMessageId();
-//                                message.setId(newId);
-//                                lastMessage.put("id", newId); //Update to the firestore to store the newly generated ID.
-//                                idChanges = true;
-//                            } else {
-//                                message.setId((String) lastMessage.get("id"));
-//                            }
-//                            message.setSender((DocumentReference) lastMessage.get("sender"));
-//                            message.setMessage_type(Message.MessageType.valueOf((String) lastMessage.get("message_type")));
-//                            message.setContent((String) lastMessage.get("content"));
-//                            message.setTimestamp((Timestamp) lastMessage.get("timestamp"));
-//                            message.setFileName((String) lastMessage.get("fileName"));
-//                            message.setReplyingTo((String) lastMessage.get("replyingTo"));
-//                            message.setMentions(lastMessage.get("mentions") != null ? (HashMap<String, String>) lastMessage.get("mentions") : null);
-//                            message.setReads(lastMessage.get("reads") != null ? (List<String>) lastMessage.get("reads") : null);
-//
-//
-//                            markMessageAsReadIfVisible(message);
-//                        }
-//                    }
-//
-//                    for (HashMap<String, Object> document : documents) {
-//                        Message message = new Message();
-//                        if(document.get("id") == null){
-//                            String newId = generateMessageId();
-//                            message.setId(newId);
-//                            document.put("id", newId); //Update to the firestore to store the newly generated ID.
-//                            idChanges = true;
-//                        }else{
-//                            message.setId((String) document.get("id"));
-//                        }
-//                        message.setSender((DocumentReference) document.get("sender"));
-//                        message.setMessage_type(Message.MessageType.valueOf((String) document.get("message_type")));
-//                        message.setContent((String) document.get("content"));
-//                        message.setTimestamp((Timestamp) document.get("timestamp"));
-//                        message.setFileName((String) document.get("fileName"));
-//                        message.setReplyingTo((String) document.get("replyingTo"));
-//                        message.setMentions(document.get("mentions") != null ? (HashMap<String, String>) document.get("mentions") : null);
-//                        message.setReads(document.get("reads") != null ? (List<String>) document.get("reads") : null);
-//
-//                        messages.add(message);
-//                    }
-//                    if(idChanges){
-//                        chatDocument.update("messages", documents);
-//                    }
-//                    chatAdapter.setMessages(messages, chatRecyclerView);
-//                } else {
-//                    Log.d(TAG, "Current data: null");
-//                }
-//
-//            }
-//        });
-//    }
-
     private ListenerRegistration setupChatDocumentListener() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -686,7 +607,6 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                 if (snapshots != null) {
                     for (QueryDocumentSnapshot document : snapshots) {
                         Message message = document.toObject(Message.class);
-
                         // Check if the last message is not from the current user and mark it as read if visible
                         if (document.getId().equals(snapshots.getDocuments().get(snapshots.size()-1).getId())) {
                             if (!message.getSender().getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
@@ -742,109 +662,6 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             }
         }
     }
-
-//    private void fetchAndMarkAllMessagesAsRead() {
-//        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//        String chatDocumentId = project.getUid(); // Replace with your chat document ID (project ID)
-//
-//        db.collection("chats")
-//                .document(chatDocumentId)
-//                .get()
-//                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                        if (task.isSuccessful()) {
-//                            DocumentSnapshot document = task.getResult();
-//                            if (document.exists()) {
-//                                ArrayList<HashMap<String, Object>> messages = (ArrayList<HashMap<String, Object>>) document.get("messages");
-//
-//                                if (messages != null) {
-//                                    for (HashMap<String, Object> message : messages) {
-//                                        String senderId = ((DocumentReference) message.get("sender")).getId();
-//                                        if (!senderId.equals(currentUserId)) {
-//                                            ArrayList<String> reads = (ArrayList<String>) message.get("reads");
-//                                            if (reads == null) {
-//                                                reads = new ArrayList<>();
-//                                            }
-//                                            if (!reads.contains(currentUserId)) {
-//                                                reads.add(currentUserId);
-//                                                message.put("reads", reads);
-//                                            }
-//                                        }
-//                                    }
-//                                    // Update the chat document with the new read status
-//                                    db.collection("chats")
-//                                            .document(chatDocumentId)
-//                                            .update("messages", messages).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                                @Override
-//                                                public void onSuccess(Void unused) {
-//                                                    firstLoadChat = false;
-//                                                }
-//                                            });
-//                                }
-//                            }
-//                        }
-//                    }
-//                });
-//    }
-//
-//
-//
-//    private void updateMessageReadStatus(String projectId, Message message) {
-//        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//
-//        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        DocumentReference chatDocRef = db.collection("chats").document(projectId);
-//        chatDocRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                if (task.isSuccessful()) {
-//                    DocumentSnapshot document = task.getResult();
-//                    if (document.exists()) {
-//                        List<HashMap<String, Object>> messages = (List<HashMap<String, Object>>) document.get("messages");
-//                        int messageIndex = -1;
-//                        for (int i = 0; i < messages.size(); i++) {
-//                            if (messages.get(i).get("id").equals(message.getId())) {
-//                                messageIndex = i;
-//                                break;
-//                            }
-//                        }
-//
-//                        if (messageIndex != -1) {
-//                            List<String> reads = (List<String>) messages.get(messageIndex).get("reads");
-//
-//                            if (reads == null) {
-//                                reads = new ArrayList<>();
-//                            }
-//
-//                            // Check if the message has not been read by the current user
-//                            if (!reads.contains(currentUserId)) {
-//                                reads.add(currentUserId);
-//                                messages.get(messageIndex).put("reads", reads);
-//                                chatDocRef.update("messages", messages)
-//                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                            @Override
-//                                            public void onSuccess(Void aVoid) {
-//                                                Log.d(TAG, "Message read status successfully updated.");
-//                                            }
-//                                        })
-//                                        .addOnFailureListener(new OnFailureListener() {
-//                                            @Override
-//                                            public void onFailure(@NonNull Exception e) {
-//                                                Log.w(TAG, "Error updating message read status", e);
-//                                            }
-//                                        });
-//                            }
-//                        }
-//                    }
-//                } else {
-//                    Log.d(TAG, "get failed with ", task.getException());
-//                }
-//            }
-//        });
-//
-//    }
 
     private void fetchAndMarkAllMessagesAsRead() {
         if(FirebaseAuth.getInstance().getCurrentUser() == null) return;
@@ -1107,19 +924,6 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         }
     });
 
-//    private final ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-//        if (result.getResultCode() == RESULT_OK && result.getData() != null && result.getData().getData() != null) {
-//            Uri sourceUri = result.getData().getData();
-//            String originalFileName = getFileNameFromUri(this, sourceUri);
-//            String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-//            String croppedFileName = originalFileName.substring(0, originalFileName.lastIndexOf(".")) + "-edited" + extension;
-//            Uri destinationUri = Uri.fromFile(new File(getCacheDir(), croppedFileName));
-//
-//            UCrop.of(sourceUri, destinationUri)
-//                    .start(ProjectChatActivity.this);
-//        }
-//    });
-
     private final ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null && result.getData().getData() != null) {
             Uri sourceUri = result.getData().getData();
@@ -1211,85 +1015,6 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         return fileName;
     }
 
-
-//    private void sendImageMessage(String fileName, String imageURL) {
-//        if (!TextUtils.isEmpty(imageURL)) {
-//            // Get the current user's ID
-//            String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//
-//            FirebaseFirestore db = FirebaseFirestore.getInstance();
-//            DocumentReference chatDocument = db.collection("chats").document(project.getUid());
-//
-//            // Create a new message object
-//            Message message = new Message();
-//            message.setSender(db.collection("users").document(currentUserId));
-//            message.setMessage_type(Message.MessageType.IMAGE);
-//            message.setContent(imageURL);
-//            message.setTimestamp(Timestamp.now());
-//            message.setId(generateMessageId());
-//            message.setFileName(fileName);
-//
-//            // Add the message to the chatDocument
-//            chatDocument.update("messages", FieldValue.arrayUnion(message))
-//                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                        @Override
-//                        public void onSuccess(Void aVoid) {
-//                            Log.d(TAG, "Message sent successfully");
-//                            messageInput.setText("");
-//                            onMessageSent(firebaseAuth.getCurrentUser().getDisplayName(), message.getContent(), message.getId());
-//                        }
-//                    })
-//                    .addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            Log.w(TAG, "Error sending message", e);
-//                            Toast.makeText(ProjectChatActivity.this, R.string.failed_to_send_message, Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//        } else {
-//            Toast.makeText(this, R.string.please_enter_a_message, Toast.LENGTH_SHORT).show();
-//        }
-//    }
-//
-//    private void sendFileMessage(String fileFullName, String fileURL) {
-//        if (!TextUtils.isEmpty(fileURL)) {
-//            // Get the current user's ID
-//            String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//
-//            FirebaseFirestore db = FirebaseFirestore.getInstance();
-//            DocumentReference chatDocument = db.collection("chats").document(project.getUid());
-//
-//            // Create a new message object
-//            Message message = new Message();
-//            message.setSender(db.collection("users").document(currentUserId));
-//            message.setMessage_type(Message.MessageType.FILE);
-//            message.setContent(fileURL);
-//            message.setTimestamp(Timestamp.now());
-//            message.setFileName(fileFullName);
-//            message.setId(generateMessageId());
-//
-//            // Add the message to the chatDocument
-//            chatDocument.update("messages", FieldValue.arrayUnion(message))
-//                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                        @Override
-//                        public void onSuccess(Void aVoid) {
-//                            Log.d(TAG, "Message sent successfully");
-//                            messageInput.setText("");
-//                            onMessageSent(firebaseAuth.getCurrentUser().getDisplayName(), message.getContent(), message.getId());
-//                        }
-//                    })
-//                    .addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            Log.w(TAG, "Error sending message", e);
-//                            Toast.makeText(ProjectChatActivity.this, R.string.failed_to_send_message, Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//        } else {
-//            Toast.makeText(this, R.string.please_enter_a_message, Toast.LENGTH_SHORT).show();
-//        }
-//    }
-
     private void sendImageMessage(String fileName, String imageURL) {
         if (!TextUtils.isEmpty(imageURL)) {
             // Get the current user's ID
@@ -1303,12 +1028,21 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             message.setSender(db.collection("users").document(currentUserId));
             message.setMessage_type(Message.MessageType.IMAGE);
             message.setContent(imageURL);
-            message.setTimestamp(Timestamp.now());
             message.setId(generateMessageId());
             message.setFileName(fileName);
 
+            // Create a map of the message to add the server timestamp
+            Map<String, Object> messageMap = new HashMap<>();
+            messageMap.put("id", message.getId());
+            messageMap.put("sender", message.getSender());
+            messageMap.put("message_type", message.getMessage_type().toString());
+            messageMap.put("content", message.getContent());
+            messageMap.put("timestamp", FieldValue.serverTimestamp()); // set to server timestamp
+            messageMap.put("fileName", message.getFileName());
+            // add other fields as necessary
+
             // Add the message to the messagesCollection
-            messagesCollection.document(message.getId()).set(message)
+            messagesCollection.document(message.getId()).set(messageMap)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -1329,6 +1063,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         }
     }
 
+
     private void sendFileMessage(String fileFullName, String fileURL) {
         if (!TextUtils.isEmpty(fileURL)) {
             // Get the current user's ID
@@ -1342,12 +1077,21 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             message.setSender(db.collection("users").document(currentUserId));
             message.setMessage_type(Message.MessageType.FILE);
             message.setContent(fileURL);
-            message.setTimestamp(Timestamp.now());
             message.setId(generateMessageId());
             message.setFileName(fileFullName);
 
+            // Create a map of the message to add the server timestamp
+            Map<String, Object> messageMap = new HashMap<>();
+            messageMap.put("id", message.getId());
+            messageMap.put("sender", message.getSender());
+            messageMap.put("message_type", message.getMessage_type().toString());
+            messageMap.put("content", message.getContent());
+            messageMap.put("timestamp", FieldValue.serverTimestamp()); // set to server timestamp
+            messageMap.put("fileName", message.getFileName());
+            // add other fields as necessary
+
             // Add the message to the messagesCollection
-            messagesCollection.document(message.getId()).set(message)
+            messagesCollection.document(message.getId()).set(messageMap)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -1368,6 +1112,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         }
     }
 
+
     private void sendProjectInviteMessage(String projectId) {
         // Get the current user's ID
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -1380,11 +1125,19 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         message.setSender(db.collection("users").document(currentUserId));
         message.setMessage_type(Message.MessageType.PROJECT_INVITE);
         message.setContent(projectId);
-        message.setTimestamp(Timestamp.now());
         message.setId(generateMessageId());
 
+        // Create a map of the message to add the server timestamp
+        Map<String, Object> messageMap = new HashMap<>();
+        messageMap.put("id", message.getId());
+        messageMap.put("sender", message.getSender());
+        messageMap.put("message_type", message.getMessage_type().toString());
+        messageMap.put("content", message.getContent());
+        messageMap.put("timestamp", FieldValue.serverTimestamp()); // set to server timestamp
+        // add other fields as necessary
+
         // Add the message to the messagesCollection
-        messagesCollection.document(message.getId()).set(message)
+        messagesCollection.document(message.getId()).set(messageMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -1401,7 +1154,6 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                     }
                 });
     }
-
 
 
     private void onMessageSent(String senderName, String displayedContent, String messageId) {
@@ -1556,60 +1308,6 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                         });
                         return true;
                     }
-
-//                    }else if (item.getItemId() == R.id.unsend_message) {
-//                        long currentTime = System.currentTimeMillis();
-//                        long messageTime = message.getTimestamp().toDate().getTime();
-//                        long timeDifference = currentTime - messageTime;
-//                        long millisecondsIn24Hours = 24 * 60 * 60 * 1000;
-//
-//                        if (timeDifference > millisecondsIn24Hours) {
-//                            Snackbar.make(menuItemView, R.string.cannot_unsend_messages_sent_more_than_24_hours_ago, Snackbar.LENGTH_SHORT).show();
-//                            return true;
-//                        }
-//
-//                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//                        DocumentReference chatDocRef = db.collection("chats").document(project.getUid());
-//                        chatDocRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                            @Override
-//                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                                if (task.isSuccessful()) {
-//                                    DocumentSnapshot document = task.getResult();
-//                                    if (document.exists()) {
-//                                        List<Message> messages = document.toObject(ChatDocument.class).getMessages();
-//                                        int messageIndex = -1;
-//                                        for (int i = 0; i < messages.size(); i++) {
-//                                            if (messages.get(i).getId().equals(message.getId())) {
-//                                                messageIndex = i;
-//                                                break;
-//                                            }
-//                                        }
-//
-//                                        if (messageIndex != -1) {
-//                                            messages.get(messageIndex).setMessage_type(Message.MessageType.UNSENT);
-//                                            messages.get(messageIndex).setContent("message deleted");
-//                                            chatDocRef.update("messages", messages)
-//                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                                        @Override
-//                                                        public void onSuccess(Void aVoid) {
-//                                                            Log.d(TAG, "Message successfully unsend.");
-//                                                        }
-//                                                    })
-//                                                    .addOnFailureListener(new OnFailureListener() {
-//                                                        @Override
-//                                                        public void onFailure(@NonNull Exception e) {
-//                                                            Log.w(TAG, "Error unsend message", e);
-//                                                        }
-//                                                    });
-//                                        }
-//                                    }
-//                                } else {
-//                                    Log.d(TAG, "get failed with ", task.getException());
-//                                }
-//                            }
-//                        });
-//                        return true;
-//                    }
                     return false;
                 }
             });
@@ -1647,50 +1345,6 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         replyModeLayout.setVisibility(View.GONE);
     }
 
-//    private void sendReplyMessage(String repliedMessageId) {
-//        String messageContent = messageInput.getText().toString().trim();
-//
-//        if (!TextUtils.isEmpty(messageContent)) {
-//            // Get the current user's ID
-//            String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//
-//            FirebaseFirestore db = FirebaseFirestore.getInstance();
-//            DocumentReference chatDocument = db.collection("chats").document(project.getUid());
-//
-//            // Create a new message object
-//            Message message = new Message();
-//            message.setSender(db.collection("users").document(currentUserId));
-//            message.setMessage_type(Message.MessageType.REPLY);
-//            message.setContent(messageContent);
-//            message.setTimestamp(Timestamp.now());
-//            message.setId(generateMessageId());
-//            message.setReplyingTo(repliedMessageId);
-//            mentionedUserIds = getMentionsFromEditable(messageInput.getText());
-//            message.setMentions(mentionedUserIds);
-//
-//            // Add the message to the chatDocument
-//            chatDocument.update("messages", FieldValue.arrayUnion(message))
-//                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                        @Override
-//                        public void onSuccess(Void aVoid) {
-//                            Log.d(TAG, "Reply message sent successfully");
-//                            messageInput.setText("");
-//                            exitReplyMode(null);
-//                            onMessageSent(firebaseAuth.getCurrentUser().getDisplayName(), message.getContent(), message.getId());
-//                        }
-//                    })
-//                    .addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            Log.w(TAG, "Error sending reply message", e);
-//                            Toast.makeText(ProjectChatActivity.this, R.string.failed_to_send_reply_message, Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//        } else {
-//            Toast.makeText(this, R.string.please_enter_a_message, Toast.LENGTH_SHORT).show();
-//        }
-//    }
-
     private void sendReplyMessage(String repliedMessageId) {
         String messageContent = messageInput.getText().toString().trim();
         messageInput.setText("");
@@ -1706,14 +1360,24 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             message.setSender(db.collection("users").document(currentUserId));
             message.setMessage_type(Message.MessageType.REPLY);
             message.setContent(messageContent);
-            message.setTimestamp(Timestamp.now());
             message.setId(generateMessageId());
             message.setReplyingTo(repliedMessageId);
             mentionedUserIds = getMentionsFromEditable(messageInput.getText());
             message.setMentions(mentionedUserIds);
 
+            // Create a map of the message to add the server timestamp
+            Map<String, Object> messageMap = new HashMap<>();
+            messageMap.put("id", message.getId());
+            messageMap.put("sender", message.getSender());
+            messageMap.put("message_type", message.getMessage_type().toString());
+            messageMap.put("content", message.getContent());
+            messageMap.put("timestamp", FieldValue.serverTimestamp()); // set to server timestamp
+            messageMap.put("replyingTo", message.getReplyingTo());
+            messageMap.put("mentions", message.getMentions());
+            // add other fields as necessary
+
             // Add the message to the messagesCollection
-            messagesCollection.document(message.getId()).set(message)
+            messagesCollection.document(message.getId()).set(messageMap)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -1735,6 +1399,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
     }
 
 
+
     private void sendMessage() {
         if (replyMode) {
             sendReplyMessage(repliedMessageId);
@@ -1754,13 +1419,23 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                 message.setSender(db.collection("users").document(currentUserId));
                 message.setMessage_type(Message.MessageType.TEXT);
                 message.setContent(messageContent);
-                message.setTimestamp(Timestamp.now());
+                // We're not setting the timestamp here, it will be set in Firestore.
                 message.setId(generateMessageId());
                 mentionedUserIds = getMentionsFromEditable(messageInput.getText());
                 message.setMentions(mentionedUserIds);
 
+                // Create a map of the message to add the server timestamp
+                Map<String, Object> messageMap = new HashMap<>();
+                messageMap.put("id", message.getId());
+                messageMap.put("sender", message.getSender());
+                messageMap.put("message_type", message.getMessage_type().toString());
+                messageMap.put("content", message.getContent());
+                messageMap.put("timestamp", FieldValue.serverTimestamp()); // set to server timestamp
+                messageMap.put("mentions", message.getMentions());
+                // add other fields as necessary
+
                 // Add the message to the messagesCollection
-                messagesCollection.document(message.getId()).set(message)
+                messagesCollection.document(message.getId()).set(messageMap)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -1781,55 +1456,6 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         }
         mentionedUserIds.clear();
     }
-
-
-
-//    private void sendMessage() {
-//        if (replyMode) {
-//            sendReplyMessage(repliedMessageId);
-//        } else {
-//            String messageContent = messageInput.getText().toString().trim();
-//
-//            if (!TextUtils.isEmpty(messageContent)) {
-//                // Get the current user's ID
-//                String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//
-//                FirebaseFirestore db = FirebaseFirestore.getInstance();
-//                DocumentReference chatDocument = db.collection("chats").document(project.getUid());
-//
-//                // Create a new message object
-//                Message message = new Message();
-//                message.setSender(db.collection("users").document(currentUserId));
-//                message.setMessage_type(Message.MessageType.TEXT);
-//                message.setContent(messageContent);
-//                message.setTimestamp(Timestamp.now());
-//                message.setId(generateMessageId());
-//                mentionedUserIds = getMentionsFromEditable(messageInput.getText());
-//                message.setMentions(mentionedUserIds);
-//
-//                // Add the message to the chatDocument
-//                chatDocument.update("messages", FieldValue.arrayUnion(message))
-//                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                Log.d(TAG, "Message sent successfully");
-//                                messageInput.setText("");
-//                                onMessageSent(firebaseAuth.getCurrentUser().getDisplayName(), message.getContent(), message.getId());
-//                            }
-//                        })
-//                        .addOnFailureListener(new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(@NonNull Exception e) {
-//                                Log.w(TAG, "Error sending message", e);
-//                                Toast.makeText(ProjectChatActivity.this, R.string.failed_to_send_message, Toast.LENGTH_SHORT).show();
-//                            }
-//                        });
-//            } else {
-//                Toast.makeText(this, R.string.please_enter_a_message, Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//        mentionedUserIds.clear();
-//    }
 
     private void uploadFileToFirebaseStorage(Uri fileUri, String folderName, String fileName) {
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(folderName).child(System.currentTimeMillis() + "_" + fileUri.getLastPathSegment());

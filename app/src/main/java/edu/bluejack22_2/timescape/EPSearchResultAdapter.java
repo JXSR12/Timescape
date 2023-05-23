@@ -22,7 +22,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import edu.bluejack22_2.timescape.model.ProjectMember;
@@ -74,7 +76,10 @@ public class EPSearchResultAdapter extends RecyclerView.Adapter<EPSearchResultAd
         DocumentReference projectRef = db.collection("projects").document(projectId);
         DocumentReference userRef = db.collection("users").document(userId);
 
-        ProjectMember newMember = new ProjectMember(userId, "", Timestamp.now(), "collaborator");
+        Map<String, Object> newMember = new HashMap<>();
+        newMember.put("id", userId);
+        newMember.put("role", "collaborator");
+        newMember.put("date_joined", FieldValue.serverTimestamp());
 
         projectRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override

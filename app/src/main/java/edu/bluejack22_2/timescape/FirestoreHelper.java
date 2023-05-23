@@ -22,6 +22,13 @@ public class FirestoreHelper {
 
         DocumentReference inboxMessageRef = db.collection("inbox_messages").document(receiverUserId);
 
+        Map<String, Object> inboxMap = new HashMap<>();
+        inboxMap.put("receiverUserId", inboxMessage.getReceiverUserId());
+        inboxMap.put("content", inboxMessage.getContent());
+        inboxMap.put("title", inboxMessage.getTitle());
+        inboxMap.put("isRead", inboxMessage.isRead());
+        inboxMap.put("sentTime", FieldValue.serverTimestamp());
+
         db.runTransaction((Transaction.Function<Void>) transaction -> {
                     DocumentSnapshot snapshot = transaction.get(inboxMessageRef);
 
@@ -33,7 +40,7 @@ public class FirestoreHelper {
                     }
 
                     // Update the messages field
-                    transaction.update(inboxMessageRef, "messages", FieldValue.arrayUnion(inboxMessage));
+                    transaction.update(inboxMessageRef, "messages", FieldValue.arrayUnion(inboxMap));
                     return null;
                 })
                 .addOnSuccessListener(aVoid -> {

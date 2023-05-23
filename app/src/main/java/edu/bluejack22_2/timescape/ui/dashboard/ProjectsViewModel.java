@@ -71,7 +71,7 @@ public class ProjectsViewModel extends ViewModel {
 
         // Combine queries for projects where user is a member and projects where user is the owner
         db.collection("projects")
-                .whereLessThanOrEqualTo("members." + userId + ".date_joined", Timestamp.now())
+                .whereNotEqualTo("members." + userId + ".role", "not_member")
                 .get()
                 .continueWithTask(task -> {
                     List<Project> projects = new ArrayList<>();

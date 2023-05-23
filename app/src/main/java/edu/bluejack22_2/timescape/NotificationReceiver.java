@@ -97,12 +97,19 @@ public class NotificationReceiver extends BroadcastReceiver {
             message.setSender(db.collection("users").document(currentUserId));
             message.setMessage_type(Message.MessageType.REPLY);
             message.setContent(content);
-            message.setTimestamp(Timestamp.now());
             message.setId(generateMessageId());
             message.setReplyingTo(repliedMessageId);
 
+            Map<String, Object> messageMap = new HashMap<>();
+            messageMap.put("sender", db.collection("users").document(currentUserId));
+            messageMap.put("message_type", Message.MessageType.REPLY);
+            messageMap.put("content", content);
+            messageMap.put("timestamp", FieldValue.serverTimestamp());
+            messageMap.put("id", generateMessageId());
+            messageMap.put("replyingTo", repliedMessageId);
+
             // Add the message to the messagesCollection
-            messagesCollection.document(message.getId()).set(message)
+            messagesCollection.document(message.getId()).set(messageMap)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {

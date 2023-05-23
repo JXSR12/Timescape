@@ -67,6 +67,7 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.auth.UserInfo;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -567,27 +568,26 @@ public class MainActivity extends BaseActivity {
             DocumentReference ownerRef = currentUser != null ? db.collection("users").document(currentUser.getUid()) : null;
 
             Timestamp deadlineDate = new Timestamp(calendar.getTime());
-            Timestamp createdDate = Timestamp.now();
 
             Map<String, Object> members = new HashMap<>();
 
             for (User member : invitedMembers) {
                 Map<String, Object> memberData = new HashMap<>();
-                memberData.put("date_joined", Timestamp.now()); // Member automatically joins, can leave any time.
+                memberData.put("date_joined", FieldValue.serverTimestamp());
                 memberData.put("role", "collaborator");
                 members.put(member.getUid(), memberData);
             }
 
-                // Create the project document with the added members
-                Map<String, Object> projectData = new HashMap<>();
-                projectData.put("title", title);
-                projectData.put("description", description);
-                projectData.put("deadline_date", deadlineDate);
-                projectData.put("private", isPrivate);
-                projectData.put("owner", ownerRef);
-                projectData.put("created_date", createdDate);
-                projectData.put("last_modified_date", createdDate);
-                projectData.put("members", members);
+            // Create the project document with the added members
+            Map<String, Object> projectData = new HashMap<>();
+            projectData.put("title", title);
+            projectData.put("description", description);
+            projectData.put("deadline_date", deadlineDate);
+            projectData.put("private", isPrivate);
+            projectData.put("owner", ownerRef);
+            projectData.put("created_date", FieldValue.serverTimestamp());
+            projectData.put("last_modified_date", FieldValue.serverTimestamp());
+            projectData.put("members", members);
 
                 db.collection("projects")
                         .add(projectData)
@@ -761,9 +761,12 @@ public class MainActivity extends BaseActivity {
                         } else {
                             // Add user as a new member
                             DocumentReference userRef = db.collection("users").document(userId);
-                            ProjectMember newMember = new ProjectMember(userRef.getId(), "", Timestamp.now(), "collaborator");
+                            Map<String, Object> newMemberMap = new HashMap<>();
+                            newMemberMap.put("userId", userRef.getId());
+                            newMemberMap.put("role", "collaborator");
+                            newMemberMap.put("date_joined", FieldValue.serverTimestamp());
 
-                            projectRef.update("members." + userRef.getId(), newMember)
+                            projectRef.update("members." + userRef.getId(), newMemberMap)
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(this, R.string.you_have_been_added_to_the_project, Toast.LENGTH_SHORT).show();
                                         Intent detailIntent = new Intent(MainActivity.this, ProjectDetailActivity.class);
