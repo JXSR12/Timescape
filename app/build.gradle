@@ -18,8 +18,8 @@ android {
         applicationId "edu.bluejack22_2.timescape"
         minSdk 26
         targetSdk 33
-        versionCode 21
-        versionName "0.5.1 - P4 - ALPHA Testing"
+        versionCode 22
+        versionName "0.5.2 - P4 - ALPHA Testing"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
