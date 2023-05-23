@@ -285,6 +285,7 @@
     <string name="no_reads_yet">尚未阅读</string>
     <string name="read_more">阅读更多</string>
     <string name="generating_invite_link">生成邀请链接</string>
+    <string name="copy">复制</string>
     <string-array name="project_completed_filter_options">
         <item>所有完成状态</item>
         <item>仅已完成</item>

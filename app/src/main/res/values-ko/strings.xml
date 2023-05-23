@@ -285,6 +285,7 @@
     <string name="no_reads_yet">아직 읽힌 내역 없음</string>
     <string name="read_more">더 읽기</string>
     <string name="generating_invite_link">초대 링크 생성 중</string>
+    <string name="copy">복사</string>
     <string-array name="project_completed_filter_options">
         <item>모든 완료 상태</item>
         <item>완료된 항목만</item>
