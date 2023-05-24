@@ -19,6 +19,10 @@ Timescape is a project management and messaging application designed to streamli
 
 ## Changelog
 
+### 0.5.8: HOTFIX App crash on sending message
+- Supposedly fixed where sometimes on poor connection sending message would cause the app to crash.
+- We are working to investigate this problem further. However, in this patch we have not yet experienced the same issue this far.
+
 ### 0.5.7: Lists UX Improvement Update
 - Added touch effect on project chats list in 'Project Chats' page
 - Added placeholders for various list displays if empty.

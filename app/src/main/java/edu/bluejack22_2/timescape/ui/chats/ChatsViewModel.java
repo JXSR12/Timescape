@@ -155,8 +155,12 @@ public class ChatsViewModel extends ViewModel {
 
                                 // Sort chatItemList based on the timestamp of the latestMessage
                                 Collections.sort(chatItemList, (chat1, chat2) -> {
-                                    Timestamp timestamp1 = chat1.getLatestMessage().getTimestamp();
-                                    Timestamp timestamp2 = chat2.getLatestMessage().getTimestamp();
+                                    Timestamp timestamp1 = chat1.getLatestMessage().getTimestamp() == null ? Timestamp.now() : chat1.getLatestMessage().getTimestamp();
+                                    Timestamp timestamp2 = chat2.getLatestMessage().getTimestamp() == null ? Timestamp.now() : chat2.getLatestMessage().getTimestamp();
+
+                                    if(timestamp1 == null || timestamp2 == null){
+                                        return 0;
+                                    }
                                     return timestamp2.compareTo(timestamp1);
                                 });
 
