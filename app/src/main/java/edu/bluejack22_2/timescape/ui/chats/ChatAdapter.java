@@ -1183,6 +1183,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         private Spannable formatMentions(String content, HashMap<String, String> mentions) {
             SpannableStringBuilder formattedContent = new SpannableStringBuilder(content);
 
+            if(mentions == null) return formattedContent;
             // For each mention in the message
             for (Map.Entry<String, String> entry : mentions.entrySet()) {
                 String mentionTag = entry.getKey().split("_")[0];  // The mention tag in the format <@User Name>

@@ -3,15 +3,24 @@ package edu.bluejack22_2.timescape;
 import static android.content.ContentValues.TAG;
 
 import android.app.ActivityManager;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -49,12 +58,82 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     private static Handler handler = new Handler(Looper.getMainLooper());
     private static Runnable offlineRunnable;
+    private ConnectivityManager connectivityManager;
+    private ConnectivityManager.NetworkCallback networkCallback;
+    private View warningOverlay;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestNecessaryPermissions();
         updateFCMToken();
         Thread.setDefaultUncaughtExceptionHandler(_unCaughtExceptionHandler);
+
+        checkConnection();
+        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        // Create a NetworkCallback
+        networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                // Network connection is available, hide warning
+                runOnUiThread(() -> {
+                    hideWarningOverlay();
+                    Log.d("CONNECTION AVAILABLE", "RECONNECTED");
+                });
+            }
+
+            @Override
+            public void onLost(@NonNull Network network) {
+                // Network connection is lost, show warning
+                runOnUiThread(() -> {
+                    showWarningOverlay();
+                    Log.d("CONNECTION UNAVAILABLE", "DISCONNECTED");
+                });
+            }
+        };
+    }
+
+    private Dialog warningDialog;
+
+    public void showWarningOverlay() {
+        if (warningDialog == null) {
+            warningDialog = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar);
+            warningDialog.setContentView(R.layout.layout_warning_overlay);
+            warningDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+            warningDialog.setCancelable(false);
+
+            Button continueButton = warningDialog.findViewById(R.id.continueButton);
+            continueButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    warningDialog.dismiss();
+                }
+            });
+
+        }
+
+        if (!warningDialog.isShowing()) {
+            warningDialog.show();
+        }
+    }
+
+
+    public void hideWarningOverlay() {
+        if (warningDialog != null && warningDialog.isShowing()) {
+            warningDialog.dismiss();
+        }
+    }
+
+    private void checkConnection() {
+        if(!isNetworkConnected()) {
+            showWarningOverlay();
+        } else {
+            hideWarningOverlay();
+        }
+    }
+    public boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
     private final Thread.UncaughtExceptionHandler _unCaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
@@ -150,6 +229,8 @@ public abstract class BaseActivity extends AppCompatActivity {
             handler.removeCallbacks(offlineRunnable);
         }
         setUserOnlineStatus(true);
+        NetworkRequest networkRequest = new NetworkRequest.Builder().build();
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback);
     }
 
     @Override
@@ -162,6 +243,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
         };
         handler.postDelayed(offlineRunnable, DELAY_MS);
+        connectivityManager.unregisterNetworkCallback(networkCallback);
     }
 
     void signOut() {

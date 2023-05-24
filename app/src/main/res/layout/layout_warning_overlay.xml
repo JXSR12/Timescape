@@ -1,0 +1,36 @@
+<!-- File: res/layout/layout_warning_overlay.xml -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:cardCornerRadius="10dp"
+        android:layout_margin="16dp">
+
+        <TextView
+            android:id="@+id/warningText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_internet_connection"
+            android:textAlignment="center"
+            android:padding="16dp"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:background="#9FB00020" />
+
+    </androidx.cardview.widget.CardView>
+    <Button
+        android:id="@+id/continueButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_gravity="center"
+        android:backgroundTint="#9FB00020"
+        android:textColor="@android:color/white"
+        android:text="@string/i_understand_continue_anyway"/>
+</FrameLayout>

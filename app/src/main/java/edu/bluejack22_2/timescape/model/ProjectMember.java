@@ -36,6 +36,7 @@ public class ProjectMember {
     }
 
     public Timestamp getDate_joined() {
+        if(date_joined == null) return Timestamp.now();
         return date_joined;
     }
 

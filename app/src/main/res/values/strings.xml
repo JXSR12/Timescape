@@ -286,6 +286,8 @@
     <string name="read_more">Read more</string>
     <string name="generating_invite_link">Generating Invite Link</string>
     <string name="copy">Copy</string>
+    <string name="no_internet_connection">No connection. We encourage you to stay connected to prevent crashes, lags, or delays. This app is optimized for full connectivity.</string>
+    <string name="i_understand_continue_anyway">I understand. Continue anyway.</string>
     <string-array name="project_completed_filter_options">
         <item>All Completion Status</item>
         <item>Completed Only</item>

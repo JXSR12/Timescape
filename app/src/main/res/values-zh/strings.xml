@@ -286,6 +286,8 @@
     <string name="read_more">阅读更多</string>
     <string name="generating_invite_link">生成邀请链接</string>
     <string name="copy">复制</string>
+    <string name="no_internet_connection">无连接。我们鼓励您保持连接以防止崩溃、延迟或延迟。此应用程序针对完全连接进行了优化。</string>
+    <string name="i_understand_continue_anyway">我了解。仍然继续。</string>
     <string-array name="project_completed_filter_options">
         <item>所有完成状态</item>
         <item>仅已完成</item>
