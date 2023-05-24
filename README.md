@@ -19,6 +19,12 @@ Timescape is a project management and messaging application designed to streamli
 
 ## Changelog
 
+### 0.5.7: Lists UX Improvement Update
+- Added touch effect on project chats list in 'Project Chats' page
+- Added placeholders for various list displays if empty.
+- Translated the project operation notification and inbox message.
+- Changed so that the floating button to Scan QR and Create Project only appears when the user is in Dashboard, providing a more intuitive UX.
+
 ### 0.5.6: No network warning dialog
 - After observing some oddities in behavior of the app and crashes caused by the absence of internet connection, we have added a warning dialog that will show up everytime user launches an activity without a proper internet connection. This dialog is dismissable by clicking on the 'I understand. Continue anyway' button.
 
