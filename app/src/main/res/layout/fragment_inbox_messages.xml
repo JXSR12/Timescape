@@ -12,4 +12,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/all_inbox_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        android:paddingTop="60dp"
+        android:paddingBottom="60dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:text="@string/no_inbox_to_display"
+        android:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>

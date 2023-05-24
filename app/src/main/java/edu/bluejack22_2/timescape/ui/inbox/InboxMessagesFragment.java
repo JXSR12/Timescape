@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -63,6 +64,16 @@ public class InboxMessagesFragment extends Fragment {
         inboxAdapter = new InboxAdapter(new ArrayList<>(), getContext(), inboxViewModel);
         recyclerView.setAdapter(inboxAdapter);
 
+        TextView emptyView = view.findViewById(R.id.all_inbox_placeholder);
+
+        if (inboxAdapter.getItemCount() == 0) {
+            emptyView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+
         // Fetch inbox messages based on the current tab position
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         // Replace the following with the appropriate user ID
@@ -110,6 +121,14 @@ public class InboxMessagesFragment extends Fragment {
                         }
                     }
                     inboxAdapter.submitList(messages);
+
+                    if (inboxAdapter.getItemCount() == 0) {
+                        emptyView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    } else {
+                        emptyView.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
                 });
 
 

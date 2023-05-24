@@ -288,6 +288,21 @@
     <string name="copy">Copy</string>
     <string name="no_internet_connection">No connection. We encourage you to stay connected to prevent crashes, lags, or delays. This app is optimized for full connectivity.</string>
     <string name="i_understand_continue_anyway">I understand. Continue anyway.</string>
+    <string name="no_recent_projects">No recent projects</string>
+    <string name="no_projects_to_display_consider_changing_filters_join_one_or_create_your_own">No projects to display. Consider changing filters, join one, or create your own</string>
+    <string name="no_tasks_to_display">No tasks to display. Consider changing filters or add tasks to your projects</string>
+    <string name="no_chats_to_display"><![CDATA[No ongoing project chats yet. To start one, go to the project page, tap on \'More\' > \'Project Chat\']]></string>
+    <string name="no_inbox_to_display">No inbox messages. You will receive inbox messages for important actions like getting added to or removed from a project</string>
+    <string name="op_added">added</string>
+    <string name="op_removed">removed</string>
+    <string name="op_has">" has "</string>
+    <string name="op_you">you</string>
+    <string name="op_to">" to "</string>
+    <string name="op_from">" from "</string>
+    <string name="op_the_project">the project.</string>
+    <string name="you_have_been">"You have been "</string>
+    <string name="the_project_should_now_be_visible_to_you_in_your_dashboard_you_can_now_collaborate_and_contribute_to_this_project_be_sure_to_also_check_the_project_chat_in_case_of_any_new_messages">" The project should now be visible to you in your dashboard. You can now collaborate and contribute to this project, be sure to also check the project chat in case of any new messages! "</string>
+    <string name="the_project_should_no_longer_be_visible_in_your_dashboard_and_your_access_to_contribute_to_the_project_has_been_revoked_if_you_think_that_this_is_a_mistake_please_contact_the_owner_of_the_project">" The project should no longer be visible in your dashboard, and your access to contribute to the project has been revoked. If you think that this is a mistake, please contact the owner of the project."</string>
     <string-array name="project_completed_filter_options">
         <item>All Completion Status</item>
         <item>Completed Only</item>

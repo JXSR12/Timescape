@@ -288,6 +288,21 @@
     <string name="copy">Salin</string>
     <string name="no_internet_connection">Tidak ada koneksi. Kami mendorong Anda tetap terhubung untuk mencegah crash, lag, atau penundaan. Aplikasi ini dioptimalkan untuk konektivitas penuh.</string>
     <string name="i_understand_continue_anyway">Saya mengerti. Tetap lanjutkan saja.</string>
+    <string name="no_recent_projects">Tidak ada proyek terbaru</string>
+    <string name="no_projects_to_display_consider_changing_filters_join_one_or_create_your_own">Tidak ada proyek yang ditampilkan. Pertimbangkan untuk mengubah filter, bergabung dengan proyek yang ada, atau membuat proyek Anda sendiri</string>
+    <string name="no_tasks_to_display">Tidak ada tugas yang ditampilkan. Pertimbangkan untuk mengubah filter atau menambahkan tugas ke proyek Anda</string>
+    <string name="no_chats_to_display">Tidak ada obrolan proyek yang sedang berlangsung. Untuk memulai, masuk ke halaman proyek, ketuk \'Lebih\' > \'Obrolan Proyek\'</string>
+    <string name="no_inbox_to_display">Tidak ada pesan di kotak masuk. Anda akan menerima pesan kotak masuk untuk tindakan penting seperti ditambahkan ke atau dihapus dari sebuah proyek</string>
+    <string name="op_added">menambahkan</string>
+    <string name="op_removed">menghapus</string>
+    <string name="op_has"> telah </string>
+    <string name="op_you">Anda</string>
+    <string name="op_to"> ke </string>
+    <string name="op_from"> dari </string>
+    <string name="op_the_project">proyek.</string>
+    <string name="you_have_been">Anda telah </string>
+    <string name="the_project_should_now_be_visible_to_you_in_your_dashboard_you_can_now_collaborate_and_contribute_to_this_project_be_sure_to_also_check_the_project_chat_in_case_of_any_new_messages">Proyek sekarang harus terlihat di dasbor Anda. Anda sekarang dapat berkolaborasi dan berkontribusi pada proyek ini, pastikan juga untuk memeriksa obrolan proyek jika ada pesan baru!</string>
+    <string name="the_project_should_no_longer_be_visible_in_your_dashboard_and_your_access_to_contribute_to_the_project_has_been_revoked_if_you_think_that_this_is_a_mistake_please_contact_the_owner_of_the_project">Proyek tidak lagi harus terlihat di dasbor Anda, dan akses Anda untuk berkontribusi pada proyek ini telah dicabut. Jika Anda menganggap ini sebagai kesalahan, harap hubungi pemilik proyek.</string>
     <string-array name="project_completed_filter_options">
         <item>Semua Status Selesai</item>
         <item>Hanya yang Selesai</item>

@@ -69,8 +69,10 @@ public class ProjectsFragment extends Fragment {
                 swipeRefreshLayout.setRefreshing(false);
             });
 
+            GridView recentProjectsGridView = binding.recentProjectsGridView;
+            recentProjectsGridView.setEmptyView(binding.recentProjectsPlaceholder);
+
             projectsViewModel.getRecentProjects().observe(getViewLifecycleOwner(), projects -> {
-                GridView recentProjectsGridView = binding.recentProjectsGridView;
                 RecentProjectAdapter recentProjectAdapter = new RecentProjectAdapter(requireContext(), projects);
                 recentProjectsGridView.setAdapter(recentProjectAdapter);
 
@@ -92,8 +94,10 @@ public class ProjectsFragment extends Fragment {
             filterAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             binding.filterDeadlineSpinner.setAdapter(filterAdapter2);
 
+            ListView listView = binding.allProjectsListView;
+            listView.setEmptyView(binding.allProjectsPlaceholder);
+
             projectsViewModel.getAllProjects().observe(getViewLifecycleOwner(), projects -> {
-                ListView listView = binding.allProjectsListView;
                 ProjectListAdapter adapter = new ProjectListAdapter(getContext(), projects);
                 listView.setAdapter(adapter);
 

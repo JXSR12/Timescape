@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,6 +45,15 @@ public class AllTasksFragment extends Fragment {
         binding.tasksRecyclerView.setAdapter(groupedTasksAdapter);
 
         // Observe allProjects LiveData
+        TextView emptyView = binding.allTasksPlaceholder;
+        if (groupedTasksAdapter.getItemCount() == 0) {
+            emptyView.setVisibility(View.VISIBLE);
+            binding.tasksRecyclerView.setVisibility(View.GONE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+            binding.tasksRecyclerView.setVisibility(View.VISIBLE);
+        }
+
         allTasksViewModel.getAllProjectsWithTasks().observe(getViewLifecycleOwner(), projects -> {
             List<Object> items = new ArrayList<>();
             for (ProjectWithTasks project : projects) {
@@ -53,6 +63,14 @@ public class AllTasksFragment extends Fragment {
                 }
             }
             groupedTasksAdapter.updateItems(items);
+
+            if (groupedTasksAdapter.getItemCount() == 0) {
+                emptyView.setVisibility(View.VISIBLE);
+                binding.tasksRecyclerView.setVisibility(View.GONE);
+            } else {
+                emptyView.setVisibility(View.GONE);
+                binding.tasksRecyclerView.setVisibility(View.VISIBLE);
+            }
         });
 
         // Set up the SwipeRefreshLayout

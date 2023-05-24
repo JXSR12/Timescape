@@ -7,15 +7,15 @@ Project Management and Messenger Application
 Timescape is a project management and messaging application designed to streamline team collaboration and project tracking.
 
 - Create and manage projects easily
-    * Easily store, manage, and track your project progress
+  * Easily store, manage, and track your project progress
 - Collaborate in real time
-    * See what your project members are doing, view their online status, and interact with them in real time
+  * See what your project members are doing, view their online status, and interact with them in real time
 - Built in robust communication system
-    * Comes with a robust messenger providing a hassle-free yet feature-rich chatting with your project mates
+  * Comes with a robust messenger providing a hassle-free yet feature-rich chatting with your project mates
 - Invite new members quick and easy
-    * Know someone using the app? Search their name or phone number and invite them.
+  * Know someone using the app? Search their name or phone number and invite them.
 - One-click invite system
-    * Don't know who to add? You can just generate an invite link and post it wherever you want! People are gonna be one tap away from joining your project.
+  * Don't know who to add? You can just generate an invite link and post it wherever you want! People are gonna be one tap away from joining your project.
 
 ## Changelog
 
@@ -116,44 +116,25 @@ Timescape is a project management and messaging application designed to streamli
 - Fixed not being able to use the QR Scanner after initially granting camera permission
 - Overhauled online/typing status to be more responsive to changes and more efficient.
 - Overhauled the chat read system to be more efficient.
-- Fixed some messages not being marked as read properly in real time
-- Fixed status not updating when typing from another device
+- Fixed some messages not being marked as read on activity resume if the reader is pausing the chat activity when the message is sent.
 
-### 0.2.2: Bug Fixes
-- Fixed unread notifications not being cleared when app is opened through launcher
-- Fixed unread notifications not being cleared when viewing chat from notification while app is already opened
-- Improved chat UX, chats will now scroll to bottom when new message is received only when the user is at the bottom
-- Fixed an issue where the first chat message of the day sent from notification does not show day separator
-- Fixed not being able to add members when the chat is still loading
-- Fixed recently accessed projects not updating when joining a project from a project invitation
-- Fixed message not marked as read when the chat is viewed from notification while app is already opened
-- Improved chat UX, chat will now scroll to bottom when keyboard is opened
-- Improved chat UX, chat will now scroll to bottom when viewing the chat from notification
-- Added check for new updates feature
+### 0.2.0: Project Chats Speed and Efficiency Update
+- Completely overhauled how chats store and retrieve messages to be significantly faster and more efficient.
+- Changed the displayed message for notifications and chat previews for image and file attachments.
+- Improved the way chat messages retrieve the message details to be faster and more efficient.
+- Added more translations.
+- NOTE: Users should now feel little to no flickering in user display names when chatting in a more intense frequency.
+- NOTE: The new way of storing chat messages also fixes the possibility of a collision (which previously results in some messages being lost) when multiple user sends message to the same chat room at the same time.
 
-### 0.2.1: Minor UI improvements and bug fixes
-- Fixed swipe down to refresh behavior on home page
-- Fixed video player keeps playing in the background after closing the activity
-- Fixed project name not being updated in the project chat after changing the project name
-- Fixed chat not showing when opening the app from the notification when the app is not in background
-- Fixed swipe to refresh behavior on project page
-- Fixed recently accessed projects not updating after leaving the project
-- Fixed recently accessed projects not updating after removing a member from the project
-- Fixed recently accessed projects not updating after deleting the project
-- Added a feature to show/hide password on login and register page
-- Improved project creation and editing UI
-- Fixed typo in settings page
-- Added a feature to clear recent projects
-- Fixed swipe to refresh behavior on settings page
+### 0.1.9: Notifications Rework and QR Invite System
+- Added QR Code when generating invite link for projects.
+- Added a QR Code scanner to directly join project from QR codes.
+- Completely revamped notification system to use Cloud Messaging.
+- Added more translations.
+- A few quality of life changes.
+- Fixed inconsistencies with project deadline notifications.
+- Other smaller bugfixes.
 
-### 0.2.0: Dark Mode
-- Implemented dark mode
-- Added a settings page to switch between dark and light mode
-- Added a feature to change the app's language
-- Fixed some bugs
-
-### 0.1.0: Initial Release
-- Initial version of Timescape
-- Core features include project management, chat messaging, and real-time collaboration
-- Plenty of bug fixes and improvements
-
+### 0.1.x: Initial release
+- Initial release of the app
+- All changes before this was not logged for versioning

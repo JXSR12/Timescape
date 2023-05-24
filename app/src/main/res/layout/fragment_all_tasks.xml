@@ -25,6 +25,18 @@
             android:layout_weight="1"
             android:layout_marginBottom="80dp"/>
 
+        <TextView
+            android:id="@+id/all_tasks_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:paddingTop="60dp"
+            android:paddingBottom="60dp"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:text="@string/no_tasks_to_display"
+            android:visibility="gone" />
+
     </LinearLayout>
 
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

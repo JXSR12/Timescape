@@ -2,6 +2,7 @@ package edu.bluejack22_2.timescape.ui.chats;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,11 +49,29 @@ public class ChatsFragment extends Fragment implements ChatListAdapter.OnChatIte
         chatListAdapter = new ChatListAdapter(getContext(), chatItemList, this);
         chatsRecyclerView.setAdapter(chatListAdapter);
 
+        TextView emptyView = binding.allChatsPlaceholder;
+
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         chatsViewModel.getChatItems(userId, chatListAdapter).observe(getViewLifecycleOwner(), chatItems -> {
             chatListAdapter.setChatItems(chatItems);
             chatListAdapter.notifyDataSetChanged();
+
+            if (chatListAdapter.getItemCount() == 0) {
+                emptyView.setVisibility(View.VISIBLE);
+                chatsRecyclerView.setVisibility(View.GONE);
+            } else {
+                emptyView.setVisibility(View.GONE);
+                chatsRecyclerView.setVisibility(View.VISIBLE);
+            }
         });
+
+        if (chatListAdapter.getItemCount() == 0) {
+            emptyView.setVisibility(View.VISIBLE);
+            chatsRecyclerView.setVisibility(View.GONE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+            chatsRecyclerView.setVisibility(View.VISIBLE);
+        }
 
         return root;
     }

@@ -203,12 +203,12 @@ public class NotificationHelper {
             String header = context.getString(R.string.project_operations_notice) + projectName;
             String actionVerb = "ACTION_VERB";
             if(action.equals("ADD")){
-                actionVerb = "added";
+                actionVerb = context.getString(R.string.op_added);
             }else if(action.equals("REMOVE")){
-                actionVerb = "removed";
+                actionVerb = context.getString(R.string.op_removed);
             }
 
-            String content = actorName + " has " + actionVerb + " " + "you" + (action.equals("ADD") ? " to " : " from ") + "the project.";
+            String content = actorName + context.getString(R.string.op_has) + actionVerb + " " + context.getString(R.string.op_you) + (action.equals("ADD") ? context.getString(R.string.op_to) : context.getString(R.string.op_from)) + context.getString(R.string.op_the_project);
 
             Intent detailActivityIntent = new Intent(context, ProjectDetailActivity.class);
             detailActivityIntent.putExtra("PROJECT_ID", projectId);
@@ -229,7 +229,7 @@ public class NotificationHelper {
 
             notificationManager.notify(notificationId, builder.build());
 
-            InboxMessage message = new InboxMessage(objectUserId, "You have been " + actionVerb + (action.equals("ADD") ? " to " : " from ") + projectName, content + (action.equals("ADD") ? " The project should now be visible to you in your dashboard. You can now collaborate and contribute to this project, be sure to also check the project chat in case of any new messages! " : " The project should no longer be visible in your dashboard, and your access to contribute to the project has been revoked. If you think that this is a mistake, please contact the owner of the project."), Timestamp.now(), false);
+            InboxMessage message = new InboxMessage(objectUserId, context.getString(R.string.you_have_been) + actionVerb + (action.equals("ADD") ? context.getString(R.string.op_to) : context.getString(R.string.op_from)) + projectName, content + (action.equals("ADD") ? context.getString(R.string.the_project_should_now_be_visible_to_you_in_your_dashboard_you_can_now_collaborate_and_contribute_to_this_project_be_sure_to_also_check_the_project_chat_in_case_of_any_new_messages) : context.getString(R.string.the_project_should_no_longer_be_visible_in_your_dashboard_and_your_access_to_contribute_to_the_project_has_been_revoked_if_you_think_that_this_is_a_mistake_please_contact_the_owner_of_the_project)), Timestamp.now(), false);
             FirestoreHelper.sendInboxMessage(message);
             Log.d("SendInbox", "Sending to " + objectUserId);
         }

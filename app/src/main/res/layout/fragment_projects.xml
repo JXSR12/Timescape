@@ -37,6 +37,16 @@
             android:paddingEnd="16dp" />
 
         <TextView
+            android:id="@+id/recent_projects_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:paddingTop="40dp"
+            android:paddingBottom="40dp"
+            android:text="@string/no_recent_projects"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/all_projects_headline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -65,6 +75,17 @@
             android:layout_weight="1"
             android:divider="@android:color/darker_gray"
             android:dividerHeight="0.5dp" />
+
+        <TextView
+            android:id="@+id/all_projects_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:paddingTop="60dp"
+            android:paddingBottom="60dp"
+            android:text="@string/no_projects_to_display_consider_changing_filters_join_one_or_create_your_own"
+            android:visibility="gone" />
+
     </LinearLayout>
 
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

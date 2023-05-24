@@ -53,9 +53,12 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -106,6 +109,7 @@ import edu.bluejack22_2.timescape.model.ApkVersion;
 import edu.bluejack22_2.timescape.model.Project;
 import edu.bluejack22_2.timescape.model.ProjectMember;
 import edu.bluejack22_2.timescape.model.User;
+import edu.bluejack22_2.timescape.ui.dashboard.DashboardFragment;
 import edu.bluejack22_2.timescape.ui.dashboard.DashboardViewModel;
 import edu.bluejack22_2.timescape.ui.dashboard.InvitedMemberAdapter;
 import edu.bluejack22_2.timescape.ui.dashboard.SearchResultAdapter;
@@ -170,6 +174,22 @@ public class MainActivity extends BaseActivity {
                 showScanProjectQRDialog();
             }
         });
+
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
+        if (navHostFragment != null) {
+            NavController navController = navHostFragment.getNavController();
+            navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+                if (destination.getId() == R.id.nav_dashboard) {
+                    binding.appBarMain.fab.setVisibility(View.VISIBLE);
+                    binding.appBarMain.fabJoinQr.setVisibility(View.VISIBLE);
+                } else {
+                    binding.appBarMain.fab.setVisibility(View.GONE);
+                    binding.appBarMain.fabJoinQr.setVisibility(View.GONE);
+                }
+            });
+        }
+
+
 
         DrawerLayout drawer = binding.drawerLayout;
 
@@ -789,19 +809,27 @@ public class MainActivity extends BaseActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference notificationsCollection = db.collection("users").document(objectUserId).collection("notifications");
 
-        Map<String, Object> notificationData = new HashMap<>();
-        notificationData.put("actorUserId", actorUserId);
-        notificationData.put("actorName", actorName);
-        notificationData.put("projectId", projectId);
-        notificationData.put("projectName", projectName);
-        notificationData.put("action", action);
-        notificationData.put("objectUserId", objectUserId);
-        notificationData.put("objectUserName", objectUserName);
-        notificationData.put("notificationType", "PROJECT_OPERATION_NOTICE");
+        DocumentReference actorRef = db.collection("users").document(actorUserId);
+        actorRef.get()
+            .addOnSuccessListener(docSnap -> {
+                String actorFetchedName = docSnap.getString("displayName");
 
-        notificationsCollection.add(notificationData)
-                .addOnSuccessListener(documentReference -> Log.d("Notification", "Notification sent successfully"))
-                .addOnFailureListener(e -> Log.w("Notification", "Error sending notification", e));
+                Map<String, Object> notificationData = new HashMap<>();
+                notificationData.put("actorUserId", actorUserId);
+                notificationData.put("actorName", actorFetchedName);
+                notificationData.put("projectId", projectId);
+                notificationData.put("projectName", projectName);
+                notificationData.put("action", action);
+                notificationData.put("objectUserId", objectUserId);
+                notificationData.put("objectUserName", objectUserName);
+                notificationData.put("notificationType", "PROJECT_OPERATION_NOTICE");
+
+                notificationsCollection.add(notificationData)
+                        .addOnSuccessListener(documentReference -> Log.d("Notification", "Notification sent successfully"))
+                        .addOnFailureListener(e -> Log.w("Notification", "Error sending notification", e));
+
+            })
+            .addOnFailureListener(e -> Log.w("", "", e));
     }
 
 

@@ -158,18 +158,19 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                             .setMessage(R.string.this_action_cannot_be_undone)
                             .setPositiveButton(R.string.delete_b, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
+                                    View root = itemView.getRootView();
                                     db.collection("tasks").document(task.getUid())
                                             .delete()
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
-                                                    Snackbar.make(itemView, R.string.task_deleted, Snackbar.LENGTH_SHORT).show();
+                                                    Snackbar.make(root, R.string.task_deleted, Snackbar.LENGTH_SHORT).show();
                                                 }
                                             })
                                             .addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
-                                                    Snackbar.make(itemView, R.string.error_while_deleting_task, Snackbar.LENGTH_SHORT).show();
+                                                    Snackbar.make(root, R.string.error_while_deleting_task, Snackbar.LENGTH_SHORT).show();
                                                 }
                                             });
                                 }
