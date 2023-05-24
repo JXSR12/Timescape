@@ -126,7 +126,7 @@ Timescape is a project management and messaging application designed to streamli
 - NOTE: Users should now feel little to no flickering in user display names when chatting in a more intense frequency.
 - NOTE: The new way of storing chat messages also fixes the possibility of a collision (which previously results in some messages being lost) when multiple user sends message to the same chat room at the same time.
 
-###0.1.9: Notifications Rework and QR Invite System
+### 0.1.9: Notifications Rework and QR Invite System
 - Added QR Code when generating invite link for projects.
 - Added a QR Code scanner to directly join project from QR codes.
 - Completely revamped notification system to use Cloud Messaging.
@@ -135,7 +135,7 @@ Timescape is a project management and messaging application designed to streamli
 - Fixed inconsistencies with project deadline notifications.
 - Other smaller bugfixes.
 
-###0.1.x: Initial release
+### 0.1.x: Initial release
 - Initial release of the app
 - All changes before this was not logged for versioning
 
