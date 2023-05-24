@@ -7,15 +7,15 @@ Project Management and Messenger Application
 Timescape is a project management and messaging application designed to streamline team collaboration and project tracking.
 
 - Create and manage projects easily
-  * Easily store, manage, and track your project progress
+    * Easily store, manage, and track your project progress
 - Collaborate in real time
-  * See what your project members are doing, view their online status, and interact with them in real time
+    * See what your project members are doing, view their online status, and interact with them in real time
 - Built in robust communication system
-  * Comes with a robust messenger providing a hassle-free yet feature-rich chatting with your project mates
+    * Comes with a robust messenger providing a hassle-free yet feature-rich chatting with your project mates
 - Invite new members quick and easy
-  * Know someone using the app? Search their name or phone number and invite them.
+    * Know someone using the app? Search their name or phone number and invite them.
 - One-click invite system
-  * Don't know who to add? You can just generate an invite link and post it wherever you want! People are gonna be one tap away from joining your project.
+    * Don't know who to add? You can just generate an invite link and post it wherever you want! People are gonna be one tap away from joining your project.
 
 ## Changelog
 
@@ -138,3 +138,4 @@ Timescape is a project management and messaging application designed to streamli
 ### 0.1.x: Initial release
 - Initial release of the app
 - All changes before this was not logged for versioning
+
