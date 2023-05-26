@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
@@ -18,8 +19,8 @@ android {
         applicationId "edu.bluejack22_2.timescape"
         minSdk 26
         targetSdk 33
-        versionCode 29
-        versionName "0.5.8HF - Phase 4 Alpha"
+        versionCode 30
+        versionName "0.6.0VCTesting - Phase 4 Alpha"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,8 +32,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     buildFeatures {
         viewBinding true
@@ -67,6 +68,11 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-process:2.6.1'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
     implementation 'com.github.yalantis:ucrop:2.2.6'
+    implementation 'io.agora.rtc:full-rtc-basic:4.2.0'
+    implementation 'io.agora.rtm:rtm-sdk:1.5.3'
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1"
+    implementation 'commons-codec:commons-codec:1.15'
+    implementation 'androidx.core:core-ktx:1.6.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

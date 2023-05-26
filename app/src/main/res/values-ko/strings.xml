@@ -303,6 +303,8 @@
     <string name="you_have_been">당신은 </string>
     <string name="the_project_should_now_be_visible_to_you_in_your_dashboard_you_can_now_collaborate_and_contribute_to_this_project_be_sure_to_also_check_the_project_chat_in_case_of_any_new_messages">프로젝트가 이제 대시보드에서 보이게 될 것입니다. 이제 이 프로젝트에 협력하고 기여할 수 있으며, 새로운 메시지가 있는지 확인하기 위해 프로젝트 채팅도 확인해주세요!</string>
     <string name="the_project_should_no_longer_be_visible_in_your_dashboard_and_your_access_to_contribute_to_the_project_has_been_revoked_if_you_think_that_this_is_a_mistake_please_contact_the_owner_of_the_project">프로젝트가 더 이상 대시보드에 표시되지 않아야 하며, 프로젝트에 기여할 수 있는 권한이 취소되었습니다. 만약 이것이 실수라고 생각하신다면, 프로젝트 소유자에게 문의해주세요.</string>
+    <string name="please_grant_camera_and_microphone_permissions">Please grant camera and microphone permissions</string>
+    <string name="TAG">TAG</string>
     <string-array name="project_completed_filter_options">
         <item>모든 완료 상태</item>
         <item>완료된 항목만</item>

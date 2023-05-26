@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
+        android:layout_alignEnd="@id/mute_button"
         android:layout_marginEnd="80dp"
         android:orientation="vertical">
 
@@ -48,12 +49,24 @@
         android:id="@+id/mute_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
+        android:layout_toStartOf="@id/live_button"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:paddingTop="16dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:paddingBottom="16dp"
         android:src="@drawable/outline_notifications_24" />
+
+    <ImageButton
+        android:id="@+id/live_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:paddingTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp"
+        android:src="@drawable/outline_voice_chat_24" />
 
 </RelativeLayout>

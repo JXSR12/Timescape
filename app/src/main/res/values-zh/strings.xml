@@ -303,6 +303,8 @@
     <string name="you_have_been">您已经</string>
     <string name="the_project_should_now_be_visible_to_you_in_your_dashboard_you_can_now_collaborate_and_contribute_to_this_project_be_sure_to_also_check_the_project_chat_in_case_of_any_new_messages">该项目现在应在您的仪表板中可见。您现在可以共同协作和贡献给该项目，请确保还要检查项目聊天以防有任何新消息！</string>
     <string name="the_project_should_no_longer_be_visible_in_your_dashboard_and_your_access_to_contribute_to_the_project_has_been_revoked_if_you_think_that_this_is_a_mistake_please_contact_the_owner_of_the_project">该项目不再应在您的仪表板中可见，并且您的参与项目的权限已被撤销。如果您认为这是个错误，请联系项目所有者。</string>
+    <string name="please_grant_camera_and_microphone_permissions">Please grant camera and microphone permissions</string>
+    <string name="TAG">TAG</string>
     <string-array name="project_completed_filter_options">
         <item>所有完成状态</item>
         <item>仅已完成</item>

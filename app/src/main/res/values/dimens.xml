@@ -12,4 +12,5 @@
     <dimen name="signup_text_margin_top">10dp</dimen>
     <dimen name="qr_code_size">240dp</dimen>
     <dimen name="max_height">360dp</dimen>
+    <dimen name="button_margin">10dp</dimen>
 </resources>

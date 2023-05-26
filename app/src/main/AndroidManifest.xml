@@ -13,6 +13,17 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <!-- The Agora SDK requires Bluetooth permissions in case users are using Bluetooth devices. -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <!-- For Android 12 and above devices, the following permission is also required. -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -80,6 +91,11 @@
             android:theme="@style/FullScreenTheme" />
         <activity
             android:name=".ProjectChatActivity"
+            android:theme="@style/FullScreenTheme"
+            android:windowSoftInputMode="adjustResize"
+            android:launchMode="singleTop"/>
+        <activity
+            android:name=".ProjectLiveActivity"
             android:theme="@style/FullScreenTheme"
             android:windowSoftInputMode="adjustResize"
             android:launchMode="singleTop"/>

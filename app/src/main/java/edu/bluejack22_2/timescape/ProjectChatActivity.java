@@ -90,6 +90,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import edu.bluejack22_2.timescape.model.Message;
 import edu.bluejack22_2.timescape.model.Project;
@@ -122,6 +123,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
     ImageButton attachImageButton;
     ImageButton inviteProjectButton;
     ImageButton muteButton;
+    ImageButton liveButton;
     RelativeLayout replyModeLayout;
     RelativeLayout newMessageLayout;
     TextView replyModeText;
@@ -182,6 +184,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             actionBarOnlineText = customActionBarView.findViewById(R.id.online_status);
             actionBarOnlineBullet = customActionBarView.findViewById(R.id.online_status_bullet);
             muteButton = customActionBarView.findViewById(R.id.mute_button);
+            liveButton = customActionBarView.findViewById(R.id.live_button);
             checkMuteStatusAndUpdateButton();
             muteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -233,6 +236,35 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
                 }
             });
 
+            liveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    String projectId = project.getUid(); // Assuming 'project' is your Project object
+                    DocumentReference liveRoomRef = db.collection("liveRooms").document(projectId);
+
+                    liveRoomRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    String activeChannelId = document.getString("activeChannelId");
+                                    if (activeChannelId == null || activeChannelId.isEmpty()) {
+                                        createAndJoinNewChannel(liveRoomRef);
+                                    } else {
+                                        joinExistingChannel(activeChannelId);
+                                    }
+                                } else {
+                                    createAndJoinNewChannel(liveRoomRef);
+                                }
+                            } else {
+                                Log.d(TAG, "Failed to get live room: ", task.getException());
+                            }
+                        }
+                    });
+                }
+            });
 
             // Set the custom view for the ActionBar
             actionBar.setCustomView(customActionBarView);
@@ -534,6 +566,29 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
 
 
     }
+
+    private void createAndJoinNewChannel(DocumentReference liveRoomRef) {
+        String newChannelId = UUID.randomUUID().toString();
+
+        liveRoomRef.set(new HashMap<String, Object>() {{
+            put("activeChannelId", newChannelId);
+        }});
+
+        // start ProjectLiveActivity with new channel ID
+        Intent intent = new Intent(ProjectChatActivity.this, ProjectLiveActivity.class);
+        intent.putExtra("channelId", newChannelId);
+        intent.putExtra("projectId", projectId);
+        startActivity(intent);
+    }
+
+    private void joinExistingChannel(String channelId) {
+        // start ProjectLiveActivity with existing channel ID
+        Intent intent = new Intent(ProjectChatActivity.this, ProjectLiveActivity.class);
+        intent.putExtra("channelId", channelId);
+        intent.putExtra("projectId", projectId);
+        startActivity(intent);
+    }
+
 
     private void checkMuteStatusAndUpdateButton() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();

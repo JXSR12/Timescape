@@ -549,7 +549,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             avatar.setLayoutParams(params);
         }
 
-        private TextDrawable generateAvatar(String userId) {
+        private static TextDrawable generateAvatar(String userId) {
             String content = "\\O/";
             Random random = new Random(userId.hashCode());
             int color = Color.argb(255, random.nextInt(256), random.nextInt(256), random.nextInt(256));
