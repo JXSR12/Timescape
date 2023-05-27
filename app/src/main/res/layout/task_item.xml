@@ -47,6 +47,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/round_drive_file_rename_outline_24" />
+        android:src="@drawable/round_more_vert_24" />
 
 </LinearLayout>

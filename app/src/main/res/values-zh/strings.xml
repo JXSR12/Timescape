@@ -303,8 +303,22 @@
     <string name="you_have_been">您已经</string>
     <string name="the_project_should_now_be_visible_to_you_in_your_dashboard_you_can_now_collaborate_and_contribute_to_this_project_be_sure_to_also_check_the_project_chat_in_case_of_any_new_messages">该项目现在应在您的仪表板中可见。您现在可以共同协作和贡献给该项目，请确保还要检查项目聊天以防有任何新消息！</string>
     <string name="the_project_should_no_longer_be_visible_in_your_dashboard_and_your_access_to_contribute_to_the_project_has_been_revoked_if_you_think_that_this_is_a_mistake_please_contact_the_owner_of_the_project">该项目不再应在您的仪表板中可见，并且您的参与项目的权限已被撤销。如果您认为这是个错误，请联系项目所有者。</string>
-    <string name="please_grant_camera_and_microphone_permissions">Please grant camera and microphone permissions</string>
-    <string name="TAG">TAG</string>
+    <string name="please_grant_camera_and_microphone_permissions">请授予相机和麦克风权限</string>
+    <string name="TAG">标签</string>
+    <string name="allow_camera_and_microphone_access_then_click_here_if_you_did_not_join_automatically">允许相机和麦克风访问，如果您没有自动加入，请单击此处</string>
+    <string name="timescape_screen_sharing">Timescape屏幕共享</string>
+    <string name="you_are_sharing_your_screen_to_a_live_room">您正在将屏幕共享到一个直播间</string>
+    <string name="timescape_screen_sharing_service">Timescape屏幕共享服务</string>
+    <string name="joining_live_room">加入直播间</string>
+    <string name="waiting_for_device_camera_to_be_ready">正在等待设备相机准备就绪</string>
+    <string name="camera_unavailable">相机不可用</string>
+    <string name="your_device_camera_is_inaccessible_at_the_moment_try_re_joining_or_you_can_continue_joining_without_camera">您的设备相机当前无法访问，请尝试重新加入或继续无相机加入。</string>
+    <string name="continue_str">继续</string>
+    <string name="successfully_changed_display_name">成功更改显示名称</string>
+    <string name="password_changed_successfully">密码已成功更改</string>
+    <string name="the_old_password_you_provided_is_incorrect">您提供的旧密码不正确</string>
+    <string name="display_name_cannot_be_empty">显示名称不能为空</string>
+
     <string-array name="project_completed_filter_options">
         <item>所有完成状态</item>
         <item>仅已完成</item>

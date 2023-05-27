@@ -5,12 +5,15 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:background="@drawable/chats_item_selector"
-    android:padding="16dp">
+    android:paddingTop="16dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="6dp">
 
     <ImageView
         android:id="@+id/avatarImageView"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
         android:src="@drawable/avatar_placeholder_chat"/>
 
     <LinearLayout
@@ -31,6 +34,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:text="Project Title"
+                android:textColor="@color/colorAccent"
                 android:textSize="16sp" />
 
             <ImageView

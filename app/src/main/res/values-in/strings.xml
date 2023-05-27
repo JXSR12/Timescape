@@ -303,8 +303,21 @@
     <string name="you_have_been">Anda telah </string>
     <string name="the_project_should_now_be_visible_to_you_in_your_dashboard_you_can_now_collaborate_and_contribute_to_this_project_be_sure_to_also_check_the_project_chat_in_case_of_any_new_messages">Proyek sekarang harus terlihat di dasbor Anda. Anda sekarang dapat berkolaborasi dan berkontribusi pada proyek ini, pastikan juga untuk memeriksa obrolan proyek jika ada pesan baru!</string>
     <string name="the_project_should_no_longer_be_visible_in_your_dashboard_and_your_access_to_contribute_to_the_project_has_been_revoked_if_you_think_that_this_is_a_mistake_please_contact_the_owner_of_the_project">Proyek tidak lagi harus terlihat di dasbor Anda, dan akses Anda untuk berkontribusi pada proyek ini telah dicabut. Jika Anda menganggap ini sebagai kesalahan, harap hubungi pemilik proyek.</string>
-    <string name="please_grant_camera_and_microphone_permissions">Please grant camera and microphone permissions</string>
+    <string name="please_grant_camera_and_microphone_permissions">Berikan izin kamera dan mikrofon</string>
     <string name="TAG">TAG</string>
+    <string name="allow_camera_and_microphone_access_then_click_here_if_you_did_not_join_automatically">Izinkan akses kamera dan mikrofon, lalu klik di sini jika Anda tidak bergabung secara otomatis</string>
+    <string name="timescape_screen_sharing">Timescape Screen Sharing</string>
+    <string name="you_are_sharing_your_screen_to_a_live_room">Anda sedang membagikan layar Anda ke ruang live</string>
+    <string name="timescape_screen_sharing_service">Layanan Berbagi Layar Timescape</string>
+    <string name="joining_live_room">Bergabung dengan Ruang Langsung</string>
+    <string name="waiting_for_device_camera_to_be_ready">Menunggu kamera perangkat siap</string>
+    <string name="camera_unavailable">Kamera tidak tersedia</string>
+    <string name="your_device_camera_is_inaccessible_at_the_moment_try_re_joining_or_you_can_continue_joining_without_camera">Kamera perangkat Anda tidak dapat diakses saat ini, coba bergabung kembali atau Anda dapat melanjutkan bergabung tanpa kamera.</string>
+    <string name="continue_str">Lanjutkan</string>
+    <string name="successfully_changed_display_name">Berhasil mengubah nama tampilan</string>
+    <string name="password_changed_successfully">Kata sandi berhasil diubah</string>
+    <string name="the_old_password_you_provided_is_incorrect">Kata sandi lama yang Anda berikan salah</string>
+    <string name="display_name_cannot_be_empty">Nama tampilan tidak boleh kosong</string>
     <string-array name="project_completed_filter_options">
         <item>Semua Status Selesai</item>
         <item>Hanya yang Selesai</item>

@@ -12,18 +12,11 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <ImageView
-            android:id="@+id/userAvatar"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp" />
-
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:backgroundTint="#19FF9800"
+            android:outlineAmbientShadowColor="@color/reverse_color"
             app:cardCornerRadius="8dp">
 
             <LinearLayout
@@ -31,6 +24,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/userAvatar"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="16dp" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/userDisplayName"
@@ -41,23 +41,13 @@
                     android:textStyle="bold"
                     android:textColor="@color/colorPrimary" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/editDisplayNameButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/edit_name"
-                    android:layout_marginTop="10dp"
-                    android:layout_gravity="center_horizontal"
-                    app:backgroundTint="@color/colorPrimary"
-                    android:textColor="#FFFFFF" />
-
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/userEmail"
                     android:layout_width="match_parent"
                     android:textAlignment="center"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:textSize="18sp"
+                    android:textSize="15sp"
                     android:textColor="@color/colorPrimaryDark" />
 
                 <com.google.android.material.textview.MaterialTextView
@@ -66,37 +56,60 @@
                     android:textAlignment="center"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:textSize="18sp"
+                    android:textSize="15sp"
                     android:textColor="@color/colorPrimaryDark" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/googleAccountMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:textAlignment="center"
+                    android:textColor="@color/reverse_color"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/editDisplayNameButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="@string/edit_name"
+                    android:textColor="#FFFFFF"
+                    app:backgroundTint="@color/colorPrimary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/changePasswordButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:text="@string/change_password"
+                    app:backgroundTint="@color/colorPrimary" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/logOutButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/sign_out"
+                    app:backgroundTint="@color/colorRed" />
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/changePasswordButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/change_password"
-            app:backgroundTint="@color/colorPrimary" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/googleAccountMessage"
-            android:layout_width="match_parent"
-            android:textAlignment="center"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:textSize="16sp"
-            android:textColor="@color/colorPrimaryDark" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/logOutButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/sign_out"
-            app:backgroundTint="@color/colorRed" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/versionText"

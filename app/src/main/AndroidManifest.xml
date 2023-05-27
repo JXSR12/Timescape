@@ -133,6 +133,11 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <service
+            android:name=".services.ScreenSharingForegroundService"
+            android:enabled="true"
+            android:exported="false"
+            />
     </application>
 
 </manifest>

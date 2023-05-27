@@ -1,29 +1,35 @@
 package edu.bluejack22_2.timescape;
 
 import static android.content.ContentValues.TAG;
-import static io.agora.rtc2.video.VideoEncoderConfiguration.STANDARD_BITRATE;
 
+import static edu.bluejack22_2.timescape.services.ScreenSharingForegroundService.CHANNEL_ID;
+
+import android.app.Notification;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.hardware.camera2.CameraManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.Switch;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -32,19 +38,17 @@ import edu.bluejack22_2.timescape.custom_ui.AgoraButton;
 import edu.bluejack22_2.timescape.custom_ui.AgoraConnectionData;
 import edu.bluejack22_2.timescape.custom_ui.AgoraSettings;
 import edu.bluejack22_2.timescape.custom_ui.AgoraVideoViewer;
+import edu.bluejack22_2.timescape.custom_ui.AgoraVideoViewerDelegate;
 import edu.bluejack22_2.timescape.custom_ui.AgoraViewerColors;
+import edu.bluejack22_2.timescape.services.ScreenSharingForegroundService;
 import io.agora.rtc2.Constants;
 import io.agora.media.RtcTokenBuilder2;
 import io.agora.media.RtcTokenBuilder2.Role;
 
-import io.agora.rtc2.IRtcEngineEventHandler;
 import io.agora.rtc2.RtcEngine;
-import io.agora.rtc2.RtcEngineConfig;
 import io.agora.rtc2.video.VideoCanvas;
 import io.agora.rtc2.ChannelMediaOptions;
-import io.agora.rtc2.video.VideoEncoderConfiguration;
 import kotlin.jvm.functions.Function1;
-import kotlin.jvm.internal.markers.KMutableSet;
 
 
 //public class ProjectLiveActivity extends BaseActivity {
@@ -261,15 +265,6 @@ import kotlin.jvm.internal.markers.KMutableSet;
 //    }
 //}
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -277,11 +272,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import android.os.Build;
+import android.util.DisplayMetrics;
+import android.widget.ProgressBar;
+
+import io.agora.rtc2.ScreenCaptureParameters;
+
+
 public class ProjectLiveActivity extends BaseActivity{
     // Object of AgoraVideoVIewer class
     private AgoraVideoViewer agView = null;
 
     // Fill the channel name.
+    Button joinButton;
+
+    private final int DEFAULT_SHARE_FRAME_RATE = 24;
+    private boolean isSharingScreen = false;
+    private Intent fgServiceIntent;
 
     private final String appCertificate = "93a77278a7c74869a0052b5aff9a1b03";
     private final String appId = "8922e10ce4734dbbb09a66d965cc0a08";
@@ -290,6 +297,8 @@ public class ProjectLiveActivity extends BaseActivity{
     private String channelName = "WILL BE SET";
 
     private String projectId = "NONE";
+
+    private RtcEngine agoraEngine;
 
     private void initializeAndJoinChannel() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -315,25 +324,45 @@ public class ProjectLiveActivity extends BaseActivity{
                             agColors.setMicFlag(getColor(R.color.orange_acc0));
                             agSettings.setColors(agColors);
 
-                            Set<AgoraSettings.BuiltinButton> agButtons = agSettings.getEnabledButtons();
-                            agButtons.remove(AgoraSettings.BuiltinButton.END);
-                            AgoraButton newEnd = new AgoraButton(ProjectLiveActivity.this);
-                            newEnd.setClickAction(new Function1<AgoraButton, Object>() {
+                            AgoraButton screenShare = new AgoraButton(ProjectLiveActivity.this);
+                            screenShare.setClickAction(new Function1<AgoraButton, Object>() {
                                 @Override
                                 public Object invoke(AgoraButton agoraButton) {
-                                    agView.leaveChannel();
-                                    onBackPressed();
-
+                                    shareScreen(agoraButton);
                                     return null;
                                 }
                             });
 
-                            newEnd.setImageResource(R.drawable.round_close_24);
-                            newEnd.getBackground().setTint(getColor(R.color.colorRed));
+                            screenShare.setImageResource(R.drawable.round_mobile_screen_share_24);
+                            screenShare.getBackground().setTint(Color.GRAY);
 
                             List<AgoraButton> extraBtns = new ArrayList<>();
-                            extraBtns.add(newEnd);
+
+                            AgoraButton endBtn = new AgoraButton(ProjectLiveActivity.this);
+                            endBtn.setImageResource(R.drawable.round_close_24);
+                            endBtn.getBackground().setTint(getColor(R.color.colorRed));
+                            endBtn.setClickAction(new Function1<AgoraButton, Object>() {
+                                @Override
+                                public Object invoke(AgoraButton agoraButton) {
+                                    agView.getAgkit().stopPreview();
+                                    agView.leaveChannel();
+                                    agoraEngine.stopScreenCapture();
+                                    onBackPressed();
+                                    return null;
+                                }
+                            });
+
+                            extraBtns.add(screenShare);
+                            extraBtns.add(endBtn);
+
                             agSettings.setExtraButtons(extraBtns);
+
+                            Set<AgoraSettings.BuiltinButton> enabledButtons = new HashSet<>();
+                            enabledButtons.add(AgoraSettings.BuiltinButton.CAMERA);
+                            enabledButtons.add(AgoraSettings.BuiltinButton.MIC);
+                            enabledButtons.add(AgoraSettings.BuiltinButton.FLIP);
+
+                            agSettings.setEnabledButtons(enabledButtons);
 
                             agView = new AgoraVideoViewer(ProjectLiveActivity.this,
                                     new AgoraConnectionData(appId, token),
@@ -341,7 +370,10 @@ public class ProjectLiveActivity extends BaseActivity{
                                     agSettings,
                                     userId,
                                     displayName);
+
                             agView.setStyle(AgoraVideoViewer.Style.FLOATING);
+
+                            agoraEngine = agView.getAgkit();
 
                         } catch (Exception e) {
                             Log.e("AgoraVideoViewer",
@@ -368,7 +400,76 @@ public class ProjectLiveActivity extends BaseActivity{
         });
     }
 
+    public void shareScreen(View view) {
+        AgoraButton sharingButton = (AgoraButton) view;
 
+        if (!isSharingScreen) { // Start sharing
+            // Ensure that your Android version is Lollipop or higher.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                fgServiceIntent = new Intent(this, ScreenSharingForegroundService.class);
+                startForegroundService(fgServiceIntent);
+            }
+            // Get the screen metrics
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+            // Set screen capture parameters
+            ScreenCaptureParameters screenCaptureParameters = new ScreenCaptureParameters();
+            screenCaptureParameters.captureVideo = true;
+            screenCaptureParameters.videoCaptureParameters.width = metrics.widthPixels;
+            screenCaptureParameters.videoCaptureParameters.height = metrics.heightPixels;
+            screenCaptureParameters.videoCaptureParameters.framerate = DEFAULT_SHARE_FRAME_RATE;
+            screenCaptureParameters.captureAudio = true;
+            screenCaptureParameters.audioCaptureParameters.captureSignalVolume = 50;
+
+            // Start screen sharing
+            agoraEngine.startScreenCapture(screenCaptureParameters);
+            isSharingScreen = true;
+//            startScreenSharePreview();
+            // Update channel media options to publish the screen sharing video stream
+            updateMediaPublishOptions(true);
+            sharingButton.getBackground().setTint(getColor(R.color.colorGreen));
+
+        } else { // Stop sharing
+            agoraEngine.stopScreenCapture();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (fgServiceIntent!=null) stopService(fgServiceIntent);
+            }
+            isSharingScreen = false;
+            sharingButton.getBackground().setTint(Color.GRAY);
+
+            // Restore camera and microphone publishing
+            updateMediaPublishOptions(false);
+//            agView.addLocalVideo();
+        }
+    }
+
+    private void startScreenSharePreview() {
+        // Create render view by RtcEngine
+        FrameLayout container = agView;
+        SurfaceView surfaceView = new SurfaceView(getBaseContext());
+        if (container.getChildCount() > 0) {
+            container.removeAllViews();
+        }
+        // Add SurfaceView to the local FrameLayout
+        container.addView(surfaceView,
+                new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT));
+
+        // Setup local video to render your local camera preview
+        agoraEngine.setupLocalVideo(new VideoCanvas(surfaceView, Constants.RENDER_MODE_FIT, 0));
+        agoraEngine.startPreview(Constants.VideoSourceType.VIDEO_SOURCE_SCREEN_PRIMARY);
+    }
+
+
+    void updateMediaPublishOptions(boolean publishScreen) {
+        ChannelMediaOptions mediaOptions = new ChannelMediaOptions();
+        mediaOptions.publishCameraTrack = !publishScreen;
+        mediaOptions.publishMicrophoneTrack = !publishScreen;
+        mediaOptions.publishScreenCaptureVideo = publishScreen;
+        mediaOptions.publishScreenCaptureAudio = publishScreen;
+        agoraEngine.updateChannelMediaOptions(mediaOptions);
+    }
 
 
     void joinChannel(){
@@ -457,8 +558,8 @@ public class ProjectLiveActivity extends BaseActivity{
         if (checkPermission()) {
             joinChannel();
         } else {
-            Button joinButton = new Button(this);
-            joinButton.setText("Allow camera and microphone access, then click here");
+            joinButton = new Button(this);
+            joinButton.setText(R.string.allow_camera_and_microphone_access_then_click_here_if_you_did_not_join_automatically);
             joinButton.setOnClickListener(new View.OnClickListener() {
                 // When the button is clicked, check permissions again and join channel
                 @Override
@@ -470,6 +571,8 @@ public class ProjectLiveActivity extends BaseActivity{
                 }
             });
             this.addContentView(joinButton, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 200));
+
+            requestPermission();
         }
     }
 
@@ -493,6 +596,7 @@ public class ProjectLiveActivity extends BaseActivity{
                     boolean microphoneAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
 
                     if (cameraAccepted && microphoneAccepted) {
+                        ((ViewGroup) joinButton.getParent()).removeView(joinButton);
                         joinChannel();
                     }
                 }
@@ -511,12 +615,15 @@ public class ProjectLiveActivity extends BaseActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_project_live_uikit);
         projectId = getIntent().getStringExtra("projectId");
+
         initializeAndJoinChannel();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        agView.leaveChannel();
+        if(agView != null){
+            agView.leaveChannel();
+        }
     }
 }

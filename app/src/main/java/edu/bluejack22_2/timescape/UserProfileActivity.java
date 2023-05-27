@@ -153,7 +153,7 @@ public class UserProfileActivity extends BaseActivity {
                 .setTitle(R.string.edit_display_name)
                 .setPositiveButton(R.string.save, (dialog, which) -> {
                     String newDisplayName = editDisplayName.getText().toString();
-                    userProfileViewModel.updateDisplayName(newDisplayName);
+                    userProfileViewModel.updateDisplayName(this, newDisplayName);
                 })
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
 
@@ -177,7 +177,7 @@ public class UserProfileActivity extends BaseActivity {
                     String confirmPassword = editConfirmPassword.getText().toString();
 
                     if (newPassword.equals(confirmPassword)) {
-                        userProfileViewModel.changePassword(oldPassword, newPassword);
+                        userProfileViewModel.changePassword(this, oldPassword, newPassword);
                     } else {
                         Toast.makeText(UserProfileActivity.this, R.string.new_passwords_do_not_match, Toast.LENGTH_SHORT).show();
                     }

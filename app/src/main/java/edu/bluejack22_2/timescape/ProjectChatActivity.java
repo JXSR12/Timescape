@@ -14,6 +14,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.hardware.camera2.CameraManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -137,6 +138,10 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
     private MemberAdapter memberAdapter;
     private boolean firstLoadChat = true;
 
+    private AlertDialog waitCamDialog;
+
+    private boolean receiveCameraCallback = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -239,30 +244,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
             liveButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-                    String projectId = project.getUid(); // Assuming 'project' is your Project object
-                    DocumentReference liveRoomRef = db.collection("liveRooms").document(projectId);
-
-                    liveRoomRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot document = task.getResult();
-                                if (document.exists()) {
-                                    String activeChannelId = document.getString("activeChannelId");
-                                    if (activeChannelId == null || activeChannelId.isEmpty()) {
-                                        createAndJoinNewChannel(liveRoomRef);
-                                    } else {
-                                        joinExistingChannel(activeChannelId);
-                                    }
-                                } else {
-                                    createAndJoinNewChannel(liveRoomRef);
-                                }
-                            } else {
-                                Log.d(TAG, "Failed to get live room: ", task.getException());
-                            }
-                        }
-                    });
+                    checkCameraAvailabilityAndInitialize();
                 }
             });
 
@@ -563,9 +545,109 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
 
         getProjectMembers(projectId);
         initTypingStatusListener();
-
-
     }
+
+    private void launchLiveRoom(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String projectId = project.getUid(); // Assuming 'project' is your Project object
+        DocumentReference liveRoomRef = db.collection("liveRooms").document(projectId);
+
+        liveRoomRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String activeChannelId = document.getString("activeChannelId");
+                        if (activeChannelId == null || activeChannelId.isEmpty()) {
+                            createAndJoinNewChannel(liveRoomRef);
+                        } else {
+                            joinExistingChannel(activeChannelId);
+                        }
+                    } else {
+                        createAndJoinNewChannel(liveRoomRef);
+                    }
+                } else {
+                    Log.d(TAG, "Failed to get live room: ", task.getException());
+                }
+            }
+        });
+    }
+
+    private void checkCameraAvailabilityAndInitialize() {
+        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(R.string.joining_live_room)
+                .setMessage(R.string.waiting_for_device_camera_to_be_ready);
+
+        ProgressBar progressBar = new ProgressBar(this);
+        builder.setView(progressBar);
+        builder.setCancelable(true);
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                // Handle cancellation
+                receiveCameraCallback = false;
+                cameraManager.unregisterAvailabilityCallback(cameraAvailabilityCallback);
+            }
+        });
+
+        waitCamDialog = builder.create();
+        waitCamDialog.show();
+
+        cameraManager.registerAvailabilityCallback(cameraAvailabilityCallback, new Handler(Looper.getMainLooper()));
+        receiveCameraCallback = true;
+    }
+
+    CameraManager.AvailabilityCallback cameraAvailabilityCallback = new CameraManager.AvailabilityCallback() {
+        @Override
+        public void onCameraAvailable(@NonNull String cameraId) {
+            super.onCameraAvailable(cameraId);
+            if(!receiveCameraCallback) return;
+//             Camera is available, you can initialize and join channel
+            if (waitCamDialog != null) {
+                waitCamDialog.dismiss();
+            }
+            waitCamDialog.dismiss();
+            receiveCameraCallback = false;
+            ((CameraManager) getSystemService(Context.CAMERA_SERVICE)).unregisterAvailabilityCallback(cameraAvailabilityCallback);
+
+            launchLiveRoom();
+        }
+
+        @Override
+        public void onCameraUnavailable(@NonNull String cameraId) {
+            super.onCameraUnavailable(cameraId);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(ProjectChatActivity.this);
+            builder.setTitle(R.string.camera_unavailable)
+                    .setMessage(R.string.your_device_camera_is_inaccessible_at_the_moment_try_re_joining_or_you_can_continue_joining_without_camera)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.continue_str, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                            receiveCameraCallback = false;
+                            ((CameraManager) getSystemService(Context.CAMERA_SERVICE)).unregisterAvailabilityCallback(cameraAvailabilityCallback);
+                            launchLiveRoom();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    }).setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            ((CameraManager) getSystemService(Context.CAMERA_SERVICE)).unregisterAvailabilityCallback(cameraAvailabilityCallback);
+                        }
+                    });
+
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+
+    };
 
     private void createAndJoinNewChannel(DocumentReference liveRoomRef) {
         String newChannelId = UUID.randomUUID().toString();

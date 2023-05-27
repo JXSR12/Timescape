@@ -21,7 +21,8 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="10dp"
             android:text="@string/recent_projects"
-            android:textSize="18sp" />
+            android:textSize="24sp"
+            android:textStyle="bold"/>
 
         <GridView
             android:id="@+id/recent_projects_grid_view"
@@ -54,27 +55,35 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
             android:text="@string/all_projects"
-            android:textSize="18sp" />
+            android:textSize="24sp"
+            android:textStyle="bold"/>
 
         <Spinner
             android:id="@+id/filter_completion_spinner"
             android:padding="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@drawable/spinner_round_background"
+            android:layout_margin="8dp"
+            android:popupBackground="@drawable/spinner_round_popup_background" />
 
         <Spinner
             android:id="@+id/filter_deadline_spinner"
             android:padding="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@drawable/spinner_round_background"
+            android:layout_margin="8dp"
+            android:popupBackground="@drawable/spinner_round_popup_background" />
+
 
         <ListView
             android:id="@+id/all_projects_list_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="0.5dp" />
+            android:divider="@color/slight_light"
+            android:dividerHeight="0.8dp" />
 
         <TextView
             android:id="@+id/all_projects_placeholder"

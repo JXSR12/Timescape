@@ -16,6 +16,7 @@
     <color name="mention_highlight">#36FFE081</color>
 
     <color name="colorRed">#FF3939</color>
+    <color name="colorGreen">#0D7E3A</color>
     <color name="cardBackground">#EEEEEE</color>
 
     <color name="colorPrimary">#FF9D0B</color>
@@ -28,6 +29,8 @@
 
     <color name="chat_background_color">#FFF6EB</color>
     <color name="reverse_color">#2B2B2B</color>
+    <color name="reverse_slight_light">#454545</color>
+    <color name="slight_light">#EFEFEF</color>
     <color name="chat_bottombar_color">#FFFFFF</color>
     <color name="onPressed">#34FFFFFF</color>
 </resources>

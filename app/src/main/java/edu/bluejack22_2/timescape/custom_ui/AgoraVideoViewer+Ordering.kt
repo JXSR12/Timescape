@@ -165,7 +165,7 @@ internal class FloatingViewAdapter(var uidList: List<Int>, private val agoraVC: 
         val linearLayout = LinearLayout(parent.context)
         val pinIcon = ImageView(parent.context)
         pinIcon.setImageResource(R.drawable.round_push_pin_24)
-        pinIcon.layoutParams = ViewGroup.LayoutParams(100, 100)
+        pinIcon.layoutParams = ViewGroup.LayoutParams(60, 60)
         linearLayout.addView(pinIcon)
         linearLayout.gravity = Gravity.CENTER
 

@@ -37,7 +37,7 @@ internal fun AgoraVideoViewer.getCameraButton(): AgoraButton {
     agCamButton.clickAction = {
         (this.context as Activity).runOnUiThread {
             it.isSelected = !it.isSelected
-            it.background.setTint(if (it.isSelected) Color.RED else Color.GRAY)
+            it.background.setTint(if (it.isSelected) resources.getColor(R.color.colorRed) else Color.GRAY)
             this.agkit.enableLocalVideo(!it.isSelected)
         }
     }
@@ -54,12 +54,12 @@ internal fun AgoraVideoViewer.getMicButton(): AgoraButton {
     val agMicButton = AgoraButton(context = this.context)
     agMicButton.clickAction = {
         it.isSelected = !it.isSelected
-        it.background.setTint(if (it.isSelected) Color.RED else Color.GRAY)
+        it.background.setTint(if (it.isSelected) resources.getColor(R.color.colorRed) else Color.GRAY)
         this.userVideoLookup[this.userID]?.audioMuted = it.isSelected
         this.agkit.muteLocalAudioStream(it.isSelected)
     }
     this.micButton = agMicButton
-    agMicButton.setImageResource(android.R.drawable.stat_notify_call_mute)
+    agMicButton.setImageResource(R.drawable.round_mic_off_24)
     return agMicButton
 }
 @ExperimentalUnsignedTypes
@@ -76,7 +76,7 @@ internal fun AgoraVideoViewer.getFlipButton(): AgoraButton {
     return agFlipButton
 }
 @ExperimentalUnsignedTypes
-internal fun AgoraVideoViewer.getEndCallButton(): AgoraButton {
+public fun AgoraVideoViewer.getEndCallButton(): AgoraButton {
     this.endCallButton?.let {
         return it
     }
@@ -85,15 +85,10 @@ internal fun AgoraVideoViewer.getEndCallButton(): AgoraButton {
         this.agkit.stopPreview()
         this.leaveChannel()
     }
-    hangupButton.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
-    hangupButton.background.setTint(Color.RED)
+    hangupButton.setImageResource(R.drawable.round_close_24)
+    hangupButton.background.setTint(resources.getColor(R.color.colorRed))
     this.endCallButton = hangupButton
     return hangupButton
-}
-
-@ExperimentalUnsignedTypes
-internal fun AgoraVideoViewer.getScreenShareButton(): AgoraButton? {
-    return null
 }
 
 @ExperimentalUnsignedTypes
@@ -113,6 +108,7 @@ internal fun AgoraVideoViewer.builtinButtons(): MutableList<AgoraButton> {
 @ExperimentalUnsignedTypes
 internal fun AgoraVideoViewer.addVideoButtons() {
     val container = this.getControlContainer()
+
     val buttons = this.builtinButtons() + this.agoraSettings.extraButtons
     container.visibility = if (buttons.isEmpty()) View.INVISIBLE else View.VISIBLE
 

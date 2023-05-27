@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/chats_item_selector"
     android:padding="16dp">
 
     <TextView
@@ -14,6 +15,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/sent_time"
         app:layout_constraintEnd_toStartOf="@+id/sent_time"
         app:layout_constraintStart_toStartOf="parent"
+        android:textColor="@color/reverse_color"
         app:layout_constraintTop_toTopOf="parent" />
     <TextView
         android:id="@+id/sent_time"

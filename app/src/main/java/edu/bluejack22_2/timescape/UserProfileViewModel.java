@@ -2,6 +2,7 @@ package edu.bluejack22_2.timescape;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
@@ -68,9 +69,13 @@ public class UserProfileViewModel extends ViewModel {
     }
 
 
-    public void updateDisplayName(String newDisplayName) {
+    public void updateDisplayName(Context ctx, String newDisplayName) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
+        if(newDisplayName.trim().isEmpty()){
+            updateMessage.setValue(ctx.getString(R.string.display_name_cannot_be_empty));
+            return;
+        }
         if (user != null) {
             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                     .setDisplayName(newDisplayName)
@@ -86,7 +91,7 @@ public class UserProfileViewModel extends ViewModel {
                             userRef.update("displayName", newDisplayName)
                                     .addOnSuccessListener(aVoid -> {
                                         Log.d(TAG, "DocumentSnapshot successfully updated!");
-                                        updateMessage.setValue("Successfully changed display name");
+                                        updateMessage.setValue(ctx.getString(R.string.successfully_changed_display_name));
                                     })
                                     .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
                             fetchUserDetails();
@@ -96,7 +101,7 @@ public class UserProfileViewModel extends ViewModel {
     }
 
 
-    public void changePassword(String oldPassword, String newPassword) {
+    public void changePassword(Context ctx, String oldPassword, String newPassword) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user != null && user.getEmail() != null) {
@@ -111,11 +116,11 @@ public class UserProfileViewModel extends ViewModel {
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful()) {
                                             Log.d(TAG, "User password updated.");
-                                            updateMessage.setValue("Password changed successfully");
+                                            updateMessage.setValue(ctx.getString(R.string.password_changed_successfully));
                                         }
                                     });
                         } else {
-                            updateMessage.setValue("The old password you provided is incorrect");
+                            updateMessage.setValue(ctx.getString(R.string.the_old_password_you_provided_is_incorrect));
                         }
                     });
         }

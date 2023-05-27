@@ -151,10 +151,10 @@ public class InboxAdapter extends RecyclerView.Adapter<InboxAdapter.ViewHolder> 
             timeAgoTextView.setText(getFriendlyTimeAgo(message.getSentTime()));
             if (message.isRead()) {
                 titleTextView.setTypeface(null, Typeface.NORMAL);
-                titleTextView.setTextColor(ContextCompat.getColor(context, R.color.orange_acc0));
+                titleTextView.setTextColor(ContextCompat.getColor(context, R.color.reverse_slight_light));
             } else {
                 titleTextView.setTypeface(null, Typeface.BOLD);
-                titleTextView.setTextColor(ContextCompat.getColor(context, R.color.orange_def2));
+                titleTextView.setTextColor(ContextCompat.getColor(context, R.color.reverse_color));
             }
         }
     }

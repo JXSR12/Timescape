@@ -303,8 +303,21 @@
     <string name="you_have_been">당신은 </string>
     <string name="the_project_should_now_be_visible_to_you_in_your_dashboard_you_can_now_collaborate_and_contribute_to_this_project_be_sure_to_also_check_the_project_chat_in_case_of_any_new_messages">프로젝트가 이제 대시보드에서 보이게 될 것입니다. 이제 이 프로젝트에 협력하고 기여할 수 있으며, 새로운 메시지가 있는지 확인하기 위해 프로젝트 채팅도 확인해주세요!</string>
     <string name="the_project_should_no_longer_be_visible_in_your_dashboard_and_your_access_to_contribute_to_the_project_has_been_revoked_if_you_think_that_this_is_a_mistake_please_contact_the_owner_of_the_project">프로젝트가 더 이상 대시보드에 표시되지 않아야 하며, 프로젝트에 기여할 수 있는 권한이 취소되었습니다. 만약 이것이 실수라고 생각하신다면, 프로젝트 소유자에게 문의해주세요.</string>
-    <string name="please_grant_camera_and_microphone_permissions">Please grant camera and microphone permissions</string>
-    <string name="TAG">TAG</string>
+    <string name="please_grant_camera_and_microphone_permissions">카메라 및 마이크 권한을 허용해주세요</string>
+    <string name="TAG">태그</string>
+    <string name="allow_camera_and_microphone_access_then_click_here_if_you_did_not_join_automatically">카메라 및 마이크 접근을 허용하고, 자동으로 참여되지 않았다면 여기를 클릭하세요</string>
+    <string name="timescape_screen_sharing">타임스케이프 화면 공유</string>
+    <string name="you_are_sharing_your_screen_to_a_live_room">라이브 방송에 화면을 공유 중입니다</string>
+    <string name="timescape_screen_sharing_service">타임스케이프 화면 공유 서비스</string>
+    <string name="joining_live_room">라이브 방송에 참여 중입니다</string>
+    <string name="waiting_for_device_camera_to_be_ready">기기 카메라가 준비될 때까지 기다리는 중입니다</string>
+    <string name="camera_unavailable">카메라를 사용할 수 없습니다</string>
+    <string name="your_device_camera_is_inaccessible_at_the_moment_try_re_joining_or_you_can_continue_joining_without_camera">현재 기기의 카메라에 접근할 수 없습니다. 다시 참여하거나 카메라 없이 참여를 계속할 수 있습니다.</string>
+    <string name="continue_str">계속하기</string>
+    <string name="successfully_changed_display_name">이름 변경에 성공했습니다</string>
+    <string name="password_changed_successfully">비밀번호가 성공적으로 변경되었습니다</string>
+    <string name="the_old_password_you_provided_is_incorrect">제공한 이전 비밀번호가 잘못되었습니다</string>
+    <string name="display_name_cannot_be_empty">이름을 입력해야 합니다</string>
     <string-array name="project_completed_filter_options">
         <item>모든 완료 상태</item>
         <item>완료된 항목만</item>

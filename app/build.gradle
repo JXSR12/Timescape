@@ -19,18 +19,29 @@ android {
         applicationId "edu.bluejack22_2.timescape"
         minSdk 26
         targetSdk 33
-        versionCode 30
-        versionName "0.6.0VCTesting - Phase 4 Alpha"
+        versionCode 31
+        versionName "0.6.2 - Phase 4 Alpha"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+            universalApk true
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -44,7 +55,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:31.5.0')
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-auth'
-    implementation 'com.google.firebase:firebase-firestore:24.6.0'
+    implementation 'com.google.firebase:firebase-firestore:24.6.1'
     implementation 'com.google.firebase:firebase-storage:20.2.0'
     implementation 'com.google.android.gms:play-services-auth:20.5.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -68,11 +79,12 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-process:2.6.1'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
     implementation 'com.github.yalantis:ucrop:2.2.6'
-    implementation 'io.agora.rtc:full-rtc-basic:4.2.0'
+    implementation 'io.agora.rtc:full-sdk:4.2.0'
     implementation 'io.agora.rtm:rtm-sdk:1.5.3'
+    implementation files('libs/AgoraScreenShareExtension.aar')
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1"
     implementation 'commons-codec:commons-codec:1.15'
-    implementation 'androidx.core:core-ktx:1.6.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

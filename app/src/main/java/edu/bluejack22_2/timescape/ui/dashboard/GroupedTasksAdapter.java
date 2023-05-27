@@ -186,6 +186,8 @@ public class GroupedTasksAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         private void updateTask(String title, String description, View itemView, Task task) {
             String projectId = task.getProject().getId();
             FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            View parent = itemView.getRootView();
             db.collection("projects").document(projectId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -198,17 +200,17 @@ public class GroupedTasksAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        Snackbar.make(itemView, R.string.task_updated, Snackbar.LENGTH_SHORT).show();
+                                        Snackbar.make(parent, R.string.task_updated, Snackbar.LENGTH_SHORT).show();
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Snackbar.make(itemView, R.string.error_while_updating_task, Snackbar.LENGTH_SHORT).show();
+                                        Snackbar.make(parent, R.string.error_while_updating_task, Snackbar.LENGTH_SHORT).show();
                                     }
                                 });
                     } else {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
+                        AlertDialog.Builder builder = new AlertDialog.Builder(parent.getContext());
                         builder.setTitle(R.string.no_access)
                                 .setMessage(R.string.it_seems_that_you_are_not_allowed_to_perform_this_action_please_refresh_or_check_if_you_are_still_part_of_the_project)
                                 .setPositiveButton(R.string.ok, null)
@@ -221,11 +223,12 @@ public class GroupedTasksAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         private void deleteTask(Task task, View itemView, ViewGroup parentView) {
             String projectId = task.getProject().getId();
             FirebaseFirestore db = FirebaseFirestore.getInstance();
+            View parent = itemView.getRootView();
             db.collection("projects").document(projectId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     if ((documentSnapshot.exists() && documentSnapshot.get("members." + FirebaseAuth.getInstance().getCurrentUser().getUid()) != null) || documentSnapshot.getDocumentReference("owner").getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
+                        AlertDialog.Builder builder = new AlertDialog.Builder(parentView.getContext());
                         builder.setTitle(R.string.delete_this_task)
                                 .setMessage(R.string.this_action_cannot_be_undone)
                                 .setPositiveButton(R.string.delete_b, new DialogInterface.OnClickListener() {
@@ -235,13 +238,13 @@ public class GroupedTasksAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        Snackbar.make(itemView, R.string.task_deleted, Snackbar.LENGTH_SHORT).show();
+                                                        Snackbar.make(parentView, R.string.task_deleted, Snackbar.LENGTH_SHORT).show();
                                                     }
                                                 })
                                                 .addOnFailureListener(new OnFailureListener() {
                                                     @Override
                                                     public void onFailure(@NonNull Exception e) {
-                                                        Snackbar.make(itemView, R.string.error_while_deleting_task, Snackbar.LENGTH_SHORT).show();
+                                                        Snackbar.make(parentView, R.string.error_while_deleting_task, Snackbar.LENGTH_SHORT).show();
                                                     }
                                                 });
                                     }
@@ -253,7 +256,7 @@ public class GroupedTasksAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                                 });
                         builder.create().show();
                     } else {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
+                        AlertDialog.Builder builder = new AlertDialog.Builder(parentView.getContext());
                         builder.setTitle(R.string.no_access)
                                 .setMessage(R.string.it_seems_that_you_are_not_allowed_to_perform_this_action_please_refresh_or_check_if_you_are_still_part_of_the_project)
                                 .setPositiveButton(R.string.ok, null)

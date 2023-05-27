@@ -27,6 +27,10 @@
         android:shadowColor="@color/black"
         android:shadowRadius="2"
         android:layout_marginTop="8dp"
+        android:padding="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:background="@drawable/spinner_round_popup_background"
         android:textSize="20sp"/>
 
     <FrameLayout

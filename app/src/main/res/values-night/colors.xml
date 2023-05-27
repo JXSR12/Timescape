@@ -5,5 +5,7 @@
     <color name="chat_background_color">#2B2B2B</color>
     <color name="chat_bottombar_color">#252525</color>
     <color name="reverse_color">#E3E3E3</color>
+    <color name="reverse_slight_light">#A6A6A6</color>
+    <color name="slight_light">#191919</color>
     <color name="cardBackground">#2B2B2B</color>
 </resources>

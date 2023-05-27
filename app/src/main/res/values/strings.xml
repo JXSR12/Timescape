@@ -305,6 +305,19 @@
     <string name="the_project_should_no_longer_be_visible_in_your_dashboard_and_your_access_to_contribute_to_the_project_has_been_revoked_if_you_think_that_this_is_a_mistake_please_contact_the_owner_of_the_project">" The project should no longer be visible in your dashboard, and your access to contribute to the project has been revoked. If you think that this is a mistake, please contact the owner of the project."</string>
     <string name="please_grant_camera_and_microphone_permissions">Please grant camera and microphone permissions</string>
     <string name="TAG">TAG</string>
+    <string name="allow_camera_and_microphone_access_then_click_here_if_you_did_not_join_automatically">Allow camera and microphone access, then click here if you did not join automatically</string>
+    <string name="timescape_screen_sharing">Timescape Screen Sharing</string>
+    <string name="you_are_sharing_your_screen_to_a_live_room">You are sharing your screen to a live room</string>
+    <string name="timescape_screen_sharing_service">Timescape Screen Sharing Service</string>
+    <string name="joining_live_room">Joining Live Room</string>
+    <string name="waiting_for_device_camera_to_be_ready">Waiting for device camera to be ready</string>
+    <string name="camera_unavailable">Camera Unavailable</string>
+    <string name="your_device_camera_is_inaccessible_at_the_moment_try_re_joining_or_you_can_continue_joining_without_camera">Your device camera is inaccessible at the moment, try re-joining or you can continue joining without camera.</string>
+    <string name="continue_str">Continue</string>
+    <string name="successfully_changed_display_name">Successfully changed display name</string>
+    <string name="password_changed_successfully">Password changed successfully</string>
+    <string name="the_old_password_you_provided_is_incorrect">The old password you provided is incorrect</string>
+    <string name="display_name_cannot_be_empty">Display name cannot be empty</string>
     <string-array name="project_completed_filter_options">
         <item>All Completion Status</item>
         <item>Completed Only</item>

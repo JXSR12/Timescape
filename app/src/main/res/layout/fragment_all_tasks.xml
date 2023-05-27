@@ -16,7 +16,10 @@
             android:id="@+id/filter_spinner"
             android:padding="12dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@drawable/spinner_round_background"
+            android:layout_margin="8dp"
+            android:popupBackground="@drawable/spinner_round_popup_background"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/tasks_recycler_view"

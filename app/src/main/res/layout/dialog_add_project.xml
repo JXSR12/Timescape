@@ -60,7 +60,7 @@
         app:boxBackgroundMode="outline"
         app:errorEnabled="true"
         app:endIconMode="custom"
-        app:endIconDrawable="@drawable/round_logout_24"
+        app:endIconDrawable="@drawable/round_today_24"
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText

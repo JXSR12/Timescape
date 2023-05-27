@@ -118,7 +118,7 @@ public class ProjectMembersAdapter extends RecyclerView.Adapter<ProjectMembersAd
             mAvatar.setImageDrawable(generateAvatar(member.getUserId()));
             mName.setText(member.getDisplayName());
             if(member.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
-                itemView.setBackgroundColor(Color.parseColor("#55FFEE63")); //light yellow
+                itemView.setBackgroundColor(Color.parseColor("#22FFEE63")); //light yellow
             }else{
                 itemView.setBackgroundColor(Color.TRANSPARENT);
             }

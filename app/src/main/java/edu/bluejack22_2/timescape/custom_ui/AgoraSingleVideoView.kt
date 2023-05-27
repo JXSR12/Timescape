@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.view.Gravity
+import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.widget.FrameLayout
@@ -21,13 +22,16 @@ import io.agora.rtc2.video.VideoCanvas
 class AgoraSingleVideoView(context: Context, uid: Int, micColor: Int, private val userId: String, private val displayName: String) : FrameLayout(context) {
     // New TextView for displaying the displayName
     lateinit var displayNameView: TextView
+    private var retryCount = 0
+    private val maxRetries = 10
+    private val retryDelay = 1000L // 1 sec
 
     // Get projectId from context's intent
     val projectId = (context as Activity).intent.getStringExtra("projectId") ?: ""
     /**
      * Canvas used to render the Agora RTC Video.
      */
-    var canvas: VideoCanvas
+    lateinit var canvas: VideoCanvas
         internal set
     internal var uid: Int = uid
 //    internal var textureView: AgoraTextureView = AgoraTextureView(context)
@@ -73,11 +77,7 @@ class AgoraSingleVideoView(context: Context, uid: Int, micColor: Int, private va
      * @param micColor: Color to be applied when the local or remote user mutes their microphone
      */
     init {
-
-        val surfaceView = SurfaceView(getContext())
-        this.canvas = VideoCanvas(surfaceView)
-        this.canvas.uid = uid
-        addView(surfaceView, ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT))
+        setupSurfaceView()
         this.backgroundView = FrameLayout(context)
         this.setBackground()
         this.mutedFlag = ImageView(context)
@@ -102,6 +102,41 @@ class AgoraSingleVideoView(context: Context, uid: Int, micColor: Int, private va
         this.layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
     }
 
+    private fun isActivityRunning(): Boolean {
+        return if (context is Activity) {
+            !(context as Activity).isFinishing
+        } else {
+            false
+        }
+    }
+
+    private fun setupSurfaceView() {
+        val surfaceView = SurfaceView(context)
+        this.canvas = VideoCanvas(surfaceView)
+        this.canvas.uid = uid
+
+        addView(surfaceView, ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT))
+
+        surfaceView.holder.addCallback(object : SurfaceHolder.Callback {
+            override fun surfaceCreated(holder: SurfaceHolder) {
+                retryCount = 0
+            }
+
+            override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+                if (holder.surface.isValid) {
+                    retryCount = 0
+                } else if (retryCount < maxRetries) {
+                    retryCount++
+                    postDelayed({ setupSurfaceView() }, retryDelay)
+                }
+            }
+
+            override fun surfaceDestroyed(holder: SurfaceHolder) {
+                // Surface is destroyed, nothing to do here for now
+            }
+        })
+    }
+
     private fun setupMutedFlag() {
 
         val mutedLayout = FrameLayout.LayoutParams(DPToPx(context, 25), DPToPx(context, 25))
@@ -111,7 +146,7 @@ class AgoraSingleVideoView(context: Context, uid: Int, micColor: Int, private va
         mutedLayout.bottomMargin = DPToPx(context, 5)
         mutedLayout.leftMargin = DPToPx(context, 5)
 
-        mutedFlag.setImageResource(android.R.drawable.stat_notify_call_mute)
+        mutedFlag.setImageResource(R.drawable.round_mic_off_24)
 
         mutedFlag.setColorFilter(this.micFlagColor)
         addView(mutedFlag, mutedLayout)

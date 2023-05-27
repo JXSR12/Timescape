@@ -248,7 +248,7 @@ open class AgoraVideoViewer : FrameLayout {
             }
         }
 
-    internal fun addLocalVideo(): AgoraSingleVideoView? {
+    public fun addLocalVideo(): AgoraSingleVideoView? {
         if (this.userID == 0 || this.userVideoLookup.containsKey(this.userID)) {
             return this.userVideoLookup[this.userID]
         }

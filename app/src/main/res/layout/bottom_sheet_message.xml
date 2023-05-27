@@ -2,13 +2,21 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/bottomSheetGrapple"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="18dp"
+        android:src="@drawable/ic_bottom_sheet_grapple" />
 
     <TextView
         android:id="@+id/message_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
+        android:padding="4dp"
         android:textStyle="bold" />
 
     <TextView
@@ -16,6 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="14sp"
+        android:padding="4dp"
         android:layout_marginTop="4dp" />
 
     <TextView
@@ -23,6 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
+        android:padding="6dp"
         android:layout_marginTop="8dp" />
 
 </LinearLayout>
