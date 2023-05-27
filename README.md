@@ -19,6 +19,26 @@ Timescape is a project management and messaging application designed to streamli
 
 ## Changelog
 
+### 0.6.2: Project Live Rooms - Video Call and Screen Sharing
+- Released the new project live room feature, instantly join the project live room via the button on the top right corner in a project's chat room.
+- User can turn off/on video, turn off/on microphone, and switch their camera.
+- User can choose one other user to pin their video.
+- User can share their screen to other members in the room.
+- Video and voice chatting is implemented using Agora Android SDK.
+- Revamped a lot of UI in different sections of the app.
+- Changed a few icons to be more representing.
+- Users can no longer change their display name to empty string.
+- The live room UI is a bit different from the VC Testing experimental version, we decided to just adapt from the Agora Video UI Kit by directly modifying the Kotlin classes and use those instead of the original.
+
+- Plans for 0.6.X going forward:
+  * Tasks will be more interactive, each task will have their own progress, and can be assigned/unassigned to specific members.
+  * Members will be able to filter tasks to only show those assigned to them.
+  * Project Space will be making its debut, it is sort of a hub for projects, where members can share post and files so it can be easily discovered. This will be separated from the files/media shared in the Project Chat.
+  * We have been focusing a lot on the 'Real Time Messenger' side of the app, and have just began touching the 'Video Conferencing' side. Now, we will be shifting our focus a bit to develop more features for the 'Project Management' side of the app for 0.6.X.
+
+- NOTE: From this version onwards, the APK files will be split into different ABIs. The in app auto updater should automatically choose the right version based on the device preferred ABI.
+- NOTE: The universal APK is still available in case the preferred ABI is not found, but it is at 240 MB in size. (The ABI specific APKs are around 60-70 MB in size)
+
 ### 0.5.8: HOTFIX App crash on sending message
 - Supposedly fixed where sometimes on poor connection sending message would cause the app to crash.
 - We are working to investigate this problem further. However, in this patch we have not yet experienced the same issue this far.
