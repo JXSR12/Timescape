@@ -318,6 +318,8 @@
     <string name="password_changed_successfully">Kata sandi berhasil diubah</string>
     <string name="the_old_password_you_provided_is_incorrect">Kata sandi lama yang Anda berikan salah</string>
     <string name="display_name_cannot_be_empty">Nama tampilan tidak boleh kosong</string>
+    <string name="timescape_has_a_new_version_released_be_sure_to_check_in_google_play_store_for_any_updates">Timescape memiliki versi terbaru yang dirilis, pastikan untuk memeriksa pembaruan di Google Play Store</string>
+    <string name="check_in_play_store">Periksa di Play Store</string>
     <string-array name="project_completed_filter_options">
         <item>Semua Status Selesai</item>
         <item>Hanya yang Selesai</item>

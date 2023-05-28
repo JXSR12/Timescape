@@ -318,7 +318,8 @@
     <string name="password_changed_successfully">密码已成功更改</string>
     <string name="the_old_password_you_provided_is_incorrect">您提供的旧密码不正确</string>
     <string name="display_name_cannot_be_empty">显示名称不能为空</string>
-
+    <string name="timescape_has_a_new_version_released_be_sure_to_check_in_google_play_store_for_any_updates">Timescape已发布新版本，请务必在Google Play商店中检查是否有更新</string>
+    <string name="check_in_play_store">在Play商店中检查</string>
     <string-array name="project_completed_filter_options">
         <item>所有完成状态</item>
         <item>仅已完成</item>

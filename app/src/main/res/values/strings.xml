@@ -318,6 +318,8 @@
     <string name="password_changed_successfully">Password changed successfully</string>
     <string name="the_old_password_you_provided_is_incorrect">The old password you provided is incorrect</string>
     <string name="display_name_cannot_be_empty">Display name cannot be empty</string>
+    <string name="timescape_has_a_new_version_released_be_sure_to_check_in_google_play_store_for_any_updates">Timescape has a new version released, be sure to check in Google Play Store for any updates</string>
+    <string name="check_in_play_store">Check in Play Store</string>
     <string-array name="project_completed_filter_options">
         <item>All Completion Status</item>
         <item>Completed Only</item>

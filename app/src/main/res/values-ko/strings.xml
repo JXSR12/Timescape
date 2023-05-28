@@ -318,6 +318,8 @@
     <string name="password_changed_successfully">비밀번호가 성공적으로 변경되었습니다</string>
     <string name="the_old_password_you_provided_is_incorrect">제공한 이전 비밀번호가 잘못되었습니다</string>
     <string name="display_name_cannot_be_empty">이름을 입력해야 합니다</string>
+    <string name="timescape_has_a_new_version_released_be_sure_to_check_in_google_play_store_for_any_updates">Timescape에 새 버전이 출시되었습니다. Google Play Store에서 업데이트를 확인하세요.</string>
+    <string name="check_in_play_store">Play 스토어에서 확인</string>
     <string-array name="project_completed_filter_options">
         <item>모든 완료 상태</item>
         <item>완료된 항목만</item>

@@ -6,6 +6,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -125,6 +126,7 @@ import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 
 public class MainActivity extends BaseActivity {
     public static final int INSTALL_PERMISSION_REQUEST_CODE = 123;
+    private static final boolean IS_GOOGLE_PLAY_RELEASE_MODE = true;
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
     private DashboardViewModel dashboardViewModel;
@@ -248,7 +250,11 @@ public class MainActivity extends BaseActivity {
 
         this.latestApkVersion = latestApkVersion;
         if (latestApkVersion.getVersionCode() > currentVersionCode) {
-            showUpdateDialog(latestApkVersion);
+            if(IS_GOOGLE_PLAY_RELEASE_MODE){
+                showGooglePlayUpdateDialog();
+            }else{
+                showUpdateDialog(latestApkVersion);
+            }
         }else{
             if(showToast){
                 Toast.makeText(this, R.string.you_are_running_the_latest_available_version_of_timescape, Toast.LENGTH_SHORT).show();
@@ -285,8 +291,29 @@ public class MainActivity extends BaseActivity {
         builder.show();
     }
 
+    private void showGooglePlayUpdateDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.timescape_updater);
+        builder.setMessage(R.string.timescape_has_a_new_version_released_be_sure_to_check_in_google_play_store_for_any_updates);
+        builder.setPositiveButton(R.string.check_in_play_store, (dialog, which) -> {
+            try {
+                Intent goToMarket = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("market://details?id=" + getPackageName()));
+                startActivity(goToMarket);
+            } catch (ActivityNotFoundException e) {
+                Intent goToMarket = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
+                startActivity(goToMarket);
+            }
+        });
+        builder.setNegativeButton(R.string.later, (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
 
     private void downloadAndInstallApk(String fileUrl) {
+        if(IS_GOOGLE_PLAY_RELEASE_MODE) return;
+
         DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
         Uri uri = Uri.parse(fileUrl);
@@ -333,6 +360,7 @@ public class MainActivity extends BaseActivity {
 
 
     private void installApk(File apkFile) {
+        if(IS_GOOGLE_PLAY_RELEASE_MODE) return;
         {
             Uri apkUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", apkFile);
             Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);

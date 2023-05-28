@@ -11,7 +11,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+<!--    Uncomment the below line if it is NOT for GOOGLE PLAY RELEASE MODE-->
+<!--    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />-->
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
