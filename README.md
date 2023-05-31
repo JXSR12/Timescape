@@ -1,5 +1,5 @@
-#Timescape
-##Project Management and Messenger Application
+# Timescape
+## Project Management and Messenger Application
 ----------------------------------------------
 Timescape is a project management and messaging application designed to streamline team collaboration and project tracking.
 
