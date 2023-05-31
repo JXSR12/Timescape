@@ -10,7 +10,7 @@
 .DS_Store
 /build
 /captures
-/release
+/app/release
 google-services.json
 .externalNativeBuild
 .cxx
