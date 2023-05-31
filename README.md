@@ -1,8 +1,5 @@
-# MOBILE-ER-JN-222
-Mobile Technology Test Progressive Assistant (TPA) Repository For 22-2
-
-## Timescape
-Project Management and Messenger Application
+# Timescape
+## Project Management and Messenger Application
 ----------------------------------------------
 Timescape is a project management and messaging application designed to streamline team collaboration and project tracking.
 
