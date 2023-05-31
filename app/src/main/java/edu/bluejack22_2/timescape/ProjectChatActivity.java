@@ -549,7 +549,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
 
     private void launchLiveRoom(){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String projectId = project.getUid(); // Assuming 'project' is your Project object
+        String projectId = project.getUid();
         DocumentReference liveRoomRef = db.collection("liveRooms").document(projectId);
 
         liveRoomRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -605,7 +605,7 @@ public class ProjectChatActivity extends BaseActivity implements ChatAdapter.Mes
         public void onCameraAvailable(@NonNull String cameraId) {
             super.onCameraAvailable(cameraId);
             if(!receiveCameraCallback) return;
-//             Camera is available, you can initialize and join channel
+
             if (waitCamDialog != null) {
                 waitCamDialog.dismiss();
             }
