@@ -1099,6 +1099,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                         selfRepliedMessageContent.setText(R.string.sent_an_image);
                     }else if (repliedMessage.getMessage_type() == Message.MessageType.PROJECT_INVITE){
                         selfRepliedMessageContent.setText(R.string.sent_a_project_invite);
+                    }else if (repliedMessage.getMessage_type() == Message.MessageType.UNSENT){
+                        selfRepliedMessageContent.setText(R.string.message_deleted);
                     }else{
                         selfRepliedMessageContent.setText(formatMentions(repliedMessage.getContent(), repliedMessage.getMentions()));
                     }
@@ -1137,7 +1139,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                     }else if (repliedMessage.getMessage_type() == Message.MessageType.IMAGE){
                         otherUserRepliedMessageContent.setText(R.string.sent_an_image);
                     }else if (repliedMessage.getMessage_type() == Message.MessageType.PROJECT_INVITE){
-                        selfRepliedMessageContent.setText(R.string.sent_a_project_invite);
+                        otherUserRepliedMessageContent.setText(R.string.sent_a_project_invite);
+                    }else if (repliedMessage.getMessage_type() == Message.MessageType.UNSENT){
+                        otherUserRepliedMessageContent.setText(R.string.message_deleted);
                     }else{
                         otherUserRepliedMessageContent.setText(formatMentions(repliedMessage.getContent(), repliedMessage.getMentions()));
                     }
