@@ -16,6 +16,10 @@ Timescape is a project management and messaging application designed to streamli
 
 ## Changelog
 
+### 0.6.3: Message Reply Bugfixes
+- Fixed app crashing when replying to unsent message with more than 1 mentions.
+- Fixed replied message not showing in the reply message when replying to a project invite message.
+
 ### 0.6.2: Project Live Rooms - Video Call and Screen Sharing
 - Released the new project live room feature, instantly join the project live room via the button on the top right corner in a project's chat room.
 - User can turn off/on video, turn off/on microphone, and switch their camera.
