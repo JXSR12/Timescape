@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'edu.bluejack22_2.timescape'
+    namespace 'edu.bluejack22_2.timescape2'
     compileSdk 33
 
     configurations.all {
@@ -16,7 +16,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "edu.bluejack22_2.timescape"
+        applicationId "edu.bluejack22_2.timescape2"
         minSdk 26
         targetSdk 33
         versionCode 34

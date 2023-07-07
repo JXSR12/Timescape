@@ -161,7 +161,7 @@
                 android:clipChildren="true"
                 android:visibility="gone" >
 
-                <edu.bluejack22_2.timescape.ui.RoundedImageView
+                <edu.bluejack22_2.timescape2.ui.RoundedImageView
                     android:id="@+id/other_user_image_message"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -186,7 +186,7 @@
                 android:clipChildren="true"
                 android:visibility="gone" >
 
-                <edu.bluejack22_2.timescape.ui.RoundedImageView
+                <edu.bluejack22_2.timescape2.ui.RoundedImageView
                     android:id="@+id/self_image_message"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

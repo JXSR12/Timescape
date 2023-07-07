@@ -44,7 +44,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="edu.bluejack22_2.timescape.provider"
+            android:authorities="edu.bluejack22_2.timescape2.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
